@@ -20,6 +20,15 @@ class ReservasVisitasReportsAdmin
 
         add_action('wp_ajax_cancel_visita', array($this, 'cancel_visita'));
         add_action('wp_ajax_nopriv_cancel_visita', array($this, 'cancel_visita'));
+
+        add_action('wp_ajax_generate_visita_pdf_download', array($this, 'generate_visita_pdf_download'));
+        add_action('wp_ajax_nopriv_generate_visita_pdf_download', array($this, 'generate_visita_pdf_download'));
+
+        add_action('wp_ajax_update_visita_data', array($this, 'update_visita_data'));
+        add_action('wp_ajax_nopriv_update_visita_data', array($this, 'update_visita_data'));
+
+        add_action('wp_ajax_resend_visita_confirmation', array($this, 'resend_visita_confirmation'));
+        add_action('wp_ajax_nopriv_resend_visita_confirmation', array($this, 'resend_visita_confirmation'));
     }
 
     /**
@@ -174,7 +183,6 @@ class ReservasVisitasReportsAdmin
 
             error_log('✅ Visitas reports data loaded successfully');
             wp_send_json_success($response_data);
-
         } catch (Exception $e) {
             error_log('❌ VISITAS REPORTS EXCEPTION: ' . $e->getMessage());
             wp_send_json_error('Server error: ' . $e->getMessage());
@@ -332,4 +340,318 @@ class ReservasVisitasReportsAdmin
             wp_send_json_error('Error cancelando la visita: ' . $wpdb->last_error);
         }
     }
+
+
+    /**
+     * Generar PDF de visita para descarga
+     */
+    public function generate_visita_pdf_download()
+    {
+        if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+            wp_send_json_error('Error de seguridad');
+            return;
+        }
+
+        if (!session_id()) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['reservas_user'])) {
+            wp_send_json_error('Sesión expirada');
+            return;
+        }
+
+        $user = $_SESSION['reservas_user'];
+        if (!in_array($user['role'], ['super_admin', 'admin'])) {
+            wp_send_json_error('Sin permisos');
+            return;
+        }
+
+        $visita_id = intval($_POST['visita_id']);
+        $localizador = sanitize_text_field($_POST['localizador']);
+
+        try {
+            global $wpdb;
+            $table_visitas = $wpdb->prefix . 'reservas_visitas';
+            $table_services = $wpdb->prefix . 'reservas_agency_services';
+
+            $visita = $wpdb->get_row($wpdb->prepare(
+                "SELECT v.*, s.logo_url, s.precio_adulto, s.precio_nino, s.precio_nino_menor, 
+                    a.agency_name, a.cif, a.razon_social, a.domicilio_fiscal, a.email as agency_email, a.phone
+             FROM $table_visitas v
+             INNER JOIN $table_services s ON v.service_id = s.id
+             INNER JOIN {$wpdb->prefix}reservas_agencies a ON v.agency_id = a.id
+             WHERE v.id = %d",
+                $visita_id
+            ));
+
+            if (!$visita) {
+                wp_send_json_error('Visita no encontrada');
+                return;
+            }
+
+            // Preparar datos para el PDF
+            $reserva_data = array(
+                'localizador' => $visita->localizador,
+                'fecha' => $visita->fecha,
+                'hora' => $visita->hora,
+                'hora_vuelta' => '',
+                'nombre' => $visita->nombre,
+                'apellidos' => $visita->apellidos,
+                'email' => $visita->email,
+                'telefono' => $visita->telefono,
+                'adultos' => $visita->adultos,
+                'residentes' => 0,
+                'ninos_5_12' => $visita->ninos,
+                'ninos_menores' => $visita->ninos_menores,
+                'total_personas' => $visita->total_personas,
+                'precio_base' => $visita->precio_total,
+                'descuento_total' => 0,
+                'precio_final' => $visita->precio_total,
+                'precio_adulto' => $visita->precio_adulto,
+                'precio_nino' => $visita->precio_nino,
+                'created_at' => $visita->created_at,
+                'metodo_pago' => $visita->metodo_pago,
+                'is_visita' => true,
+                'agency_logo_url' => $visita->logo_url,
+                'agency_name' => $visita->agency_name,
+                'agency_cif' => $visita->cif ?? '',
+                'agency_razon_social' => $visita->razon_social ?? '',
+                'agency_domicilio_fiscal' => $visita->domicilio_fiscal ?? '',
+                'agency_email' => $visita->agency_email ?? '',
+                'agency_phone' => $visita->phone ?? ''
+            );
+
+            // Generar PDF
+            if (!class_exists('ReservasPDFGenerator')) {
+                require_once RESERVAS_PLUGIN_PATH . 'includes/class-pdf-generator.php';
+            }
+
+            $pdf_generator = new ReservasPDFGenerator();
+            $pdf_path = $pdf_generator->generate_ticket_pdf($reserva_data);
+
+            if (!$pdf_path || !file_exists($pdf_path)) {
+                wp_send_json_error('Error generando el PDF');
+                return;
+            }
+
+            // Crear URL público
+            $upload_dir = wp_upload_dir();
+            $relative_path = str_replace($upload_dir['basedir'], '', $pdf_path);
+            $pdf_url = $upload_dir['baseurl'] . $relative_path;
+
+            // Programar eliminación
+            wp_schedule_single_event(time() + 3600, 'delete_temp_pdf', array($pdf_path));
+
+            wp_send_json_success(array(
+                'pdf_url' => $pdf_url,
+                'filename' => 'visita_' . $localizador . '.pdf',
+                'file_exists' => file_exists($pdf_path),
+                'file_size' => filesize($pdf_path)
+            ));
+        } catch (Exception $e) {
+            error_log('Error generando PDF de visita: ' . $e->getMessage());
+            wp_send_json_error('Error interno: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Actualizar datos de visita
+     */
+    public function update_visita_data()
+    {
+        if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+            wp_send_json_error('Error de seguridad');
+            return;
+        }
+
+        if (!session_id()) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['reservas_user'])) {
+            wp_send_json_error('Sesión expirada');
+            return;
+        }
+
+        $user = $_SESSION['reservas_user'];
+        if (!in_array($user['role'], ['super_admin', 'admin'])) {
+            wp_send_json_error('Sin permisos');
+            return;
+        }
+
+        global $wpdb;
+        $table_visitas = $wpdb->prefix . 'reservas_visitas';
+
+        $visita_id = intval($_POST['visita_id']);
+        $nombre = sanitize_text_field($_POST['nombre']);
+        $apellidos = sanitize_text_field($_POST['apellidos']);
+        $email = sanitize_email($_POST['email']);
+        $telefono = sanitize_text_field($_POST['telefono']);
+        $adultos = intval($_POST['adultos']);
+        $ninos = intval($_POST['ninos']);
+        $ninos_menores = intval($_POST['ninos_menores']);
+        $motivo = sanitize_textarea_field($_POST['motivo']);
+
+        // Validaciones
+        if (empty($nombre) || strlen($nombre) < 2) {
+            wp_send_json_error('El nombre debe tener al menos 2 caracteres');
+            return;
+        }
+
+        if (empty($apellidos) || strlen($apellidos) < 2) {
+            wp_send_json_error('Los apellidos deben tener al menos 2 caracteres');
+            return;
+        }
+
+        if (!is_email($email)) {
+            wp_send_json_error('Email no válido');
+            return;
+        }
+
+        if (empty($telefono) || strlen($telefono) < 9) {
+            wp_send_json_error('Teléfono debe tener al menos 9 dígitos');
+            return;
+        }
+
+        if ($adultos < 1) {
+            wp_send_json_error('Debe haber al menos 1 adulto');
+            return;
+        }
+
+        if (empty($motivo) || strlen($motivo) < 5) {
+            wp_send_json_error('El motivo debe tener al menos 5 caracteres');
+            return;
+        }
+
+        // Obtener datos actuales
+        $visita_actual = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_visitas WHERE id = %d",
+            $visita_id
+        ));
+
+        if (!$visita_actual) {
+            wp_send_json_error('Visita no encontrada');
+            return;
+        }
+
+        // Calcular nuevo total de personas
+        $total_personas = $adultos + $ninos + $ninos_menores;
+
+        // Actualizar datos
+        $result = $wpdb->update(
+            $table_visitas,
+            array(
+                'nombre' => $nombre,
+                'apellidos' => $apellidos,
+                'email' => $email,
+                'telefono' => $telefono,
+                'adultos' => $adultos,
+                'ninos' => $ninos,
+                'ninos_menores' => $ninos_menores,
+                'total_personas' => $total_personas,
+                'updated_at' => current_time('mysql')
+            ),
+            array('id' => $visita_id)
+        );
+
+        if ($result === false) {
+            wp_send_json_error('Error actualizando la visita: ' . $wpdb->last_error);
+            return;
+        }
+
+        // Registrar cambio en log
+        $admin_user = $user['username'] ?? 'admin';
+        error_log("VISITA EDITADA - ID: {$visita_id} - Admin: {$admin_user} - Motivo: {$motivo}");
+
+        // Enviar email de confirmación con nuevos datos
+        $visita_actualizada = $wpdb->get_row($wpdb->prepare(
+            "SELECT v.*, s.precio_adulto, s.precio_nino, s.precio_nino_menor, s.logo_url,
+                a.agency_name, a.cif, a.razon_social, a.domicilio_fiscal, a.email as agency_email, a.phone
+         FROM $table_visitas v
+         INNER JOIN {$wpdb->prefix}reservas_agency_services s ON v.service_id = s.id
+         INNER JOIN {$wpdb->prefix}reservas_agencies a ON v.agency_id = a.id
+         WHERE v.id = %d",
+            $visita_id
+        ));
+
+        if ($visita_actualizada && $visita_actualizada->email) {
+            if (!class_exists('ReservasEmailService')) {
+                require_once RESERVAS_PLUGIN_PATH . 'includes/class-email-service.php';
+            }
+
+            $email_data = array(
+                'localizador' => $visita_actualizada->localizador,
+                'fecha' => $visita_actualizada->fecha,
+                'hora' => $visita_actualizada->hora,
+                'hora_vuelta' => '',
+                'nombre' => $visita_actualizada->nombre,
+                'apellidos' => $visita_actualizada->apellidos,
+                'email' => $visita_actualizada->email,
+                'telefono' => $visita_actualizada->telefono,
+                'adultos' => $visita_actualizada->adultos,
+                'residentes' => 0,
+                'ninos_5_12' => $visita_actualizada->ninos,
+                'ninos_menores' => $visita_actualizada->ninos_menores,
+                'total_personas' => $visita_actualizada->total_personas,
+                'precio_base' => $visita_actualizada->precio_total,
+                'descuento_total' => 0,
+                'precio_final' => $visita_actualizada->precio_total,
+                'precio_adulto' => $visita_actualizada->precio_adulto,
+                'precio_nino' => $visita_actualizada->precio_nino,
+                'created_at' => $visita_actualizada->created_at,
+                'metodo_pago' => $visita_actualizada->metodo_pago,
+                'is_visita' => true,
+                'agency_logo_url' => $visita_actualizada->logo_url,
+                'agency_name' => $visita_actualizada->agency_name
+            );
+
+            ReservasEmailService::send_customer_confirmation($email_data);
+        }
+
+        wp_send_json_success('Datos actualizados correctamente y email enviado al cliente');
+    }
+
+    /**
+ * Reenviar email de confirmación de visita
+ */
+public function resend_visita_confirmation()
+{
+    if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+        wp_send_json_error('Error de seguridad');
+        return;
+    }
+
+    if (!session_id()) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['reservas_user'])) {
+        wp_send_json_error('Sesión expirada');
+        return;
+    }
+
+    $user = $_SESSION['reservas_user'];
+    if (!in_array($user['role'], ['super_admin', 'admin'])) {
+        wp_send_json_error('Sin permisos');
+        return;
+    }
+
+    $visita_id = intval($_POST['visita_id']);
+
+    global $wpdb;
+    $table_visitas = $wpdb->prefix . 'reservas_visitas';
+
+    $visita = $wpdb->get_row($wpdb->prepare(
+        "SELECT v.*, s.precio_adulto, s.precio_nino, s.precio_nino_menor, s.logo_url,
+                a.agency_name, a.cif, a.razon_social, a.domicilio_fiscal, a.email as agency_email, a.phone
+         FROM $table_visitas v
+         INNER JOIN {$wpdb->prefix}reservas_agency_services s ON v.service_id = s.id
+         INNER JOIN {$wpdb->prefix}reservas_agencies a ON v.agency_id = a.id
+         WHERE v.id = %d",
+        $visita_id
+    ));
+
+    if (!$visita) {
+        wp_sen
 }

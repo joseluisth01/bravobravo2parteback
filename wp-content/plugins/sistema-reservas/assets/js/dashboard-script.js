@@ -3229,6 +3229,7 @@ function initReportsEvents() {
     });
 }
 
+
 // ✅ NUEVA FUNCIÓN para cargar horarios disponibles en el filtro
 function loadAvailableSchedulesForFilter() {
     const fechaInicio = document.getElementById('fecha-inicio').value;
@@ -7006,41 +7007,41 @@ function saveAgencyServiceAfterCreate(agencyId) {
     serviceFormData.append('agency_id', agencyId);
     serviceFormData.append('nonce', reservasAjax.nonce);
     serviceFormData.append('servicio_activo', '1');
-    
+
     // ✅ NUEVO: Recopilar horarios
     const horarios = collectHorariosData();
-    
+
     Object.keys(horarios).forEach(day => {
         horarios[day].forEach((hora, index) => {
             serviceFormData.append(`horarios[${day}][]`, hora);
         });
     });
-    
+
     serviceFormData.append('precio_adulto', jQuery('#precio_adulto_servicio').val());
-serviceFormData.append('precio_nino', jQuery('#precio_nino_servicio').val());
-serviceFormData.append('precio_nino_menor', jQuery('#precio_nino_menor_servicio').val());
-serviceFormData.append('descripcion', jQuery('#descripcion_servicio').val());
+    serviceFormData.append('precio_nino', jQuery('#precio_nino_servicio').val());
+    serviceFormData.append('precio_nino_menor', jQuery('#precio_nino_menor_servicio').val());
+    serviceFormData.append('descripcion', jQuery('#descripcion_servicio').val());
     serviceFormData.append('titulo', jQuery('#titulo_servicio').val());
-serviceFormData.append('orden_prioridad', jQuery('#orden_prioridad').val());
-    
+    serviceFormData.append('orden_prioridad', jQuery('#orden_prioridad').val());
+
     // Añadir archivos
     const logoFile = jQuery('#logo_image')[0].files[0];
     if (logoFile) {
         serviceFormData.append('logo_image', logoFile);
     }
-    
+
     const portadaFile = jQuery('#portada_image')[0].files[0];
     if (portadaFile) {
         serviceFormData.append('portada_image', portadaFile);
     }
-    
+
     jQuery.ajax({
         url: reservasAjax.ajax_url,
         type: 'POST',
         data: serviceFormData,
         processData: false,
         contentType: false,
-        success: function(response) {
+        success: function (response) {
             if (response.success) {
                 alert('Agencia y servicio creados correctamente');
             } else {
@@ -7049,7 +7050,7 @@ serviceFormData.append('orden_prioridad', jQuery('#orden_prioridad').val());
             closeCreateAgencyModal();
             loadAgenciesSection();
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error guardando servicio:', error);
             alert('Agencia creada correctamente');
             closeCreateAgencyModal();
@@ -7113,49 +7114,49 @@ jQuery(document).off('submit', '#editAgencyForm').on('submit', '#editAgencyForm'
 function saveAgencyServiceOnEdit(agencyId) {
     console.log('=== GUARDANDO SERVICIO EN EDICIÓN ===');
     console.log('Agency ID:', agencyId);
-    
+
     const servicioActivo = jQuery('#edit_servicio_activo').is(':checked');
-    
+
     // ✅ CREAR FormData CORRECTAMENTE
     const serviceFormData = new FormData();
     serviceFormData.append('action', 'save_agency_service');
     serviceFormData.append('agency_id', agencyId);
     serviceFormData.append('nonce', reservasAjax.nonce);
     serviceFormData.append('servicio_activo', servicioActivo ? '1' : '0');
-    
+
     if (servicioActivo) {
         // Recopilar horarios usando la función auxiliar
         const horarios = collectHorariosData();
-        
+
         if (Object.keys(horarios).length === 0) {
             alert('Error: Debes seleccionar al menos un día con horarios');
             return;
         }
-        
+
         Object.keys(horarios).forEach(day => {
             horarios[day].forEach((hora, index) => {
                 serviceFormData.append(`horarios[${day}][]`, hora);
             });
         });
-        
+
         // Validar y añadir precios
         const precioAdulto = parseFloat(jQuery('#edit_precio_adulto_servicio').val());
         if (!precioAdulto || precioAdulto <= 0) {
             alert('Error: El precio de adulto debe ser mayor a 0');
             return;
         }
-        
+
         serviceFormData.append('precio_adulto', precioAdulto);
-serviceFormData.append('precio_nino', jQuery('#edit_precio_nino_servicio').val());
-serviceFormData.append('precio_nino_menor', jQuery('#edit_precio_nino_menor_servicio').val()); // ✅ NUEVO
-serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val());
+        serviceFormData.append('precio_nino', jQuery('#edit_precio_nino_servicio').val());
+        serviceFormData.append('precio_nino_menor', jQuery('#edit_precio_nino_menor_servicio').val()); // ✅ NUEVO
+        serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val());
         serviceFormData.append('titulo', jQuery('#edit_titulo_servicio').val());
         serviceFormData.append('orden_prioridad', jQuery('#edit_orden_prioridad').val());
-        
+
         // ✅ CRÍTICO: Verificar y añadir archivos CORRECTAMENTE
         const logoInput = document.getElementById('edit_logo_image');
         const portadaInput = document.getElementById('edit_portada_image');
-        
+
         if (logoInput && logoInput.files && logoInput.files.length > 0) {
             const logoFile = logoInput.files[0];
             console.log('✅ Logo nuevo detectado:', logoFile.name, logoFile.size, 'bytes');
@@ -7163,7 +7164,7 @@ serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val()
         } else {
             console.log('ℹ️ No hay logo nuevo');
         }
-        
+
         if (portadaInput && portadaInput.files && portadaInput.files.length > 0) {
             const portadaFile = portadaInput.files[0];
             console.log('✅ Portada nueva detectada:', portadaFile.name, portadaFile.size, 'bytes');
@@ -7172,7 +7173,7 @@ serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val()
             console.log('ℹ️ No hay portada nueva');
         }
     }
-    
+
     // Debug: Ver qué se va a enviar
     console.log('📋 Datos del servicio a enviar:');
     for (let pair of serviceFormData.entries()) {
@@ -7182,7 +7183,7 @@ serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val()
             console.log(pair[0] + ':', pair[1]);
         }
     }
-    
+
     // ✅ ENVIAR CON AJAX CONFIGURADO PARA ARCHIVOS
     jQuery.ajax({
         url: reservasAjax.ajax_url,
@@ -7190,9 +7191,9 @@ serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val()
         data: serviceFormData,
         processData: false,  // ✅ CRÍTICO
         contentType: false,  // ✅ CRÍTICO
-        success: function(response) {
+        success: function (response) {
             console.log('✅ Respuesta del servidor:', response);
-            
+
             if (response.success) {
                 alert('✅ Agencia y servicio actualizados correctamente');
             } else {
@@ -7201,7 +7202,7 @@ serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val()
             closeEditAgencyModal();
             loadAgenciesSection();
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('❌ Error guardando servicio:', error);
             console.error('Status:', status);
             console.error('Response:', xhr.responseText);
@@ -7218,16 +7219,16 @@ serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val()
  */
 function collectHorariosData() {
     const horarios = {};
-    
+
     // Buscar checkboxes marcados (tanto en crear como en editar)
     const checkboxes = document.querySelectorAll('.day-checkbox input:checked, .edit-day-checkbox:checked');
-    
+
     checkboxes.forEach(checkbox => {
         const day = checkbox.value;
         const isEdit = checkbox.classList.contains('edit-day-checkbox');
         const prefix = isEdit ? 'edit-' : '';
         const hoursInputs = document.querySelectorAll(`#${prefix}hours-${day} input[type="time"]`);
-        
+
         horarios[day] = [];
         hoursInputs.forEach(input => {
             if (input.value) {
@@ -7235,7 +7236,7 @@ function collectHorariosData() {
             }
         });
     });
-    
+
     return horarios;
 }
 
@@ -13829,6 +13830,845 @@ function get_agencies_for_reservation() {
         })
     });
 }
+
+
+/**
+ * ✅ CARGAR SECCIÓN DE INFORMES DE VISITAS GUIADAS
+ */
+function loadVisitasReportsSection() {
+    console.log('=== CARGANDO SECCIÓN DE INFORMES DE VISITAS GUIADAS ===');
+
+    document.body.innerHTML = `
+        <div class="reports-management">
+            <div class="reports-header">
+                <h1>📊 Informes de Visitas Guiadas</h1>
+                <div class="reports-actions">
+                    <button class="btn-secondary" onclick="goBackToDashboard()">← Volver al Dashboard</button>
+                </div>
+            </div>
+            
+            <!-- Filtros -->
+            <div class="advanced-filters">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="visitas-fecha-inicio">Fecha Inicio:</label>
+                        <input type="date" id="visitas-fecha-inicio" value="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="visitas-fecha-fin">Fecha Fin:</label>
+                        <input type="date" id="visitas-fecha-fin" value="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    <div class="filter-group">
+                        <label for="visitas-tipo-fecha">Tipo de Fecha:</label>
+                        <select id="visitas-tipo-fecha">
+                            <option value="servicio">Fecha de Servicio</option>
+                            <option value="compra">Fecha de Compra</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="visitas-estado-filtro">Estado:</label>
+                        <select id="visitas-estado-filtro">
+                            <option value="confirmadas">Confirmadas</option>
+                            <option value="canceladas">Canceladas</option>
+                            <option value="todas">Todas</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="visitas-agency-filter">Agencia:</label>
+                        <select id="visitas-agency-filter">
+                            <option value="todas">🔄 Cargando agencias...</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn-primary" onclick="loadVisitasReportData()">🔍 Aplicar Filtros</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Búsqueda rápida -->
+            <div class="search-section" style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <h3>🔎 Búsqueda Rápida</h3>
+                <div class="search-row" style="display: flex; gap: 10px; align-items: center;">
+                    <select id="visitas-search-type" style="padding: 8px; border-radius: 4px; border: 1px solid #ced4da;">
+                        <option value="localizador">Localizador</option>
+                        <option value="email">Email</option>
+                        <option value="telefono">Teléfono</option>
+                        <option value="nombre">Nombre</option>
+                        <option value="fecha_servicio">Fecha Servicio</option>
+                    </select>
+                    <input type="text" id="visitas-search-value" placeholder="Buscar..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ced4da;">
+                    <button class="btn-primary" onclick="searchVisitasData()">Buscar</button>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div id="visitas-stats-container"></div>
+
+            <!-- Lista de visitas -->
+            <div id="visitas-list-container"></div>
+
+            <!-- Paginación -->
+            <div id="visitas-pagination-container"></div>
+        </div>
+
+        <!-- Modal para detalles de visita -->
+        <div id="visitaDetailsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeVisitaDetailsModal()">&times;</span>
+                <h3>Detalles de Visita</h3>
+                <div id="visita-details-content"></div>
+            </div>
+        </div>
+    `;
+
+    // Cargar agencias y luego datos iniciales
+    loadAgenciesForVisitasFilter().then(() => {
+        loadVisitasReportData();
+    });
+
+    // Configurar eventos
+    initVisitasReportsEvents();
+}
+
+/**
+ * ✅ CARGAR AGENCIAS PARA FILTRO DE VISITAS
+ */
+function loadAgenciesForVisitasFilter() {
+    return new Promise((resolve, reject) => {
+        const agencySelect = document.getElementById('visitas-agency-filter');
+        if (!agencySelect) {
+            reject('Select no encontrado');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('action', 'get_agencies_for_filter');
+        formData.append('nonce', reservasAjax.nonce);
+
+        fetch(reservasAjax.ajax_url, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data && data.data.length > 0) {
+                    agencySelect.innerHTML = '<option value="todas">Todas las agencias</option>';
+
+                    data.data.forEach(agency => {
+                        const option = document.createElement('option');
+                        option.value = agency.id;
+                        option.textContent = agency.agency_name;
+                        agencySelect.appendChild(option);
+                    });
+
+                    resolve();
+                } else {
+                    agencySelect.innerHTML = '<option value="todas">Todas las agencias</option>';
+                    resolve();
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando agencias:', error);
+                agencySelect.innerHTML = '<option value="todas">Todas las agencias</option>';
+                reject(error);
+            });
+    });
+}
+
+/**
+ * ✅ CARGAR DATOS DEL INFORME DE VISITAS
+ */
+function loadVisitasReportData(page = 1) {
+    const fechaInicio = document.getElementById('visitas-fecha-inicio').value;
+    const fechaFin = document.getElementById('visitas-fecha-fin').value;
+    const tipoFecha = document.getElementById('visitas-tipo-fecha').value;
+    const estadoFiltro = document.getElementById('visitas-estado-filtro').value;
+    const agencyFilter = document.getElementById('visitas-agency-filter').value;
+
+    if (!fechaInicio || !fechaFin) {
+        alert('Por favor, selecciona ambas fechas');
+        return;
+    }
+
+    document.getElementById('visitas-list-container').innerHTML = '<div class="loading">Cargando visitas...</div>';
+
+    const formData = new FormData();
+    formData.append('action', 'get_visitas_report');
+    formData.append('fecha_inicio', fechaInicio);
+    formData.append('fecha_fin', fechaFin);
+    formData.append('tipo_fecha', tipoFecha);
+    formData.append('estado_filtro', estadoFiltro);
+    formData.append('agency_filter', agencyFilter);
+    formData.append('page', page);
+    formData.append('nonce', reservasAjax.nonce);
+
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderVisitasReport(data.data);
+            } else {
+                document.getElementById('visitas-list-container').innerHTML =
+                    '<div class="error">Error: ' + data.data + '</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('visitas-list-container').innerHTML =
+                '<div class="error">Error de conexión</div>';
+        });
+}
+
+/**
+ * ✅ RENDERIZAR INFORME DE VISITAS
+ */
+function renderVisitasReport(data) {
+    // Mostrar estadísticas
+    const statsHtml = `
+        <div class="stats-cards">
+            <div class="stat-card">
+                <h4>Total Visitas</h4>
+                <div class="stat-number">${data.stats.total_visitas || 0}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Total Personas</h4>
+                <div class="stat-number">${data.stats.total_personas || 0}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Adultos</h4>
+                <div class="stat-number">${data.stats.total_adultos || 0}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Niños (5-12)</h4>
+                <div class="stat-number">${data.stats.total_ninos || 0}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Niños (-5)</h4>
+                <div class="stat-number">${data.stats.total_ninos_menores || 0}</div>
+            </div>
+            <div class="stat-card">
+                <h4>Ingresos Totales</h4>
+                <div class="stat-number">${parseFloat(data.stats.ingresos_totales || 0).toFixed(2)}€</div>
+            </div>
+        </div>
+    `;
+
+    // Estadísticas por agencia
+    let agencyStatsHtml = '';
+    if (data.stats_por_agencias && data.stats_por_agencias.length > 0) {
+        agencyStatsHtml = '<div class="stats-by-agencies" style="margin-top: 20px;"><h4>📊 Desglose por Agencias</h4>';
+
+        data.stats_por_agencias.forEach(stat => {
+            agencyStatsHtml += `
+                <div class="agency-stat-card">
+                    <h5>${stat.agency_name}</h5>
+                    <div class="stat-number">${stat.total_visitas} visitas</div>
+                    <div class="stat-amount">${parseFloat(stat.ingresos_total || 0).toFixed(2)}€</div>
+                    <div class="stat-extra">${stat.total_personas} personas</div>
+                </div>
+            `;
+        });
+
+        agencyStatsHtml += '</div>';
+    }
+
+    document.getElementById('visitas-stats-container').innerHTML = statsHtml + agencyStatsHtml;
+
+    // Mostrar tabla de visitas
+    let tableHtml = `
+        <h4 style="margin: 20px 0;">Visitas del ${data.filtros.fecha_inicio} al ${data.filtros.fecha_fin}</h4>
+        <table class="reservations-table-data">
+            <thead>
+                <tr>
+                    <th>Localizador</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Cliente</th>
+                    <th>Personas</th>
+                    <th>Total</th>
+                    <th>Agencia</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    if (data.visitas && data.visitas.length > 0) {
+        data.visitas.forEach(visita => {
+            const fechaFormateada = new Date(visita.fecha).toLocaleDateString('es-ES');
+            const estadoClass = visita.estado === 'confirmada' ? 'status-confirmada' : 'status-cancelada';
+
+            tableHtml += `
+                <tr>
+                    <td><strong>${visita.localizador}</strong></td>
+                    <td>${fechaFormateada}</td>
+                    <td>${visita.hora}</td>
+                    <td>${visita.nombre} ${visita.apellidos}</td>
+                    <td>A:${visita.adultos} N:${visita.ninos} B:${visita.ninos_menores}</td>
+                    <td><strong>${parseFloat(visita.precio_total).toFixed(2)}€</strong></td>
+                    <td>${visita.agency_name || 'Sin agencia'}</td>
+                    <td><span class="status-badge ${estadoClass}">${visita.estado.toUpperCase()}</span></td>
+                    <td>
+                        <button class="btn-small btn-info" onclick="showVisitaDetails(${visita.id})" title="Ver detalles">👁️</button>
+                        <button class="btn-small btn-success" onclick="downloadVisitaPDF(${visita.id}, '${visita.localizador}')" title="Descargar PDF">📄</button>
+                        <button class="btn-small btn-warning" onclick="showEditVisitaModal(${visita.id})" title="Editar datos">✏️</button>
+                        <button class="btn-small btn-primary" onclick="resendVisitaConfirmationEmail(${visita.id}, '${visita.localizador}')" title="Reenviar email">📧</button>
+                        ${visita.estado === 'confirmada' ?
+                                        `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
+                                        '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
+                                    }
+                    </td>
+                </tr>
+            `;
+        });
+    } else {
+        tableHtml += '<tr><td colspan="9" style="text-align: center; padding: 40px;">No se encontraron visitas</td></tr>';
+    }
+
+    tableHtml += '</tbody></table>';
+
+    document.getElementById('visitas-list-container').innerHTML = tableHtml;
+
+    // Paginación
+    if (data.pagination && data.pagination.total_pages > 1) {
+        renderVisitasPagination(data.pagination);
+    }
+}
+
+/**
+ * ✅ RENDERIZAR PAGINACIÓN DE VISITAS
+ */
+function renderVisitasPagination(pagination) {
+    let paginationHtml = '<div class="pagination">';
+
+    if (pagination.current_page > 1) {
+        paginationHtml += `<button class="btn-pagination" onclick="loadVisitasReportData(${pagination.current_page - 1})">« Anterior</button>`;
+    }
+
+    for (let i = 1; i <= pagination.total_pages; i++) {
+        const activeClass = i === pagination.current_page ? 'active' : '';
+        paginationHtml += `<button class="btn-pagination ${activeClass}" onclick="loadVisitasReportData(${i})">${i}</button>`;
+    }
+
+    if (pagination.current_page < pagination.total_pages) {
+        paginationHtml += `<button class="btn-pagination" onclick="loadVisitasReportData(${pagination.current_page + 1})">Siguiente »</button>`;
+    }
+
+    paginationHtml += '</div>';
+
+    document.getElementById('visitas-pagination-container').innerHTML = paginationHtml;
+}
+
+/**
+ * ✅ BUSCAR VISITAS
+ */
+function searchVisitasData() {
+    const searchType = document.getElementById('visitas-search-type').value;
+    const searchValue = document.getElementById('visitas-search-value').value;
+
+    if (!searchValue) {
+        alert('Por favor, introduce un valor de búsqueda');
+        return;
+    }
+
+    document.getElementById('visitas-list-container').innerHTML = '<div class="loading">Buscando...</div>';
+
+    const formData = new FormData();
+    formData.append('action', 'search_visitas');
+    formData.append('search_type', searchType);
+    formData.append('search_value', searchValue);
+    formData.append('nonce', reservasAjax.nonce);
+
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderVisitasReport({
+                    visitas: data.data.visitas,
+                    stats: { total_visitas: data.data.total_found },
+                    filtros: { fecha_inicio: 'Búsqueda', fecha_fin: '' }
+                });
+            } else {
+                document.getElementById('visitas-list-container').innerHTML =
+                    '<div class="error">Error: ' + data.data + '</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('visitas-list-container').innerHTML =
+                '<div class="error">Error de conexión</div>';
+        });
+}
+
+/**
+ * ✅ MOSTRAR DETALLES DE VISITA
+ */
+function showVisitaDetails(visitaId) {
+    const formData = new FormData();
+    formData.append('action', 'get_visita_details');
+    formData.append('visita_id', visitaId);
+    formData.append('nonce', reservasAjax.nonce);
+
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const visita = data.data;
+                const detailsHtml = `
+                <div class="details-grid">
+                    <div><strong>Localizador:</strong> ${visita.localizador}</div>
+                    <div><strong>Fecha:</strong> ${visita.fecha}</div>
+                    <div><strong>Hora:</strong> ${visita.hora}</div>
+                    <div><strong>Cliente:</strong> ${visita.nombre} ${visita.apellidos}</div>
+                    <div><strong>Email:</strong> ${visita.email}</div>
+                    <div><strong>Teléfono:</strong> ${visita.telefono}</div>
+                    <div><strong>Adultos:</strong> ${visita.adultos}</div>
+                    <div><strong>Niños (5-12):</strong> ${visita.ninos}</div>
+                    <div><strong>Niños (-5):</strong> ${visita.ninos_menores}</div>
+                    <div><strong>Total:</strong> ${parseFloat(visita.precio_total).toFixed(2)}€</div>
+                    <div><strong>Agencia:</strong> ${visita.agency_name || 'Sin agencia'}</div>
+                    <div><strong>Estado:</strong> ${visita.estado}</div>
+                </div>
+            `;
+
+                document.getElementById('visita-details-content').innerHTML = detailsHtml;
+                document.getElementById('visitaDetailsModal').style.display = 'block';
+            }
+        });
+}
+
+/**
+ * ✅ CERRAR MODAL DE DETALLES
+ */
+function closeVisitaDetailsModal() {
+    document.getElementById('visitaDetailsModal').style.display = 'none';
+}
+
+/**
+ * ✅ CANCELAR VISITA
+ */
+function cancelVisitaData(visitaId) {
+    const motivo = prompt('Motivo de cancelación (opcional):');
+
+    if (motivo === null) return; // Usuario canceló el prompt
+
+    const formData = new FormData();
+    formData.append('action', 'cancel_visita');
+    formData.append('visita_id', visitaId);
+    formData.append('motivo_cancelacion', motivo || 'Cancelación administrativa');
+    formData.append('nonce', reservasAjax.nonce);
+
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Visita cancelada correctamente');
+                loadVisitasReportData();
+            } else {
+                alert('❌ Error: ' + data.data);
+            }
+        });
+}
+
+/**
+ * ✅ INICIALIZAR EVENTOS DE LA SECCIÓN
+ */
+function initVisitasReportsEvents() {
+    // Evento para cambiar tipo de búsqueda
+    document.getElementById('visitas-search-type').addEventListener('change', function () {
+        const searchValue = document.getElementById('visitas-search-value');
+        if (this.value === 'fecha_servicio') {
+            searchValue.type = 'date';
+        } else {
+            searchValue.type = 'text';
+        }
+    });
+
+    // Enter en búsqueda
+    document.getElementById('visitas-search-value').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            searchVisitasData();
+        }
+    });
+
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function (event) {
+        const modal = document.getElementById('visitaDetailsModal');
+        if (event.target === modal) {
+            closeVisitaDetailsModal();
+        }
+    };
+}
+
+
+/**
+ * ✅ DESCARGAR PDF DE VISITA
+ */
+function downloadVisitaPDF(visitaId, localizador) {
+    console.log('📄 Descargando PDF de visita:', localizador);
+
+    showLoadingModal('Generando PDF...');
+
+    const formData = new FormData();
+    formData.append('action', 'generate_visita_pdf_download');
+    formData.append('visita_id', visitaId);
+    formData.append('localizador', localizador);
+    formData.append('nonce', reservasAjax.nonce);
+
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            hideLoadingModal();
+
+            if (data.success && data.data.pdf_url) {
+                // Descargar archivo
+                const link = document.createElement('a');
+                link.href = data.data.pdf_url;
+                link.download = `visita_${localizador}.pdf`;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showNotification('✅ PDF descargado correctamente', 'success');
+            } else {
+                showNotification('❌ Error generando PDF: ' + (data.data || 'Error desconocido'), 'error');
+            }
+        })
+        .catch(error => {
+            hideLoadingModal();
+            console.error('Error:', error);
+            showNotification('❌ Error de conexión', 'error');
+        });
+}
+
+/**
+ * ✅ MOSTRAR MODAL PARA EDITAR VISITA
+ */
+function showEditVisitaModal(visitaId) {
+    console.log('✏️ Editando visita:', visitaId);
+
+    // Obtener datos actuales de la visita
+    const formData = new FormData();
+    formData.append('action', 'get_visita_details');
+    formData.append('visita_id', visitaId);
+    formData.append('nonce', reservasAjax.nonce);
+
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderEditVisitaModal(data.data);
+            } else {
+                alert('❌ Error obteniendo datos de la visita');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error de conexión');
+        });
+}
+
+/**
+ * ✅ RENDERIZAR MODAL DE EDICIÓN DE VISITA
+ */
+function renderEditVisitaModal(visita) {
+    const modalHtml = `
+        <div id="editVisitaModal" class="modal" style="display: block;">
+            <div class="modal-content" style="max-width: 600px;">
+                <span class="close" onclick="closeEditVisitaModal()">&times;</span>
+                <h3>✏️ Editar Datos de Visita</h3>
+                
+                <form id="editVisitaForm" style="margin-top: 20px;">
+                    <input type="hidden" id="edit-visita-id" value="${visita.id}">
+                    
+                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label for="edit-visita-nombre">Nombre *</label>
+                            <input type="text" id="edit-visita-nombre" value="${visita.nombre}" required 
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-visita-apellidos">Apellidos *</label>
+                            <input type="text" id="edit-visita-apellidos" value="${visita.apellidos}" required
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label for="edit-visita-email">Email *</label>
+                            <input type="email" id="edit-visita-email" value="${visita.email}" required
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-visita-telefono">Teléfono *</label>
+                            <input type="tel" id="edit-visita-telefono" value="${visita.telefono}" required
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label for="edit-visita-adultos">Adultos *</label>
+                            <input type="number" id="edit-visita-adultos" value="${visita.adultos}" min="1" required
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-visita-ninos">Niños (5-12)</label>
+                            <input type="number" id="edit-visita-ninos" value="${visita.ninos}" min="0"
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-visita-ninos-menores">Niños (-5)</label>
+                            <input type="number" id="edit-visita-ninos-menores" value="${visita.ninos_menores}" min="0"
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="edit-visita-motivo">Motivo del cambio *</label>
+                        <textarea id="edit-visita-motivo" required placeholder="Explica el motivo de la modificación..."
+                                  style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 60px;"></textarea>
+                    </div>
+                    
+                    <div class="form-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" class="btn-secondary" onclick="closeEditVisitaModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">💾 Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <style>
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        </style>
+    `;
+
+    // Eliminar modal anterior si existe
+    const oldModal = document.getElementById('editVisitaModal');
+    if (oldModal) {
+        oldModal.remove();
+    }
+
+    // Añadir nuevo modal
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Configurar evento submit
+    document.getElementById('editVisitaForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        updateVisitaData();
+    });
+}
+
+/**
+ * ✅ CERRAR MODAL DE EDICIÓN
+ */
+function closeEditVisitaModal() {
+    const modal = document.getElementById('editVisitaModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+/**
+ * ✅ ACTUALIZAR DATOS DE VISITA
+ */
+function updateVisitaData() {
+    const visitaId = document.getElementById('edit-visita-id').value;
+    const nombre = document.getElementById('edit-visita-nombre').value.trim();
+    const apellidos = document.getElementById('edit-visita-apellidos').value.trim();
+    const email = document.getElementById('edit-visita-email').value.trim();
+    const telefono = document.getElementById('edit-visita-telefono').value.trim();
+    const adultos = parseInt(document.getElementById('edit-visita-adultos').value);
+    const ninos = parseInt(document.getElementById('edit-visita-ninos').value);
+    const ninosMenores = parseInt(document.getElementById('edit-visita-ninos-menores').value);
+    const motivo = document.getElementById('edit-visita-motivo').value.trim();
+
+    // Validaciones
+    if (!nombre || nombre.length < 2) {
+        alert('❌ El nombre debe tener al menos 2 caracteres');
+        return;
+    }
+
+    if (!apellidos || apellidos.length < 2) {
+        alert('❌ Los apellidos deben tener al menos 2 caracteres');
+        return;
+    }
+
+    if (!email || !email.includes('@')) {
+        alert('❌ Email no válido');
+        return;
+    }
+
+    if (!telefono || telefono.length < 9) {
+        alert('❌ Teléfono debe tener al menos 9 dígitos');
+        return;
+    }
+
+    if (adultos < 1) {
+        alert('❌ Debe haber al menos 1 adulto');
+        return;
+    }
+
+    if (!motivo || motivo.length < 5) {
+        alert('❌ Debes especificar el motivo del cambio (mínimo 5 caracteres)');
+        return;
+    }
+
+    showLoadingModal('Actualizando datos...');
+
+    const formData = new FormData();
+    formData.append('action', 'update_visita_data');
+    formData.append('visita_id', visitaId);
+    formData.append('nombre', nombre);
+    formData.append('apellidos', apellidos);
+    formData.append('email', email);
+    formData.append('telefono', telefono);
+    formData.append('adultos', adultos);
+    formData.append('ninos', ninos);
+    formData.append('ninos_menores', ninosMenores);
+    formData.append('motivo', motivo);
+    formData.append('nonce', reservasAjax.nonce);
+
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            hideLoadingModal();
+
+            if (data.success) {
+                showNotification('✅ Datos actualizados correctamente', 'success');
+                closeEditVisitaModal();
+                loadVisitasReportData(); // Recargar lista
+            } else {
+                showNotification('❌ Error: ' + data.data, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoadingModal();
+            console.error('Error:', error);
+            showNotification('❌ Error de conexión', 'error');
+        });
+}
+
+/**
+ * ✅ REENVIAR EMAIL DE CONFIRMACIÓN DE VISITA
+ */
+function resendVisitaConfirmationEmail(visitaId, localizador) {
+    if (!confirm(`¿Reenviar email de confirmación para la visita ${localizador}?`)) {
+        return;
+    }
+
+    showLoadingModal('Enviando email...');
+
+    const formData = new FormData();
+    formData.append('action', 'resend_visita_confirmation');
+    formData.append('visita_id', visitaId);
+    formData.append('nonce', reservasAjax.nonce);
+
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            hideLoadingModal();
+
+            if (data.success) {
+                showNotification('✅ Email reenviado correctamente', 'success');
+            } else {
+                showNotification('❌ Error: ' + data.data, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoadingModal();
+            console.error('Error:', error);
+            showNotification('❌ Error de conexión', 'error');
+        });
+}
+
+/**
+ * ✅ FUNCIONES AUXILIARES (si no existen ya)
+ */
+function showLoadingModal(message) {
+    let modal = document.getElementById('loading-modal-global');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'loading-modal-global';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        `;
+
+        const content = document.createElement('div');
+        content.style.cssText = `
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+        `;
+
+        content.innerHTML = `
+            <div style="font-size: 24px; margin-bottom: 15px;">⏳</div>
+            <div id="loading-message-global" style="font-size: 16px; color: #333;">${message}</div>
+        `;
+
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+    } else {
+        document.getElementById('loading-message-global').textContent = message;
+        modal.style.display = 'flex';
+    }
+}
+
+function hideLoadingModal() {
+    const modal = document.getElementById('loading-modal-global');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+
 
 // Exponer funciones globalmente
 window.selectRetroDate = selectRetroDate;
