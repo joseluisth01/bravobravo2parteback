@@ -50,6 +50,14 @@ class ReservasAgencyServicesFrontend
                 true
             );
 
+            wp_enqueue_script(
+    'reservas-visitas-reports-script',
+    RESERVAS_PLUGIN_URL . 'assets/js/visitas-reports-script.js',
+    array('jquery'),
+    '1.0.0',
+    true
+);
+
             wp_localize_script('reservas-visita-script', 'reservasVisitaAjax', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('reservas_nonce')

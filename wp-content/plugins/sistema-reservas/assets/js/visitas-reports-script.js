@@ -184,6 +184,10 @@ function renderVisitasStats(stats, stats_agencias) {
                 <div class="stat-number">${stats.total_ninos || 0}</div>
             </div>
             <div class="stat-card">
+                <h3>Niños Menores</h3>
+                <div class="stat-number">${stats.total_ninos_menores || 0}</div>
+            </div>
+            <div class="stat-card">
                 <h3>Ingresos Totales</h3>
                 <div class="stat-number">${parseFloat(stats.ingresos_totales || 0).toFixed(2)}€</div>
             </div>
@@ -322,6 +326,14 @@ function renderVisitasPagination(pagination) {
 }
 
 /**
+ * Cambiar página
+ */
+function changeVisitasPage(page) {
+    currentVisitasPage = page;
+    loadVisitasReport();
+}
+
+/**
  * Aplicar filtros
  */
 function applyVisitasFilters() {
@@ -436,4 +448,89 @@ function showVisitaDetailsModal(visita) {
                         <strong>Teléfono:</strong> ${visita.telefono}
                     </div>
                     <div class="detail-item">
-                        <strong>Adultos:</strong> ${visita.adul
+                        <strong>Adultos:</strong> ${visita.adultos}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Niños (5-12):</strong> ${visita.ninos}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Niños (-5):</strong> ${visita.ninos_menores}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Total Personas:</strong> ${visita.total_personas}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Precio Total:</strong> ${parseFloat(visita.precio_total).toFixed(2)}€
+                    </div>
+                    <div class="detail-item">
+                        <strong>Agencia:</strong> ${visita.agency_name || 'Sin agencia'}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Estado:</strong> ${visita.estado}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Fecha de Reserva:</strong> ${new Date(visita.created_at).toLocaleString('es-ES')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+/**
+ * Cerrar modal de detalles
+ */
+function closeVisitaDetailsModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+/**
+ * Cancelar visita
+ */
+function cancelVisita(visitaId) {
+    if (!confirm('¿Estás seguro de que deseas cancelar esta visita?')) {
+        return;
+    }
+
+    const motivo = prompt('Motivo de cancelación (opcional):');
+
+    jQuery.ajax({
+        url: reservasAjax.ajax_url,
+        type: 'POST',
+        data: {
+            action: 'cancel_visita',
+            nonce: reservasAjax.nonce,
+            visita_id: visitaId,
+            motivo_cancelacion: motivo || 'Cancelación administrativa'
+        },
+        success: function(response) {
+            if (response.success) {
+                alert('Visita cancelada correctamente');
+                loadVisitasReport();
+            } else {
+                alert('Error: ' + response.data);
+            }
+        }
+    });
+}
+
+/**
+ * Mostrar estado de carga
+ */
+function showVisitasLoading() {
+    const container = document.getElementById('visitas-list-container');
+    container.innerHTML = '<div class="loading">Cargando datos...</div>';
+}
+
+/**
+ * Mostrar error
+ */
+function showError(message) {
+    const container = document.getElementById('visitas-list-container');
+    container.innerHTML = `<div class="error">${message}</div>`;
+}

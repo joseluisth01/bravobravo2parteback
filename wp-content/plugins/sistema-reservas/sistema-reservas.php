@@ -22,6 +22,7 @@ class SistemaReservas
     private $reports_admin;
     private $agencies_admin;
     private $conductor_admin;
+    private $visitas_reports_admin;
 
     public function __construct()
     {
@@ -133,25 +134,26 @@ class SistemaReservas
     private function load_dependencies()
     {
         $files = array(
-            'includes/class-database.php',
-            'includes/class-auth.php',
-            'includes/class-admin.php',
-            'includes/class-dashboard.php',
-            'includes/class-calendar-admin.php',
-            'includes/class-discounts-admin.php',
-            'includes/class-configuration-admin.php',
-            'includes/class-reports-admin.php',
-            'includes/class-agencies-admin.php',
-            'includes/class-agency-profile-admin.php',
-            'includes/class-reservas-processor.php',
-            'includes/class-email-service.php',
-            'includes/class-frontend.php',
-            'includes/class-reserva-rapida-admin.php',
-            'includes/class-redsys-handler.php',
-            'includes/class-conductor-admin.php',
-            'includes/class-agency-services-admin.php',
-            'includes/class-agency-services-frontend.php',
-        );
+        'includes/class-database.php',
+        'includes/class-auth.php',
+        'includes/class-admin.php',
+        'includes/class-dashboard.php',
+        'includes/class-calendar-admin.php',
+        'includes/class-discounts-admin.php',
+        'includes/class-configuration-admin.php',
+        'includes/class-reports-admin.php',
+        'includes/class-visitas-reports-admin.php',  // ✅ AÑADIR ESTA LÍNEA
+        'includes/class-agencies-admin.php',
+        'includes/class-agency-profile-admin.php',
+        'includes/class-reservas-processor.php',
+        'includes/class-email-service.php',
+        'includes/class-frontend.php',
+        'includes/class-reserva-rapida-admin.php',
+        'includes/class-redsys-handler.php',
+        'includes/class-conductor-admin.php',
+        'includes/class-agency-services-admin.php',
+        'includes/class-agency-services-frontend.php',
+    );
 
         foreach ($files as $file) {
             $path = RESERVAS_PLUGIN_PATH . $file;
@@ -239,6 +241,10 @@ class SistemaReservas
         if (class_exists('ReservasConductorAdmin')) {
             $this->conductor_admin = new ReservasConductorAdmin();
         }
+
+        if (class_exists('ReservasVisitasReportsAdmin')) {
+    $this->visitas_reports_admin = new ReservasVisitasReportsAdmin();
+}
     }
 
     public function add_rewrite_rules()
