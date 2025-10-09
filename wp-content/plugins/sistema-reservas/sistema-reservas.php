@@ -153,17 +153,18 @@ class SistemaReservas
         'includes/class-conductor-admin.php',
         'includes/class-agency-services-admin.php',
         'includes/class-agency-services-frontend.php',
+        'includes/class-visitas-report-pdf-generator.php',
     );
 
         foreach ($files as $file) {
-            $path = RESERVAS_PLUGIN_PATH . $file;
-            if (file_exists($path)) {
-                require_once $path;
-                error_log("✅ Cargado: $file");
-            } else {
-                error_log("❌ RESERVAS ERROR: No se pudo cargar $file");
-            }
+        $path = RESERVAS_PLUGIN_PATH . $file;
+        if (file_exists($path)) {
+            require_once $path;
+            error_log("✅ Cargado: $file");
+        } else {
+            error_log("❌ RESERVAS ERROR: No se pudo cargar $file");
         }
+    }
     }
 
     private function initialize_classes()

@@ -13838,116 +13838,116 @@ function loadVisitasReportsSection() {
     document.body.innerHTML = `
         <style>
         /* ===== DESGLOSE POR AGENCIAS - ESTILO MEJORADO ===== */
-.agencies-breakdown-section {
-    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-    padding: 30px;
-    border-radius: 12px;
-    margin: 30px 0;
-    border: 1px solid #e9d5ff;
-}
+            .agencies-breakdown-section {
+                background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+                padding: 30px;
+                border-radius: 12px;
+                margin: 30px 0;
+                border: 1px solid #e9d5ff;
+            }
 
-.agencies-breakdown-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #5b21b6;
-    margin: 0 0 25px 0;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #ddd6fe;
-}
+            .agencies-breakdown-title {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 18px;
+                font-weight: 600;
+                color: #5b21b6;
+                margin: 0 0 25px 0;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #ddd6fe;
+            }
 
-.title-icon {
-    font-size: 22px;
-}
+            .title-icon {
+                font-size: 22px;
+            }
 
-.agencies-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
-}
+            .agencies-cards-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 20px;
+            }
 
-.agency-breakdown-card {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border-left: 4px solid #8b5cf6;
-    transition: all 0.3s ease;
-    text-align: center;
-}
+            .agency-breakdown-card {
+                background: white;
+                padding: 25px;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                border-left: 4px solid #8b5cf6;
+                transition: all 0.3s ease;
+                text-align: center;
+            }
 
-.agency-breakdown-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2);
-}
+            .agency-breakdown-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2);
+            }
 
-.agency-card-header {
-    font-size: 13px;
-    font-weight: 600;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #f3f4f6;
-}
+            .agency-card-header {
+                font-size: 13px;
+                font-weight: 600;
+                color: #6b7280;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #f3f4f6;
+            }
 
-.agency-card-main-stat {
-    font-size: 48px;
-    font-weight: 700;
-    color: #7c3aed;
-    line-height: 1;
-    margin-bottom: 5px;
-}
+            .agency-card-main-stat {
+                font-size: 48px;
+                font-weight: 700;
+                color: #7c3aed;
+                line-height: 1;
+                margin-bottom: 5px;
+            }
 
-.agency-card-main-label {
-    font-size: 14px;
-    color: #9ca3af;
-    margin-bottom: 15px;
-}
+            .agency-card-main-label {
+                font-size: 14px;
+                color: #9ca3af;
+                margin-bottom: 15px;
+            }
 
-.agency-card-amount {
-    font-size: 22px;
-    font-weight: 700;
-    color: #10b981;
-    margin-bottom: 12px;
-}
+            .agency-card-amount {
+                font-size: 22px;
+                font-weight: 700;
+                color: #10b981;
+                margin-bottom: 12px;
+            }
 
-.agency-card-details {
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #f3f4f6;
-}
+            .agency-card-details {
+                font-size: 13px;
+                color: #6b7280;
+                margin-bottom: 10px;
+                padding-top: 10px;
+                border-top: 1px solid #f3f4f6;
+            }
 
-.agency-card-breakdown {
-    font-size: 11px;
-    color: #9ca3af;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-}
+            .agency-card-breakdown {
+                font-size: 11px;
+                color: #9ca3af;
+                font-weight: 500;
+                letter-spacing: 0.3px;
+            }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .agencies-cards-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    }
-    
-    .agency-breakdown-card {
-        padding: 20px;
-    }
-    
-    .agency-card-main-stat {
-        font-size: 36px;
-    }
-    
-    .agency-card-amount {
-        font-size: 18px;
-    }
-}
+            /* Responsive */
+            @media (max-width: 768px) {
+                .agencies-cards-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                }
+                
+                .agency-breakdown-card {
+                    padding: 20px;
+                }
+                
+                .agency-card-main-stat {
+                    font-size: 36px;
+                }
+                
+                .agency-card-amount {
+                    font-size: 18px;
+                }
+            }
             /* ===== ESTILOS PARA FILTROS DE VISITAS ===== */
             .visitas-filters-container {
                 background: white;
@@ -14347,11 +14347,15 @@ function loadVisitasReportsSection() {
                 </div>
 
                 <div class="filters-actions">
+                    <button class="btn-apply-filters" onclick="loadVisitasReportData()">
+                        🔍 Aplicar Filtros
+                    </button>
                     <button class="btn-reset-filters" onclick="resetVisitasFilters()">
                         ↺ Restablecer
                     </button>
-                    <button class="btn-apply-filters" onclick="loadVisitasReportData()">
-                        🔍 Aplicar Filtros
+                    <!-- ✅ NUEVO BOTÓN -->
+                    <button class="btn-apply-filters" onclick="getAvailableSchedulesForVisitasPDF()" style="background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);">
+                        📄 Descargar PDF
                     </button>
                 </div>
             </div>
@@ -14607,9 +14611,9 @@ function renderVisitasReport(data) {
                         <button class="btn-small btn-warning" onclick="showEditVisitaModal(${visita.id})" title="Editar datos">✏️</button>
                         <button class="btn-small btn-primary" onclick="resendVisitaConfirmationEmail(${visita.id}, '${visita.localizador}')" title="Reenviar email">📧</button>
                         ${visita.estado === 'confirmada' ?
-                            `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
-                            '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
-                        }
+                    `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
+                    '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
+                }
                     </td>
                 </tr>
             `;
@@ -14710,7 +14714,7 @@ function showVisitaDetails(visitaId) {
         .then(data => {
             if (data.success) {
                 const visita = data.data;
-                
+
                 const fechaFormateada = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
                     weekday: 'long',
                     year: 'numeric',

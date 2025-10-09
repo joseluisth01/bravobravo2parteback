@@ -958,3 +958,236 @@ function showError(message) {
     const container = document.getElementById('visitas-list-container');
     container.innerHTML = `<div class="error">${message}</div>`;
 }
+
+
+/**
+ * Obtener horarios disponibles para el filtro de PDF de visitas
+ */
+function getAvailableSchedulesForVisitasPDF() {
+    console.log('=== OBTENIENDO HORARIOS DISPONIBLES PARA VISITAS ===');
+    
+    const fecha_inicio = document.getElementById('visitas-fecha-inicio').value;
+    const fecha_fin = document.getElementById('visitas-fecha-fin').value;
+    const tipo_fecha = document.getElementById('visitas-tipo-fecha').value;
+    const estado_filtro = document.getElementById('visitas-estado-filtro').value;
+    const agency_filter = document.getElementById('visitas-agency-filter').value;
+
+    jQuery.ajax({
+        url: reservasAjax.ajax_url,
+        type: 'POST',
+        data: {
+            action: 'get_available_schedules_for_visitas_pdf',
+            nonce: reservasAjax.nonce,
+            fecha_inicio: fecha_inicio,
+            fecha_fin: fecha_fin,
+            tipo_fecha: tipo_fecha,
+            estado_filtro: estado_filtro,
+            agency_filter: agency_filter
+        },
+        success: function(response) {
+            console.log('Horarios disponibles:', response);
+            
+            if (response.success && response.data.schedules) {
+                showSchedulesModalForVisitas(response.data.schedules, response.data);
+            } else {
+                alert('No se encontraron horarios disponibles para los filtros seleccionados');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error obteniendo horarios:', error);
+            alert('Error al obtener los horarios disponibles');
+        }
+    });
+}
+
+/**
+ * Mostrar modal de selección de horarios para visitas
+ */
+function showSchedulesModalForVisitas(schedules, stats) {
+    console.log('Mostrando modal con', schedules.length, 'horarios');
+
+    const modalHtml = `
+        <div class="modal-overlay" id="schedules-modal-visitas" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        ">
+            <div style="
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            ">
+                <h2 style="margin-top: 0; color: #667eea; text-align: center;">
+                    📅 Seleccionar Horarios para el Informe
+                </h2>
+                
+                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="margin: 5px 0;"><strong>Total de visitas:</strong> ${stats.total_services || 0}</p>
+                    <p style="margin: 5px 0;"><strong>Días con servicio:</strong> ${stats.days_with_services || 0}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #e6f3ff; border-radius: 5px; cursor: pointer;">
+                        <input type="checkbox" id="select-all-schedules-visitas" onchange="toggleAllSchedulesVisitas(this)">
+                        <strong>Seleccionar todos los horarios</strong>
+                    </label>
+                </div>
+
+                <div id="schedules-list-visitas" style="max-height: 300px; overflow-y: auto;">
+                    ${schedules.map(schedule => `
+                        <label style="
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            padding: 12px;
+                            margin-bottom: 8px;
+                            background: #f9f9f9;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            transition: all 0.2s;
+                        " onmouseover="this.style.background='#e6f3ff'" onmouseout="this.style.background='#f9f9f9'">
+                            <input type="checkbox" class="schedule-checkbox-visitas" value='${JSON.stringify({hora: schedule.hora})}'>
+                            <span style="flex: 1;">
+                                <strong>Hora:</strong> ${schedule.hora.substring(0,5)}
+                                <br>
+                                <small style="color: #666;">
+                                    ${schedule.count} visita(s) en ${schedule.days_count} día(s)
+                                </small>
+                            </span>
+                        </label>
+                    `).join('')}
+                </div>
+
+                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="closeSchedulesModalVisitas()" style="
+                        padding: 10px 20px;
+                        background: #e2e8f0;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                    ">
+                        Cancelar
+                    </button>
+                    <button onclick="generateVisitasPDFWithSchedules()" style="
+                        padding: 10px 20px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: 600;
+                    ">
+                        Generar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+/**
+ * Alternar selección de todos los horarios
+ */
+function toggleAllSchedulesVisitas(checkbox) {
+    const checkboxes = document.querySelectorAll('.schedule-checkbox-visitas');
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+    });
+}
+
+/**
+ * Cerrar modal de horarios
+ */
+function closeSchedulesModalVisitas() {
+    const modal = document.getElementById('schedules-modal-visitas');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+/**
+ * Generar PDF con horarios seleccionados
+ */
+function generateVisitasPDFWithSchedules() {
+    const checkboxes = document.querySelectorAll('.schedule-checkbox-visitas:checked');
+    
+    if (checkboxes.length === 0) {
+        alert('Por favor, selecciona al menos un horario');
+        return;
+    }
+
+    const selectedSchedules = Array.from(checkboxes).map(cb => JSON.parse(cb.value));
+    
+    console.log('Horarios seleccionados:', selectedSchedules);
+    
+    closeSchedulesModalVisitas();
+    
+    // Generar PDF con los horarios seleccionados
+    const fecha_inicio = document.getElementById('visitas-fecha-inicio').value;
+    const fecha_fin = document.getElementById('visitas-fecha-fin').value;
+    const tipo_fecha = document.getElementById('visitas-tipo-fecha').value;
+    const estado_filtro = document.getElementById('visitas-estado-filtro').value;
+    const agency_filter = document.getElementById('visitas-agency-filter').value;
+
+    showVisitasLoading();
+
+    jQuery.ajax({
+        url: reservasAjax.ajax_url,
+        type: 'POST',
+        data: {
+            action: 'generate_visitas_pdf_report',
+            nonce: reservasAjax.nonce,
+            fecha_inicio: fecha_inicio,
+            fecha_fin: fecha_fin,
+            tipo_fecha: tipo_fecha,
+            estado_filtro: estado_filtro,
+            agency_filter: agency_filter,
+            selected_schedules: JSON.stringify(selectedSchedules)
+        },
+        success: function(response) {
+            console.log('Respuesta PDF:', response);
+            
+            if (response.success && response.data.pdf_url) {
+                // Abrir PDF en nueva ventana
+                window.open(response.data.pdf_url, '_blank');
+                
+                // Mostrar mensaje de éxito
+                showNotification('PDF generado correctamente', 'success');
+            } else {
+                alert('Error generando el PDF: ' + (response.data || 'Error desconocido'));
+            }
+            
+            hideVisitasLoading();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error AJAX:', error);
+            alert('Error de conexión al generar el PDF');
+            hideVisitasLoading();
+        }
+    });
+}
+
+function showVisitasLoading() {
+    const container = document.getElementById('visitas-list-container');
+    if (container) {
+        container.innerHTML = '<div class="loading">Generando PDF...</div>';
+    }
+}
+
+function hideVisitasLoading() {
+    // La lista se recargará automáticamente
+}

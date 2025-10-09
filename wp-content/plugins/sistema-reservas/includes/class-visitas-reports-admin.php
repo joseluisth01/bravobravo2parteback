@@ -29,6 +29,13 @@ class ReservasVisitasReportsAdmin
 
         add_action('wp_ajax_resend_visita_confirmation', array($this, 'resend_visita_confirmation'));
         add_action('wp_ajax_nopriv_resend_visita_confirmation', array($this, 'resend_visita_confirmation'));
+
+            add_action('wp_ajax_get_available_schedules_for_visitas_pdf', array($this, 'get_available_schedules_for_visitas_pdf'));
+    add_action('wp_ajax_nopriv_get_available_schedules_for_visitas_pdf', array($this, 'get_available_schedules_for_visitas_pdf'));
+    
+    add_action('wp_ajax_generate_visitas_pdf_report', array($this, 'generate_visitas_pdf_report'));
+    add_action('wp_ajax_nopriv_generate_visitas_pdf_report', array($this, 'generate_visitas_pdf_report'));
+
     }
 
     /**
@@ -611,6 +618,214 @@ class ReservasVisitasReportsAdmin
 
         wp_send_json_success('Datos actualizados correctamente y email enviado al cliente');
     }
+
+
+    /**
+ * Obtener horarios disponibles para filtro de PDF de visitas
+ */
+public function get_available_schedules_for_visitas_pdf()
+{
+    if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+        wp_send_json_error('Error de seguridad');
+        return;
+    }
+
+    if (!session_id()) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['reservas_user'])) {
+        wp_send_json_error('Sesión expirada');
+        return;
+    }
+
+    $user = $_SESSION['reservas_user'];
+    if (!in_array($user['role'], ['super_admin', 'admin'])) {
+        wp_send_json_error('Sin permisos');
+        return;
+    }
+
+    global $wpdb;
+    $table_visitas = $wpdb->prefix . 'reservas_visitas';
+    $table_agencies = $wpdb->prefix . 'reservas_agencies';
+
+    // Obtener filtros
+    $fecha_inicio = sanitize_text_field($_POST['fecha_inicio'] ?? date('Y-m-d'));
+    $fecha_fin = sanitize_text_field($_POST['fecha_fin'] ?? date('Y-m-d'));
+    $tipo_fecha = sanitize_text_field($_POST['tipo_fecha'] ?? 'servicio');
+    $estado_filtro = sanitize_text_field($_POST['estado_filtro'] ?? 'confirmadas');
+    $agency_filter = sanitize_text_field($_POST['agency_filter'] ?? 'todas');
+
+    try {
+        // Construir condiciones WHERE
+        $where_conditions = array();
+        $query_params = array();
+
+        // Filtro por tipo de fecha
+        if ($tipo_fecha === 'compra') {
+            $where_conditions[] = "DATE(v.created_at) BETWEEN %s AND %s";
+        } else {
+            $where_conditions[] = "v.fecha BETWEEN %s AND %s";
+        }
+        $query_params[] = $fecha_inicio;
+        $query_params[] = $fecha_fin;
+
+        // Filtro de estado
+        switch ($estado_filtro) {
+            case 'confirmadas':
+                $where_conditions[] = "v.estado = 'confirmada'";
+                break;
+            case 'canceladas':
+                $where_conditions[] = "v.estado = 'cancelada'";
+                break;
+            case 'todas':
+                break;
+        }
+
+        // Filtro por agencias
+        if ($agency_filter !== 'todas' && is_numeric($agency_filter)) {
+            $where_conditions[] = "v.agency_id = %d";
+            $query_params[] = intval($agency_filter);
+        }
+
+        $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
+
+        // Query para obtener horarios únicos
+        $schedules_query = "
+            SELECT 
+                v.hora,
+                COUNT(DISTINCT v.id) as count,
+                COUNT(DISTINCT v.fecha) as days_count
+            FROM $table_visitas v
+            LEFT JOIN $table_agencies a ON v.agency_id = a.id
+            $where_clause
+            GROUP BY v.hora
+            ORDER BY v.hora ASC
+        ";
+
+        $schedules = $wpdb->get_results($wpdb->prepare($schedules_query, ...$query_params));
+
+        if ($wpdb->last_error) {
+            error_log('❌ Database error: ' . $wpdb->last_error);
+            wp_send_json_error('Error de base de datos');
+            return;
+        }
+
+        // Obtener estadísticas generales
+        $stats_query = "
+            SELECT 
+                COUNT(DISTINCT v.id) as total_services,
+                COUNT(DISTINCT v.fecha) as days_with_services
+            FROM $table_visitas v
+            LEFT JOIN $table_agencies a ON v.agency_id = a.id
+            $where_clause
+        ";
+
+        $stats = $wpdb->get_row($wpdb->prepare($stats_query, ...$query_params));
+
+        $response_data = array(
+            'schedules' => $schedules,
+            'total_services' => intval($stats->total_services ?? 0),
+            'days_with_services' => intval($stats->days_with_services ?? 0),
+            'filtros' => array(
+                'fecha_inicio' => $fecha_inicio,
+                'fecha_fin' => $fecha_fin,
+                'tipo_fecha' => $tipo_fecha,
+                'estado_filtro' => $estado_filtro,
+                'agency_filter' => $agency_filter
+            )
+        );
+
+        wp_send_json_success($response_data);
+    } catch (Exception $e) {
+        error_log('❌ Exception: ' . $e->getMessage());
+        wp_send_json_error('Error del servidor');
+    }
+}
+
+/**
+ * Generar PDF de informe de visitas
+ */
+public function generate_visitas_pdf_report()
+{
+    if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+        wp_send_json_error('Error de seguridad');
+        return;
+    }
+
+    if (!session_id()) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['reservas_user'])) {
+        wp_send_json_error('Sesión expirada');
+        return;
+    }
+
+    $user = $_SESSION['reservas_user'];
+    if (!in_array($user['role'], ['super_admin', 'admin'])) {
+        wp_send_json_error('Sin permisos');
+        return;
+    }
+
+    try {
+        error_log('=== GENERANDO PDF DE VISITAS CON FILTROS ===');
+        error_log('POST data: ' . print_r($_POST, true));
+
+        // Obtener filtros
+        $fecha_inicio = sanitize_text_field($_POST['fecha_inicio'] ?? date('Y-m-d'));
+        $fecha_fin = sanitize_text_field($_POST['fecha_fin'] ?? date('Y-m-d'));
+        $tipo_fecha = sanitize_text_field($_POST['tipo_fecha'] ?? 'servicio');
+        $estado_filtro = sanitize_text_field($_POST['estado_filtro'] ?? 'confirmadas');
+        $agency_filter = sanitize_text_field($_POST['agency_filter'] ?? 'todas');
+        $selected_schedules = $_POST['selected_schedules'] ?? '';
+
+        error_log('Selected schedules recibido: ' . $selected_schedules);
+
+        // Cargar clase generadora de PDF de visitas
+        if (!class_exists('ReservasVisitasReportPDFGenerator')) {
+            require_once RESERVAS_PLUGIN_PATH . 'includes/class-visitas-report-pdf-generator.php';
+        }
+
+        $pdf_generator = new ReservasVisitasReportPDFGenerator();
+
+        $filtros = array(
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin,
+            'tipo_fecha' => $tipo_fecha,
+            'estado_filtro' => $estado_filtro,
+            'agency_filter' => $agency_filter,
+            'selected_schedules' => $selected_schedules
+        );
+
+        error_log('Filtros enviados al PDF: ' . print_r($filtros, true));
+
+        $pdf_path = $pdf_generator->generate_report_pdf($filtros);
+
+        if (!$pdf_path || !file_exists($pdf_path)) {
+            wp_send_json_error('Error generando el PDF');
+            return;
+        }
+
+        // Crear URL público
+        $upload_dir = wp_upload_dir();
+        $pdf_url = str_replace($upload_dir['path'], $upload_dir['url'], $pdf_path);
+
+        // Programar eliminación después de 2 horas
+        wp_schedule_single_event(time() + 7200, 'delete_temp_pdf', array($pdf_path));
+
+        $filename = 'informe_visitas_' . $fecha_inicio . '_' . $fecha_fin . '.pdf';
+
+        wp_send_json_success(array(
+            'pdf_url' => $pdf_url,
+            'filename' => $filename,
+            'filtros_aplicados' => $filtros
+        ));
+    } catch (Exception $e) {
+        error_log('Error generando PDF de visitas: ' . $e->getMessage());
+        wp_send_json_error('Error interno: ' . $e->getMessage());
+    }
+}
 
     /**
  * Reenviar email de confirmación de visita
