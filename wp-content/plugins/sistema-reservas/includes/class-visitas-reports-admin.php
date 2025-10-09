@@ -641,17 +641,67 @@ public function resend_visita_confirmation()
 
     global $wpdb;
     $table_visitas = $wpdb->prefix . 'reservas_visitas';
+    $table_services = $wpdb->prefix . 'reservas_agency_services';
+    $table_agencies = $wpdb->prefix . 'reservas_agencies';
 
     $visita = $wpdb->get_row($wpdb->prepare(
         "SELECT v.*, s.precio_adulto, s.precio_nino, s.precio_nino_menor, s.logo_url,
                 a.agency_name, a.cif, a.razon_social, a.domicilio_fiscal, a.email as agency_email, a.phone
          FROM $table_visitas v
-         INNER JOIN {$wpdb->prefix}reservas_agency_services s ON v.service_id = s.id
-         INNER JOIN {$wpdb->prefix}reservas_agencies a ON v.agency_id = a.id
+         INNER JOIN $table_services s ON v.service_id = s.id
+         INNER JOIN $table_agencies a ON v.agency_id = a.id
          WHERE v.id = %d",
         $visita_id
     ));
 
     if (!$visita) {
-        wp_sen
+        wp_send_json_error('Visita no encontrada');
+        return;
+    }
+
+    // Preparar datos para el email
+    $email_data = array(
+        'localizador' => $visita->localizador,
+        'fecha' => $visita->fecha,
+        'hora' => $visita->hora,
+        'hora_vuelta' => '',
+        'nombre' => $visita->nombre,
+        'apellidos' => $visita->apellidos,
+        'email' => $visita->email,
+        'telefono' => $visita->telefono,
+        'adultos' => $visita->adultos,
+        'residentes' => 0,
+        'ninos_5_12' => $visita->ninos,
+        'ninos_menores' => $visita->ninos_menores,
+        'total_personas' => $visita->total_personas,
+        'precio_base' => $visita->precio_total,
+        'descuento_total' => 0,
+        'precio_final' => $visita->precio_total,
+        'precio_adulto' => $visita->precio_adulto,
+        'precio_nino' => $visita->precio_nino,
+        'created_at' => $visita->created_at,
+        'metodo_pago' => $visita->metodo_pago,
+        'is_visita' => true,
+        'agency_logo_url' => $visita->logo_url,
+        'agency_name' => $visita->agency_name,
+        'agency_cif' => $visita->cif ?? '',
+        'agency_razon_social' => $visita->razon_social ?? '',
+        'agency_domicilio_fiscal' => $visita->domicilio_fiscal ?? '',
+        'agency_email' => $visita->agency_email ?? '',
+        'agency_phone' => $visita->phone ?? ''
+    );
+
+    // Enviar email
+    if (!class_exists('ReservasEmailService')) {
+        require_once RESERVAS_PLUGIN_PATH . 'includes/class-email-service.php';
+    }
+
+    $result = ReservasEmailService::send_customer_confirmation($email_data);
+
+    if ($result['success']) {
+        wp_send_json_success('Email reenviado correctamente');
+    } else {
+        wp_send_json_error('Error enviando el email: ' . $result['message']);
+    }
+}
 }

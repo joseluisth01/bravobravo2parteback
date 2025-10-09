@@ -13832,13 +13832,473 @@ function get_agencies_for_reservation() {
 }
 
 
-/**
- * ✅ CARGAR SECCIÓN DE INFORMES DE VISITAS GUIADAS
- */
 function loadVisitasReportsSection() {
     console.log('=== CARGANDO SECCIÓN DE INFORMES DE VISITAS GUIADAS ===');
 
     document.body.innerHTML = `
+        <style>
+        /* ===== DESGLOSE POR AGENCIAS - ESTILO MEJORADO ===== */
+.agencies-breakdown-section {
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    padding: 30px;
+    border-radius: 12px;
+    margin: 30px 0;
+    border: 1px solid #e9d5ff;
+}
+
+.agencies-breakdown-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #5b21b6;
+    margin: 0 0 25px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #ddd6fe;
+}
+
+.title-icon {
+    font-size: 22px;
+}
+
+.agencies-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.agency-breakdown-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #8b5cf6;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.agency-breakdown-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2);
+}
+
+.agency-card-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.agency-card-main-stat {
+    font-size: 48px;
+    font-weight: 700;
+    color: #7c3aed;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.agency-card-main-label {
+    font-size: 14px;
+    color: #9ca3af;
+    margin-bottom: 15px;
+}
+
+.agency-card-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: #10b981;
+    margin-bottom: 12px;
+}
+
+.agency-card-details {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.agency-card-breakdown {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .agencies-cards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    
+    .agency-breakdown-card {
+        padding: 20px;
+    }
+    
+    .agency-card-main-stat {
+        font-size: 36px;
+    }
+    
+    .agency-card-amount {
+        font-size: 18px;
+    }
+}
+            /* ===== ESTILOS PARA FILTROS DE VISITAS ===== */
+            .visitas-filters-container {
+                background: white;
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+                border: 1px solid #e2e8f0;
+            }
+
+            .visitas-filters-header {
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #f1f5f9;
+            }
+
+            .visitas-filters-header h3 {
+                color: #2d3748;
+                font-size: 18px;
+                font-weight: 600;
+                margin: 0 0 5px 0;
+            }
+
+            .visitas-filters-header p {
+                color: #64748b;
+                font-size: 13px;
+                margin: 0;
+            }
+
+            .filters-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+
+            .filter-item {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .filter-item label {
+                color: #475569;
+                font-weight: 600;
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+
+            .filter-item input[type="date"],
+            .filter-item select {
+                padding: 10px 12px;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                background: white;
+                font-size: 14px;
+                color: #2d3748;
+                transition: all 0.2s ease;
+            }
+
+            .filter-item input[type="date"]:focus,
+            .filter-item select:focus {
+                outline: none;
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
+
+            .filters-actions {
+                display: flex;
+                gap: 12px;
+                justify-content: flex-end;
+                margin-top: 25px;
+                padding-top: 20px;
+                border-top: 1px solid #f1f5f9;
+            }
+
+            .filters-actions button {
+                padding: 10px 24px;
+                border: none;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .btn-apply-filters {
+                background: #3b82f6;
+                color: white;
+            }
+
+            .btn-apply-filters:hover {
+                background: #2563eb;
+            }
+
+            .btn-reset-filters {
+                background: #f1f5f9;
+                color: #475569;
+            }
+
+            .btn-reset-filters:hover {
+                background: #e2e8f0;
+            }
+
+            /* ===== BÚSQUEDA RÁPIDA ===== */
+            .quick-search-container {
+                background: white;
+                padding: 20px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+                border: 1px solid #e2e8f0;
+            }
+
+            .quick-search-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .quick-search-header h3 {
+                font-size: 16px;
+                color: #2d3748;
+                margin: 0;
+                font-weight: 600;
+            }
+
+            .search-input-group {
+                display: flex;
+                gap: 12px;
+                align-items: center;
+            }
+
+            .search-input-group select,
+            .search-input-group input {
+                padding: 10px 12px;
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                font-size: 14px;
+                transition: all 0.2s ease;
+            }
+
+            .search-input-group select {
+                min-width: 150px;
+            }
+
+            .search-input-group input {
+                flex: 1;
+            }
+
+            .search-input-group select:focus,
+            .search-input-group input:focus {
+                outline: none;
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
+
+            .btn-search {
+                padding: 10px 24px;
+                background: #3b82f6;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .btn-search:hover {
+                background: #2563eb;
+            }
+
+            /* ===== MODAL DE DETALLES MEJORADO ===== */
+            #visitaDetailsModal {
+                display: none;
+                position: fixed;
+                z-index: 10000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                animation: fadeIn 0.2s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            #visitaDetailsModal .modal-content {
+                background: white;
+                margin: 3% auto;
+                padding: 0;
+                border-radius: 12px;
+                max-width: 1000px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                animation: slideDown 0.3s ease;
+                overflow: hidden;
+            }
+
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-30px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .modal-header-visita {
+                background: #f8f9fa;
+                padding: 20px 30px;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .modal-header-visita h3 {
+                color: #2d3748;
+                font-size: 20px;
+                font-weight: 600;
+                margin: 0;
+            }
+
+            .modal-header-visita .close {
+                color: #64748b;
+                font-size: 28px;
+                font-weight: 300;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 6px;
+            }
+
+            .modal-header-visita .close:hover {
+                background: #e2e8f0;
+                color: #1e293b;
+            }
+
+            .modal-body-visita {
+                padding: 30px;
+            }
+
+            .visita-details-sections {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+
+            .detail-section {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                border-left: 3px solid #3b82f6;
+            }
+
+            .detail-section-title {
+                font-size: 12px;
+                color: #64748b;
+                text-transform: uppercase;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .detail-row {
+                margin-bottom: 12px;
+            }
+
+            .detail-row:last-child {
+                margin-bottom: 0;
+            }
+
+            .detail-label {
+                font-size: 11px;
+                color: #64748b;
+                margin-bottom: 4px;
+                font-weight: 500;
+            }
+
+            .detail-value {
+                font-size: 14px;
+                color: #2d3748;
+                font-weight: 600;
+            }
+
+            .detail-value-large {
+                font-size: 18px;
+                color: #10b981;
+            }
+
+            .status-badge-modal {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .status-confirmada {
+                background: #d1fae5;
+                color: #065f46;
+            }
+
+            .status-cancelada {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+            /* ===== RESPONSIVE ===== */
+            @media (max-width: 768px) {
+                .filters-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .visita-details-sections {
+                    grid-template-columns: 1fr;
+                }
+
+                .filters-actions {
+                    flex-direction: column;
+                }
+
+                .filters-actions button {
+                    width: 100%;
+                }
+
+                .search-input-group {
+                    flex-direction: column;
+                }
+
+                .search-input-group select,
+                .search-input-group input {
+                    width: 100%;
+                }
+            }
+        </style>
+
         <div class="reports-management">
             <div class="reports-header">
                 <h1>📊 Informes de Visitas Guiadas</h1>
@@ -13848,24 +14308,29 @@ function loadVisitasReportsSection() {
             </div>
             
             <!-- Filtros -->
-            <div class="advanced-filters">
-                <div class="filters-row">
-                    <div class="filter-group">
+            <div class="visitas-filters-container">
+                <div class="visitas-filters-header">
+                    <h3>🔍 Filtros de Búsqueda</h3>
+                    <p>Selecciona los criterios para generar tu informe</p>
+                </div>
+                
+                <div class="filters-grid">
+                    <div class="filter-item">
                         <label for="visitas-fecha-inicio">Fecha Inicio:</label>
                         <input type="date" id="visitas-fecha-inicio" value="${new Date().toISOString().split('T')[0]}">
                     </div>
-                    <div class="filter-group">
+                    <div class="filter-item">
                         <label for="visitas-fecha-fin">Fecha Fin:</label>
                         <input type="date" id="visitas-fecha-fin" value="${new Date().toISOString().split('T')[0]}">
                     </div>
-                    <div class="filter-group">
+                    <div class="filter-item">
                         <label for="visitas-tipo-fecha">Tipo de Fecha:</label>
                         <select id="visitas-tipo-fecha">
                             <option value="servicio">Fecha de Servicio</option>
                             <option value="compra">Fecha de Compra</option>
                         </select>
                     </div>
-                    <div class="filter-group">
+                    <div class="filter-item">
                         <label for="visitas-estado-filtro">Estado:</label>
                         <select id="visitas-estado-filtro">
                             <option value="confirmadas">Confirmadas</option>
@@ -13873,31 +14338,39 @@ function loadVisitasReportsSection() {
                             <option value="todas">Todas</option>
                         </select>
                     </div>
-                    <div class="filter-group">
+                    <div class="filter-item">
                         <label for="visitas-agency-filter">Agencia:</label>
                         <select id="visitas-agency-filter">
                             <option value="todas">🔄 Cargando agencias...</option>
                         </select>
                     </div>
-                    <div class="filter-group">
-                        <button class="btn-primary" onclick="loadVisitasReportData()">🔍 Aplicar Filtros</button>
-                    </div>
+                </div>
+
+                <div class="filters-actions">
+                    <button class="btn-reset-filters" onclick="resetVisitasFilters()">
+                        ↺ Restablecer
+                    </button>
+                    <button class="btn-apply-filters" onclick="loadVisitasReportData()">
+                        🔍 Aplicar Filtros
+                    </button>
                 </div>
             </div>
 
-            <!-- Búsqueda rápida -->
-            <div class="search-section" style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                <h3>🔎 Búsqueda Rápida</h3>
-                <div class="search-row" style="display: flex; gap: 10px; align-items: center;">
-                    <select id="visitas-search-type" style="padding: 8px; border-radius: 4px; border: 1px solid #ced4da;">
+            <!-- Búsqueda Rápida -->
+            <div class="quick-search-container">
+                <div class="quick-search-header">
+                    <h3>🔎 Búsqueda Rápida</h3>
+                </div>
+                <div class="search-input-group">
+                    <select id="visitas-search-type">
                         <option value="localizador">Localizador</option>
                         <option value="email">Email</option>
                         <option value="telefono">Teléfono</option>
                         <option value="nombre">Nombre</option>
                         <option value="fecha_servicio">Fecha Servicio</option>
                     </select>
-                    <input type="text" id="visitas-search-value" placeholder="Buscar..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ced4da;">
-                    <button class="btn-primary" onclick="searchVisitasData()">Buscar</button>
+                    <input type="text" id="visitas-search-value" placeholder="Introduce el valor a buscar...">
+                    <button class="btn-search" onclick="searchVisitasData()">Buscar</button>
                 </div>
             </div>
 
@@ -13912,21 +14385,23 @@ function loadVisitasReportsSection() {
         </div>
 
         <!-- Modal para detalles de visita -->
-        <div id="visitaDetailsModal" class="modal" style="display: none;">
+        <div id="visitaDetailsModal" class="modal">
             <div class="modal-content">
-                <span class="close" onclick="closeVisitaDetailsModal()">&times;</span>
-                <h3>Detalles de Visita</h3>
-                <div id="visita-details-content"></div>
+                <div class="modal-header-visita">
+                    <h3>Detalles de la Visita</h3>
+                    <span class="close" onclick="closeVisitaDetailsModal()">&times;</span>
+                </div>
+                <div class="modal-body-visita">
+                    <div id="visita-details-content"></div>
+                </div>
             </div>
         </div>
     `;
 
-    // Cargar agencias y luego datos iniciales
     loadAgenciesForVisitasFilter().then(() => {
         loadVisitasReportData();
     });
 
-    // Configurar eventos
     initVisitasReportsEvents();
 }
 
@@ -14023,10 +14498,10 @@ function loadVisitasReportData(page = 1) {
 }
 
 /**
- * ✅ RENDERIZAR INFORME DE VISITAS
+ * ✅ RENDERIZAR INFORME DE VISITAS CON DESGLOSE POR AGENCIAS MEJORADO
  */
 function renderVisitasReport(data) {
-    // Mostrar estadísticas
+    // Mostrar estadísticas generales
     const statsHtml = `
         <div class="stats-cards">
             <div class="stat-card">
@@ -14056,23 +14531,37 @@ function renderVisitasReport(data) {
         </div>
     `;
 
-    // Estadísticas por agencia
+    // Estadísticas por agencia con diseño mejorado
     let agencyStatsHtml = '';
     if (data.stats_por_agencias && data.stats_por_agencias.length > 0) {
-        agencyStatsHtml = '<div class="stats-by-agencies" style="margin-top: 20px;"><h4>📊 Desglose por Agencias</h4>';
+        agencyStatsHtml = `
+            <div class="agencies-breakdown-section">
+                <h3 class="agencies-breakdown-title">
+                    <span class="title-icon">📊</span>
+                    Desglose por Agencias
+                </h3>
+                <div class="agencies-cards-grid">
+        `;
 
         data.stats_por_agencias.forEach(stat => {
             agencyStatsHtml += `
-                <div class="agency-stat-card">
-                    <h5>${stat.agency_name}</h5>
-                    <div class="stat-number">${stat.total_visitas} visitas</div>
-                    <div class="stat-amount">${parseFloat(stat.ingresos_total || 0).toFixed(2)}€</div>
-                    <div class="stat-extra">${stat.total_personas} personas</div>
+                <div class="agency-breakdown-card">
+                    <div class="agency-card-header">${stat.agency_name}</div>
+                    <div class="agency-card-main-stat">${stat.total_visitas}</div>
+                    <div class="agency-card-main-label">visitas</div>
+                    <div class="agency-card-amount">${parseFloat(stat.ingresos_total || 0).toFixed(2)}€</div>
+                    <div class="agency-card-details">
+                        ${stat.total_personas} personas
+                    </div>
+                
                 </div>
             `;
         });
 
-        agencyStatsHtml += '</div>';
+        agencyStatsHtml += `
+                </div>
+            </div>
+        `;
     }
 
     document.getElementById('visitas-stats-container').innerHTML = statsHtml + agencyStatsHtml;
@@ -14118,9 +14607,9 @@ function renderVisitasReport(data) {
                         <button class="btn-small btn-warning" onclick="showEditVisitaModal(${visita.id})" title="Editar datos">✏️</button>
                         <button class="btn-small btn-primary" onclick="resendVisitaConfirmationEmail(${visita.id}, '${visita.localizador}')" title="Reenviar email">📧</button>
                         ${visita.estado === 'confirmada' ?
-                                        `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
-                                        '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
-                                    }
+                            `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
+                            '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
+                        }
                     </td>
                 </tr>
             `;
@@ -14207,9 +14696,6 @@ function searchVisitasData() {
         });
 }
 
-/**
- * ✅ MOSTRAR DETALLES DE VISITA
- */
 function showVisitaDetails(visitaId) {
     const formData = new FormData();
     formData.append('action', 'get_visita_details');
@@ -14224,22 +14710,94 @@ function showVisitaDetails(visitaId) {
         .then(data => {
             if (data.success) {
                 const visita = data.data;
+                
+                const fechaFormateada = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const estadoClass = visita.estado === 'confirmada' ? 'status-confirmada' : 'status-cancelada';
+                const estadoTexto = visita.estado === 'confirmada' ? 'CONFIRMADA' : 'CANCELADA';
+
                 const detailsHtml = `
-                <div class="details-grid">
-                    <div><strong>Localizador:</strong> ${visita.localizador}</div>
-                    <div><strong>Fecha:</strong> ${visita.fecha}</div>
-                    <div><strong>Hora:</strong> ${visita.hora}</div>
-                    <div><strong>Cliente:</strong> ${visita.nombre} ${visita.apellidos}</div>
-                    <div><strong>Email:</strong> ${visita.email}</div>
-                    <div><strong>Teléfono:</strong> ${visita.telefono}</div>
-                    <div><strong>Adultos:</strong> ${visita.adultos}</div>
-                    <div><strong>Niños (5-12):</strong> ${visita.ninos}</div>
-                    <div><strong>Niños (-5):</strong> ${visita.ninos_menores}</div>
-                    <div><strong>Total:</strong> ${parseFloat(visita.precio_total).toFixed(2)}€</div>
-                    <div><strong>Agencia:</strong> ${visita.agency_name || 'Sin agencia'}</div>
-                    <div><strong>Estado:</strong> ${visita.estado}</div>
-                </div>
-            `;
+                    <div class="visita-details-sections">
+                        <!-- Información General -->
+                        <div class="detail-section">
+                            <div class="detail-section-title">📋 Información General</div>
+                            <div class="detail-row">
+                                <div class="detail-label">Localizador:</div>
+                                <div class="detail-value">${visita.localizador}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Estado:</div>
+                                <div class="detail-value">
+                                    <span class="status-badge-modal ${estadoClass}">${estadoTexto}</span>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Fecha de servicio:</div>
+                                <div class="detail-value" style="font-size: 12px;">${fechaFormateada}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Hora:</div>
+                                <div class="detail-value">${visita.hora}</div>
+                            </div>
+                        </div>
+
+                        <!-- Datos del Cliente -->
+                        <div class="detail-section">
+                            <div class="detail-section-title">👤 Datos del Cliente</div>
+                            <div class="detail-row">
+                                <div class="detail-label">Nombre:</div>
+                                <div class="detail-value">${visita.nombre} ${visita.apellidos}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Email:</div>
+                                <div class="detail-value" style="font-size: 12px;">${visita.email}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Teléfono:</div>
+                                <div class="detail-value">${visita.telefono}</div>
+                            </div>
+                        </div>
+
+                        <!-- Distribución de Personas -->
+                        <div class="detail-section">
+                            <div class="detail-section-title">👨‍👩‍👧‍👦 Distribución de Personas</div>
+                            <div class="detail-row">
+                                <div class="detail-label">Adultos:</div>
+                                <div class="detail-value">${visita.adultos}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Niños (5-12 años):</div>
+                                <div class="detail-value">${visita.ninos}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Niños menores (-5):</div>
+                                <div class="detail-value">${visita.ninos_menores}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Total personas:</div>
+                                <div class="detail-value">${visita.adultos + visita.ninos + visita.ninos_menores}</div>
+                            </div>
+                        </div>
+
+                        <!-- Información de Precios -->
+                        <div class="detail-section">
+                            <div class="detail-section-title">💰 Información de Precios</div>
+                            <div class="detail-row">
+                                <div class="detail-label">Agencia:</div>
+                                <div class="detail-value" style="font-size: 12px;">${visita.agency_name || 'Sin agencia'}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Total:</div>
+                                <div class="detail-value detail-value-large">${parseFloat(visita.precio_total).toFixed(2)}€</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
                 document.getElementById('visita-details-content').innerHTML = detailsHtml;
                 document.getElementById('visitaDetailsModal').style.display = 'block';

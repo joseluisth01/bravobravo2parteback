@@ -12,61 +12,441 @@ let currentVisitasFilters = {
     agency_filter: 'todas'
 };
 
-/**
- * Cargar sección de informes de visitas
- */
 function loadVisitasReportsSection() {
-    console.log('=== CARGANDO SECCIÓN DE INFORMES DE VISITAS ===');
+    console.log('=== CARGANDO SECCIÓN DE INFORMES DE VISITAS GUIADAS ===');
 
-    const content = `
-        <div class="visitas-reports-container">
-            <h2>📊 Informes de Visitas Guiadas</h2>
+    document.body.innerHTML = `
+        <style>
+            /* ===== ESTILOS PARA FILTROS DE VISITAS ===== */
+            .visitas-filters-container {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+            }
+
+            .visitas-filters-header {
+                text-align: center;
+                margin-bottom: 25px;
+            }
+
+            .visitas-filters-header h3 {
+                color: white;
+                font-size: 24px;
+                font-weight: 700;
+                margin: 0 0 10px 0;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .visitas-filters-header p {
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 14px;
+                margin: 0;
+            }
+
+            .filters-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+
+            .filter-item {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .filter-item label {
+                color: white;
+                font-weight: 600;
+                font-size: 13px;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .filter-item input[type="date"],
+            .filter-item select {
+                padding: 12px 15px;
+                border: none;
+                border-radius: 8px;
+                background: white;
+                font-size: 14px;
+                color: #2d3748;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .filter-item input[type="date"]:focus,
+            .filter-item select:focus {
+                outline: none;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+                transform: translateY(-2px);
+            }
+
+            .filters-actions {
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+                margin-top: 25px;
+            }
+
+            .filters-actions button {
+                padding: 14px 35px;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .btn-apply-filters {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            .btn-apply-filters:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+
+            .btn-reset-filters {
+                background: white;
+                color: #667eea;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-reset-filters:hover {
+                background: #f7fafc;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            /* ===== BÚSQUEDA RÁPIDA ===== */
+            .quick-search-container {
+                background: white;
+                padding: 25px;
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                margin-bottom: 30px;
+            }
+
+            .quick-search-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .quick-search-header h3 {
+                font-size: 18px;
+                color: #2d3748;
+                margin: 0;
+                font-weight: 700;
+            }
+
+            .search-input-group {
+                display: flex;
+                gap: 15px;
+                align-items: center;
+            }
+
+            .search-input-group select,
+            .search-input-group input {
+                padding: 12px 15px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            }
+
+            .search-input-group select {
+                min-width: 150px;
+            }
+
+            .search-input-group input {
+                flex: 1;
+            }
+
+            .search-input-group select:focus,
+            .search-input-group input:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .btn-search {
+                padding: 12px 30px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .btn-search:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }
+
+            /* ===== MODAL DE DETALLES MEJORADO ===== */
+            #visitaDetailsModal {
+                display: none;
+                position: fixed;
+                z-index: 10000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(5px);
+                animation: fadeIn 0.3s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            #visitaDetailsModal .modal-content {
+                background: white;
+                margin: 3% auto;
+                padding: 0;
+                border-radius: 20px;
+                max-width: 900px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                animation: slideDown 0.3s ease;
+                overflow: hidden;
+            }
+
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-50px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .modal-header-visita {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 30px;
+                position: relative;
+            }
+
+            .modal-header-visita h3 {
+                color: white;
+                font-size: 28px;
+                font-weight: 700;
+                margin: 0;
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .modal-header-visita .close {
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: white;
+                font-size: 32px;
+                font-weight: 300;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .modal-header-visita .close:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-50%) rotate(90deg);
+            }
+
+            .modal-body-visita {
+                padding: 40px;
+            }
+
+            .visita-details-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+            }
+
+            .detail-card {
+                background: #f7fafc;
+                padding: 20px;
+                border-radius: 12px;
+                border-left: 4px solid #667eea;
+                transition: all 0.3s ease;
+            }
+
+            .detail-card:hover {
+                transform: translateX(5px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .detail-card-label {
+                font-size: 12px;
+                color: #718096;
+                text-transform: uppercase;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                margin-bottom: 8px;
+            }
+
+            .detail-card-value {
+                font-size: 18px;
+                color: #2d3748;
+                font-weight: 700;
+            }
+
+            .detail-card-highlight {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-left: none;
+            }
+
+            .detail-card-highlight .detail-card-label {
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .detail-card-highlight .detail-card-value {
+                color: white;
+                font-size: 24px;
+            }
+
+            .detail-card-full {
+                grid-column: 1 / -1;
+            }
+
+            .status-badge-modal {
+                display: inline-block;
+                padding: 8px 20px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .status-confirmada {
+                background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+                color: white;
+            }
+
+            .status-cancelada {
+                background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+                color: white;
+            }
+
+            /* ===== RESPONSIVE ===== */
+            @media (max-width: 768px) {
+                .filters-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .visita-details-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .filters-actions {
+                    flex-direction: column;
+                }
+
+                .filters-actions button {
+                    width: 100%;
+                }
+
+                .search-input-group {
+                    flex-direction: column;
+                }
+
+                .search-input-group select,
+                .search-input-group input {
+                    width: 100%;
+                }
+            }
+        </style>
+
+        <div class="reports-management">
+            <div class="reports-header">
+                <h1>📊 Informes de Visitas Guiadas</h1>
+                <div class="reports-actions">
+                    <button class="btn-secondary" onclick="goBackToDashboard()">← Volver al Dashboard</button>
+                </div>
+            </div>
             
-            <!-- Filtros -->
-            <div class="filters-section">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label>Fecha Inicio:</label>
-                        <input type="date" id="visitas-fecha-inicio" value="${currentVisitasFilters.fecha_inicio}">
+            <!-- Filtros Mejorados -->
+            <div class="visitas-filters-container">
+                <div class="visitas-filters-header">
+                    <h3>🔍 Filtros de Búsqueda</h3>
+                    <p>Selecciona los criterios para generar tu informe personalizado</p>
+                </div>
+                
+                <div class="filters-grid">
+                    <div class="filter-item">
+                        <label for="visitas-fecha-inicio">📅 Fecha Inicio</label>
+                        <input type="date" id="visitas-fecha-inicio" value="${new Date().toISOString().split('T')[0]}">
                     </div>
-                    <div class="filter-group">
-                        <label>Fecha Fin:</label>
-                        <input type="date" id="visitas-fecha-fin" value="${currentVisitasFilters.fecha_fin}">
+                    <div class="filter-item">
+                        <label for="visitas-fecha-fin">📅 Fecha Fin</label>
+                        <input type="date" id="visitas-fecha-fin" value="${new Date().toISOString().split('T')[0]}">
                     </div>
-                    <div class="filter-group">
-                        <label>Tipo de Fecha:</label>
+                    <div class="filter-item">
+                        <label for="visitas-tipo-fecha">📆 Tipo de Fecha</label>
                         <select id="visitas-tipo-fecha">
                             <option value="servicio">Fecha de Servicio</option>
                             <option value="compra">Fecha de Compra</option>
                         </select>
                     </div>
-                </div>
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label>Estado:</label>
+                    <div class="filter-item">
+                        <label for="visitas-estado-filtro">✓ Estado</label>
                         <select id="visitas-estado-filtro">
                             <option value="confirmadas">Confirmadas</option>
                             <option value="canceladas">Canceladas</option>
                             <option value="todas">Todas</option>
                         </select>
                     </div>
-                    <div class="filter-group">
-                        <label>Agencia:</label>
+                    <div class="filter-item">
+                        <label for="visitas-agency-filter">🏢 Agencia</label>
                         <select id="visitas-agency-filter">
-                            <option value="todas">Todas las agencias</option>
+                            <option value="todas">🔄 Cargando agencias...</option>
                         </select>
                     </div>
-                    <div class="filter-group">
-                        <button class="btn-primary" onclick="applyVisitasFilters()">🔍 Filtrar</button>
-                        <button class="btn-secondary" onclick="resetVisitasFilters()">↺ Reset</button>
-                    </div>
+                </div>
+
+                <div class="filters-actions">
+                    <button class="btn-apply-filters" onclick="loadVisitasReportData()">
+                        🔍 Aplicar Filtros
+                    </button>
+                    <button class="btn-reset-filters" onclick="resetVisitasFilters()">
+                        ↺ Restablecer
+                    </button>
                 </div>
             </div>
 
-            <!-- Búsqueda rápida -->
-            <div class="search-section">
-                <h3>🔎 Búsqueda Rápida</h3>
-                <div class="search-row">
+            <!-- Búsqueda Rápida Mejorada -->
+            <div class="quick-search-container">
+                <div class="quick-search-header">
+                    <h3>🔎 Búsqueda Rápida</h3>
+                </div>
+                <div class="search-input-group">
                     <select id="visitas-search-type">
                         <option value="localizador">Localizador</option>
                         <option value="email">Email</option>
@@ -74,8 +454,8 @@ function loadVisitasReportsSection() {
                         <option value="nombre">Nombre</option>
                         <option value="fecha_servicio">Fecha Servicio</option>
                     </select>
-                    <input type="text" id="visitas-search-value" placeholder="Buscar...">
-                    <button class="btn-primary" onclick="searchVisitas()">Buscar</button>
+                    <input type="text" id="visitas-search-value" placeholder="Introduce el valor a buscar...">
+                    <button class="btn-search" onclick="searchVisitasData()">Buscar</button>
                 </div>
             </div>
 
@@ -88,15 +468,28 @@ function loadVisitasReportsSection() {
             <!-- Paginación -->
             <div id="visitas-pagination-container"></div>
         </div>
+
+        <!-- Modal Mejorado para detalles de visita -->
+        <div id="visitaDetailsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header-visita">
+                    <h3>Detalles de la Visita</h3>
+                    <span class="close" onclick="closeVisitaDetailsModal()">&times;</span>
+                </div>
+                <div class="modal-body-visita">
+                    <div id="visita-details-content"></div>
+                </div>
+            </div>
+        </div>
     `;
 
-    document.getElementById('dashboard-content').innerHTML = content;
+    // Cargar agencias y luego datos iniciales
+    loadAgenciesForVisitasFilter().then(() => {
+        loadVisitasReportData();
+    });
 
-    // Cargar agencias para el filtro
-    loadAgenciesForVisitasFilter();
-
-    // Cargar datos iniciales
-    loadVisitasReport();
+    // Configurar eventos
+    initVisitasReportsEvents();
 }
 
 /**
@@ -348,9 +741,6 @@ function applyVisitasFilters() {
     loadVisitasReport();
 }
 
-/**
- * Resetear filtros
- */
 function resetVisitasFilters() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('visitas-fecha-inicio').value = today;
@@ -358,7 +748,7 @@ function resetVisitasFilters() {
     document.getElementById('visitas-tipo-fecha').value = 'servicio';
     document.getElementById('visitas-estado-filtro').value = 'confirmadas';
     document.getElementById('visitas-agency-filter').value = 'todas';
-    applyVisitasFilters();
+    loadVisitasReportData();
 }
 
 /**
@@ -416,67 +806,101 @@ function viewVisitaDetails(visitaId) {
     });
 }
 
-/**
- * Mostrar modal de detalles
- */
-function showVisitaDetailsModal(visita) {
-    const fecha = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES');
-    
-    const modalHtml = `
-        <div class="modal-overlay" onclick="closeVisitaDetailsModal()">
-            <div class="modal-content" onclick="event.stopPropagation()">
-                <span class="close" onclick="closeVisitaDetailsModal()">&times;</span>
-                <h2>Detalles de Visita</h2>
-                
-                <div class="details-grid">
-                    <div class="detail-item">
-                        <strong>Localizador:</strong> ${visita.localizador}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Fecha:</strong> ${fecha}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Hora:</strong> ${visita.hora}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Cliente:</strong> ${visita.nombre} ${visita.apellidos}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Email:</strong> ${visita.email}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Teléfono:</strong> ${visita.telefono}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Adultos:</strong> ${visita.adultos}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Niños (5-12):</strong> ${visita.ninos}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Niños (-5):</strong> ${visita.ninos_menores}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Total Personas:</strong> ${visita.total_personas}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Precio Total:</strong> ${parseFloat(visita.precio_total).toFixed(2)}€
-                    </div>
-                    <div class="detail-item">
-                        <strong>Agencia:</strong> ${visita.agency_name || 'Sin agencia'}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Estado:</strong> ${visita.estado}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Fecha de Reserva:</strong> ${new Date(visita.created_at).toLocaleString('es-ES')}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+function showVisitaDetails(visitaId) {
+    const formData = new FormData();
+    formData.append('action', 'get_visita_details');
+    formData.append('visita_id', visitaId);
+    formData.append('nonce', reservasAjax.nonce);
 
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const visita = data.data;
+                
+                const fechaFormateada = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const estadoClass = visita.estado === 'confirmada' ? 'status-confirmada' : 'status-cancelada';
+                const estadoTexto = visita.estado === 'confirmada' ? '✓ Confirmada' : '✕ Cancelada';
+
+                const detailsHtml = `
+                    <div class="visita-details-grid">
+                        <div class="detail-card detail-card-highlight">
+                            <div class="detail-card-label">Localizador</div>
+                            <div class="detail-card-value">${visita.localizador}</div>
+                        </div>
+
+                        <div class="detail-card detail-card-highlight">
+                            <div class="detail-card-label">Estado</div>
+                            <div class="detail-card-value">
+                                <span class="status-badge-modal ${estadoClass}">${estadoTexto}</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">📅 Fecha del Servicio</div>
+                            <div class="detail-card-value">${fechaFormateada}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">🕐 Hora</div>
+                            <div class="detail-card-value">${visita.hora}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">👤 Cliente</div>
+                            <div class="detail-card-value">${visita.nombre} ${visita.apellidos}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">📧 Email</div>
+                            <div class="detail-card-value" style="font-size: 14px;">${visita.email}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">📱 Teléfono</div>
+                            <div class="detail-card-value">${visita.telefono}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">🏢 Agencia</div>
+                            <div class="detail-card-value">${visita.agency_name || 'Sin agencia'}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">👨‍👩‍👧‍👦 Adultos</div>
+                            <div class="detail-card-value">${visita.adultos}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">👶 Niños (5-12 años)</div>
+                            <div class="detail-card-value">${visita.ninos}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">🍼 Niños menores (-5 años)</div>
+                            <div class="detail-card-value">${visita.ninos_menores}</div>
+                        </div>
+
+                        <div class="detail-card detail-card-highlight">
+                            <div class="detail-card-label">💰 Total</div>
+                            <div class="detail-card-value">${parseFloat(visita.precio_total).toFixed(2)}€</div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('visita-details-content').innerHTML = detailsHtml;
+                document.getElementById('visitaDetailsModal').style.display = 'block';
+            }
+        });
 }
 
 /**
