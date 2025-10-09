@@ -1,0 +1,543 @@
+<?php
+
+/**
+ * Clase para gestionar los servicios adicionales de las agencias
+ * Archivo: wp-content/plugins/sistema-reservas/includes/class-agency-services-admin.php
+ */
+class ReservasAgencyServicesAdmin
+{
+    public function __construct()
+    {
+        // Hooks AJAX para gestión de servicios de agencias
+        add_action('wp_ajax_save_agency_service', array($this, 'save_agency_service'));
+        add_action('wp_ajax_delete_agency_service', array($this, 'delete_agency_service'));
+        add_action('wp_ajax_get_agency_service', array($this, 'get_agency_service'));
+        add_action('wp_ajax_debug_agency_services_table', array($this, 'debug_table_status'));
+
+        add_action('init', array($this, 'maybe_create_table'));
+        add_action('init', array($this, 'maybe_update_services_table')); // ✅ NUEVA LÍNEA
+
+        add_action('wp_ajax_get_available_services_for_confirmation', array($this, 'get_available_services_ajax'));
+        add_action('wp_ajax_nopriv_get_available_services_for_confirmation', array($this, 'get_available_services_ajax'));
+
+
+        // Hook para crear/actualizar tabla
+        add_action('init', array($this, 'maybe_create_table'));
+    }
+
+    /**
+     * Crear tabla de servicios de agencias si no existe
+     */
+    public function maybe_create_table()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_agency_services';
+
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
+
+        if (!$table_exists) {
+            $this->create_services_table();
+        }
+    }
+
+    public function get_available_services_ajax()
+    {
+        error_log('=== AJAX GET AVAILABLE SERVICES ===');
+
+        $fecha = sanitize_text_field($_POST['fecha'] ?? '');
+        $hora = sanitize_text_field($_POST['hora'] ?? '');
+
+        if (empty($fecha) || empty($hora)) {
+            wp_send_json_error('Fecha y hora son requeridos');
+            return;
+        }
+
+        $services = self::get_available_services($fecha, $hora);
+
+        wp_send_json_success($services);
+    }
+
+    /**
+     * Actualizar tabla para añadir campo de horarios
+     */
+    public function maybe_update_services_table()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_agency_services';
+
+        // Verificar si existe el campo horarios_disponibles
+        $column_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_name LIKE 'horarios_disponibles'");
+
+        if (empty($column_exists)) {
+            $wpdb->query("ALTER TABLE $table_name ADD COLUMN horarios_disponibles TEXT NULL AFTER dias_disponibles");
+            error_log('✅ Columna horarios_disponibles añadida a tabla de servicios de agencias');
+        }
+    }
+
+    public function debug_table_status()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_agency_services';
+
+        error_log('=== DEBUG TABLE STATUS ===');
+        error_log('Table name: ' . $table_name);
+
+        // Verificar si existe
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
+        error_log('Table exists: ' . ($table_exists ? 'YES' : 'NO'));
+
+        if ($table_exists) {
+            // Obtener estructura
+            $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
+            error_log('Columns: ' . print_r($columns, true));
+
+            // Contar registros
+            $count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+            error_log('Total records: ' . $count);
+        }
+    }
+
+    /**
+     * Crear tabla de servicios
+     */
+    private function create_services_table()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_agency_services';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            agency_id mediumint(9) NOT NULL,
+            servicio_activo tinyint(1) DEFAULT 0,
+            dias_disponibles varchar(100) DEFAULT NULL,
+            precio_adulto decimal(10,2) DEFAULT 0.00,
+            precio_nino decimal(10,2) DEFAULT 0.00,
+            logo_url varchar(255) DEFAULT NULL,
+            portada_url varchar(255) DEFAULT NULL,
+            descripcion text DEFAULT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY agency_id (agency_id),
+            KEY servicio_activo (servicio_activo)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+
+        error_log('✅ Tabla de servicios de agencias creada correctamente');
+    }
+
+    /**
+     * Guardar servicio de agencia
+     */
+    public function save_agency_service()
+{
+    error_log('=== SAVE AGENCY SERVICE START ===');
+    error_log('POST data: ' . print_r($_POST, true));
+    error_log('FILES data: ' . print_r($_FILES, true));
+
+    // Verificar nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+        wp_send_json_error('Error de seguridad');
+        return;
+    }
+
+    if (!session_id()) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['reservas_user']) || $_SESSION['reservas_user']['role'] !== 'super_admin') {
+        wp_send_json_error('Sin permisos para gestionar servicios de agencias');
+        return;
+    }
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'reservas_agency_services';
+
+    $agency_id = intval($_POST['agency_id']);
+    $servicio_activo = isset($_POST['servicio_activo']) ? 1 : 0;
+
+    // Validar que la agencia existe
+    $table_agencies = $wpdb->prefix . 'reservas_agencies';
+    $agency_exists = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM $table_agencies WHERE id = %d",
+        $agency_id
+    ));
+
+    if (!$agency_exists) {
+        wp_send_json_error('Agencia no encontrada');
+        return;
+    }
+
+    $data = array(
+        'agency_id' => $agency_id,
+        'servicio_activo' => $servicio_activo
+    );
+
+    // Solo procesar los demás campos si el servicio está activo
+    if ($servicio_activo) {
+        // ✅ VALIDAR Y PROCESAR HORARIOS (SIN CAMBIOS)
+        if (!isset($_POST['horarios']) || empty($_POST['horarios'])) {
+            wp_send_json_error('Debes seleccionar al menos un día con horarios');
+            return;
+        }
+
+        $horarios_data = $_POST['horarios'];
+        $horarios_json = array();
+        $dias_disponibles = array();
+
+        foreach ($horarios_data as $dia => $horas) {
+            if (!empty($horas) && is_array($horas)) {
+                $horas_validas = array_filter($horas, function ($hora) {
+                    return !empty($hora);
+                });
+
+                if (!empty($horas_validas)) {
+                    $horarios_json[$dia] = array_values($horas_validas);
+                    $dias_disponibles[] = $dia;
+                }
+            }
+        }
+
+        if (empty($horarios_json)) {
+            wp_send_json_error('Debes añadir al menos un horario para los días seleccionados');
+            return;
+        }
+
+        $data['dias_disponibles'] = implode(',', $dias_disponibles);
+        $data['horarios_disponibles'] = json_encode($horarios_json);
+
+        // ✅ VALIDAR PRECIOS (AHORA CON PRECIO NIÑOS MENORES)
+        $precio_adulto = floatval($_POST['precio_adulto'] ?? 0);
+        $precio_nino = floatval($_POST['precio_nino'] ?? 0);
+        $precio_nino_menor = floatval($_POST['precio_nino_menor'] ?? 0); // ✅ NUEVO
+
+        if ($precio_adulto <= 0) {
+            wp_send_json_error('El precio de adulto debe ser mayor a 0');
+            return;
+        }
+
+        if ($precio_nino < 0) {
+            wp_send_json_error('El precio de niño no puede ser negativo');
+            return;
+        }
+        
+        if ($precio_nino_menor < 0) { // ✅ NUEVO
+            wp_send_json_error('El precio de niño menor no puede ser negativo');
+            return;
+        }
+
+        $data['precio_adulto'] = $precio_adulto;
+        $data['precio_nino'] = $precio_nino;
+        $data['precio_nino_menor'] = $precio_nino_menor; // ✅ NUEVO
+        $data['descripcion'] = sanitize_textarea_field($_POST['descripcion'] ?? '');
+        $data['titulo'] = sanitize_text_field($_POST['titulo'] ?? '');
+        $data['orden_prioridad'] = intval($_POST['orden_prioridad'] ?? 999);
+
+        // Procesar imágenes si se subieron (SIN CAMBIOS)
+        if (!empty($_FILES['logo_image']['name'])) {
+            $logo_upload = $this->handle_image_upload($_FILES['logo_image'], 'logo', $agency_id);
+            if (is_wp_error($logo_upload)) {
+                wp_send_json_error('Error subiendo logo: ' . $logo_upload->get_error_message());
+                return;
+            }
+            $data['logo_url'] = $logo_upload;
+        }
+
+        if (!empty($_FILES['portada_image']['name'])) {
+            $portada_upload = $this->handle_image_upload($_FILES['portada_image'], 'portada', $agency_id);
+            if (is_wp_error($portada_upload)) {
+                wp_send_json_error('Error subiendo portada: ' . $portada_upload->get_error_message());
+                return;
+            }
+            $data['portada_url'] = $portada_upload;
+        }
+    }
+
+    // Verificar si ya existe un servicio para esta agencia
+    $existing = $wpdb->get_var($wpdb->prepare(
+        "SELECT id FROM $table_name WHERE agency_id = %d",
+        $agency_id
+    ));
+
+    if ($existing) {
+        $result = $wpdb->update($table_name, $data, array('agency_id' => $agency_id));
+    } else {
+        $result = $wpdb->insert($table_name, $data);
+    }
+
+    if ($result !== false) {
+        error_log('✅ Servicio de agencia guardado correctamente');
+        wp_send_json_success('Servicio guardado correctamente');
+    } else {
+        error_log('❌ Error guardando servicio: ' . $wpdb->last_error);
+        wp_send_json_error('Error al guardar el servicio: ' . $wpdb->last_error);
+    }
+}
+
+    /**
+     * Obtener servicios disponibles para una fecha y hora específica
+     */
+    public static function get_available_services($fecha, $hora)
+    {
+        error_log('=== GET AVAILABLE SERVICES ===');
+        error_log('Fecha: ' . $fecha);
+        error_log('Hora: ' . $hora);
+
+        global $wpdb;
+        $table_services = $wpdb->prefix . 'reservas_agency_services';
+        $table_agencies = $wpdb->prefix . 'reservas_agencies';
+
+        // Obtener día de la semana en español
+        $fecha_obj = new DateTime($fecha);
+        $dia_numero = $fecha_obj->format('N'); // 1 (lunes) a 7 (domingo)
+
+        $dias_semana = [
+            1 => 'lunes',
+            2 => 'martes',
+            3 => 'miercoles',
+            4 => 'jueves',
+            5 => 'viernes',
+            6 => 'sabado',
+            7 => 'domingo'
+        ];
+
+        $dia_nombre = $dias_semana[$dia_numero];
+        error_log('Día de la semana: ' . $dia_nombre);
+
+        // Obtener todos los servicios activos
+        $services = $wpdb->get_results("
+        SELECT s.*, a.agency_name, a.contact_person, a.email, a.phone
+        FROM $table_services s
+        INNER JOIN $table_agencies a ON s.agency_id = a.id
+        WHERE s.servicio_activo = 1
+        AND a.status = 'active'
+        ORDER BY s.orden_prioridad ASC, s.created_at ASC
+    ");
+
+        error_log('Total servicios activos: ' . count($services));
+
+        $available_services = array();
+
+        foreach ($services as $service) {
+            // Verificar si el servicio está disponible este día
+            $dias_disponibles = explode(',', $service->dias_disponibles);
+
+            if (!in_array($dia_nombre, $dias_disponibles)) {
+                continue;
+            }
+
+            // Verificar horarios
+            $horarios = json_decode($service->horarios_disponibles, true);
+
+            if (!isset($horarios[$dia_nombre])) {
+                continue;
+            }
+
+            // Verificar si la hora coincide con algún horario disponible
+            $hora_coincide = false;
+            foreach ($horarios[$dia_nombre] as $horario_disponible) {
+                // Comparar solo HH:MM (ignorar segundos)
+                $hora_reserva = substr($hora, 0, 5);
+                $hora_servicio = substr($horario_disponible, 0, 5);
+
+                if ($hora_reserva === $hora_servicio) {
+                    $hora_coincide = true;
+                    break;
+                }
+            }
+
+            if ($hora_coincide) {
+                $available_services[] = $service;
+                error_log('✅ Servicio disponible: ' . $service->agency_name);
+            }
+        }
+
+        error_log('Total servicios disponibles: ' . count($available_services));
+
+        return $available_services;
+    }
+
+    /**
+     * Obtener servicio de una agencia
+     */
+    public function get_agency_service()
+    {
+        error_log('=== GET AGENCY SERVICE START ===');
+        error_log('POST data: ' . print_r($_POST, true));
+
+        // Verificar nonce
+        if (!isset($_POST['nonce'])) {
+            error_log('❌ Nonce no presente en POST');
+            wp_send_json_error('Nonce no proporcionado');
+            return;
+        }
+
+        if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+            error_log('❌ Nonce inválido');
+            wp_send_json_error('Error de seguridad - nonce inválido');
+            return;
+        }
+
+        error_log('✅ Nonce verificado correctamente');
+
+        if (!session_id()) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['reservas_user'])) {
+            error_log('❌ Usuario no encontrado en sesión');
+            wp_send_json_error('Sesión expirada');
+            return;
+        }
+
+        error_log('Usuario en sesión: ' . print_r($_SESSION['reservas_user'], true));
+
+        if ($_SESSION['reservas_user']['role'] !== 'super_admin') {
+            error_log('❌ Usuario sin permisos: ' . $_SESSION['reservas_user']['role']);
+            wp_send_json_error('Sin permisos');
+            return;
+        }
+
+        error_log('✅ Permisos verificados');
+
+        if (!isset($_POST['agency_id'])) {
+            error_log('❌ Agency ID no presente');
+            wp_send_json_error('ID de agencia no proporcionado');
+            return;
+        }
+
+        $agency_id = intval($_POST['agency_id']);
+        error_log('Agency ID: ' . $agency_id);
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_agency_services';
+
+        error_log('Tabla: ' . $table_name);
+
+        $service = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE agency_id = %d",
+            $agency_id
+        ));
+
+        error_log('Resultado query: ' . print_r($service, true));
+        error_log('wpdb error: ' . $wpdb->last_error);
+
+        if ($service) {
+            // Convertir días de string a array
+            if ($service->dias_disponibles) {
+                $service->dias_disponibles = explode(',', $service->dias_disponibles);
+            } else {
+                $service->dias_disponibles = array();
+            }
+
+            error_log('✅ Servicio encontrado, enviando respuesta');
+            wp_send_json_success($service);
+        } else {
+            error_log('ℹ️ No se encontró servicio, enviando estructura vacía');
+            // Devolver estructura vacía
+            wp_send_json_success(array(
+                'servicio_activo' => 0,
+                'dias_disponibles' => array(),
+                'precio_adulto' => 0,
+                'precio_nino' => 0,
+                'logo_url' => '',
+                'portada_url' => '',
+                'descripcion' => ''
+            ));
+        }
+    }
+
+    /**
+     * Manejar subida de imágenes
+     */
+    private function handle_image_upload($file, $type, $agency_id)
+    {
+        if (!function_exists('wp_handle_upload')) {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+
+        // Validar tipo de archivo
+        $allowed_types = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif');
+        if (!in_array($file['type'], $allowed_types)) {
+            return new WP_Error('invalid_type', 'Solo se permiten imágenes (JPG, PNG, GIF)');
+        }
+
+        // Validar tamaño (máximo 2MB)
+        if ($file['size'] > 2097152) {
+            return new WP_Error('file_too_large', 'La imagen no puede superar los 2MB');
+        }
+
+        $upload_overrides = array(
+            'test_form' => false,
+            'unique_filename_callback' => function ($dir, $name, $ext) use ($agency_id, $type) {
+                return "agency_{$agency_id}_{$type}" . $ext;
+            }
+        );
+
+        $uploaded = wp_handle_upload($file, $upload_overrides);
+
+        if (isset($uploaded['error'])) {
+            return new WP_Error('upload_error', $uploaded['error']);
+        }
+
+        return $uploaded['url'];
+    }
+
+    /**
+     * Eliminar servicio de agencia (desactivar)
+     */
+    public function delete_agency_service()
+    {
+        if (!session_id()) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['reservas_user']) || $_SESSION['reservas_user']['role'] !== 'super_admin') {
+            wp_send_json_error('Sin permisos');
+            return;
+        }
+
+        $agency_id = intval($_POST['agency_id']);
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_agency_services';
+
+        // Solo desactivar, no eliminar
+        $result = $wpdb->update(
+            $table_name,
+            array('servicio_activo' => 0),
+            array('agency_id' => $agency_id)
+        );
+
+        if ($result !== false) {
+            wp_send_json_success('Servicio desactivado correctamente');
+        } else {
+            wp_send_json_error('Error al desactivar el servicio');
+        }
+    }
+
+    /**
+     * Método estático para obtener servicios disponibles por día
+     */
+    public static function get_services_by_day($day_name)
+    {
+        global $wpdb;
+        $table_services = $wpdb->prefix . 'reservas_agency_services';
+        $table_agencies = $wpdb->prefix . 'reservas_agencies';
+
+        $services = $wpdb->get_results($wpdb->prepare(
+            "SELECT s.*, a.agency_name, a.contact_person 
+             FROM $table_services s
+             INNER JOIN $table_agencies a ON s.agency_id = a.id
+             WHERE s.servicio_activo = 1
+             AND a.status = 'active'
+             AND FIND_IN_SET(%s, s.dias_disponibles) > 0",
+            $day_name
+        ));
+
+        return $services;
+    }
+}

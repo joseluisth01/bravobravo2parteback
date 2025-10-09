@@ -1,0 +1,29 @@
+[Oct 1 10:52:46] 
+[Oct 1 10:52:46] ==DUPLICATOR INSTALLER BOOTSTRAP v1.5.12==
+[Oct 1 10:52:46] ----------------------------------------------------
+[Oct 1 10:52:46] Installer bootstrap start
+[Oct 1 10:52:46] Manual extract found so not going to extract dup-installer dir
+[Oct 1 10:52:46] EXTRACT dup-installer dir
+[Oct 1 10:52:46] NOTICE: Didn't need to extract the installer.
+[Oct 1 10:52:46] [PHP ERR][ISSUE] MSG:Creation of dynamic property DUPX_Bootstrap::$archive is deprecated [CODE:8192|FILE:/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/installer.php|LINE:530]
+[Oct 1 10:52:46] [PHP ERR][ISSUE] MSG:Creation of dynamic property DUPX_Bootstrap::$bootloader is deprecated [CODE:8192|FILE:/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/installer.php|LINE:531]
+[Oct 1 10:52:46] Set permissions of dup-installer<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/addons<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/assets<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/classes<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/ctrls<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/favicon<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/libs<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/original_files_[HASH]<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/src<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/templates<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/vendor<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/dup-archive__[HASH].txt<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/dup-database__[HASH].sql<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/dup-installer-csrf__[HASH].txt<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/dup-scan__[HASH].json<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/dup-scanned-dirs__[HASH].txt<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/dup-scanned-files__[HASH].txt<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/index.php<br/>
+[Oct 1 10:52:46] Set permissions of dup-installer/main.installer.php<br/>
+[Oct 1 10:52:46] DONE: No detected errors so redirecting to the main installer. Main Installer URI = https://dev.tictac-comunicacion.es/bravobravo2parte/dup-installer/main.installer.php

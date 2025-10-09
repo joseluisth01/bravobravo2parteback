@@ -1,0 +1,1270 @@
+********************************************************************************
+* DUPLICATOR LITE: Install-Log
+* STEP-0 START @ 10:52:46
+* NOTICE: Do NOT post to public sites or forums!!
+********************************************************************************
+PACKAGE INFO________ ORIGINAL SERVER                        |CURRENT SERVER
+OS__________________: Linux                                 |Linux
+PHP VERSION_________: 8.1.33                                |8.2.29
+********************************************************************************
+CURRENT SERVER INFO
+PHP_________________: 8.2.29 | SAPI: fpm-fcgi
+PHP MEMORY__________: 4294967296 | SUHOSIN: disabled
+ARCHITECTURE________: 64-bit
+SERVER______________: Apache
+DOC ROOT____________: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+REQUEST URL_________: "https://dev.tictac-comunicacion.es/bravobravo2parte"
+********************************************************************************
+OVERWRITE PARAMS
+ *** FROM PACKAGE
+PARAM SET KEY[blogname]
+********************************************************************************
+MAINTENANCE MODE DISABLE
+INSTALLER INFO
+
+TEMPLATE____________: "base"
+SECURE MODE_________: "none"
+URL PLUGINS_________: https://autobusmedinaazahara.com/wp-content/plugins
+VALIDATE ON START___: "normal"
+PATH_NEW____________: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+URL_NEW_____________: "https://dev.tictac-comunicacion.es/bravobravo2parte"
+********************************************************************************
+ARCHIVE INFO
+
+ARCHIVE NAME________: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/20250707_autocaresbravo_[HASH]_20251001104923_archive.zip"
+ARCHIVE SIZE________: 256MB
+CREATED_____________: 2025-10-01 10:49:23
+WP VERSION__________: 6.8.3
+DUP VERSION_________: 1.5.12
+LICENSE_____________: Free version
+DB VERSION__________: 10.6.23
+DB FILE SIZE________: 11.3MB
+DB TABLES___________: 94
+DB ROWS_____________: 5659
+URL HOME____________: https://autobusmedinaazahara.com
+URL CORE____________: https://autobusmedinaazahara.com
+URL CONTENT_________: https://autobusmedinaazahara.com/wp-content
+URL UPLOAD__________: https://autobusmedinaazahara.com/wp-content/uploads
+URL PLUGINS_________: https://autobusmedinaazahara.com/wp-content/plugins
+URL MU PLUGINS______: https://autobusmedinaazahara.com/wp-content/mu-plugins
+URL THEMES__________: https://autobusmedinaazahara.com/wp-content/themes
+PATH HOME___________: /home/autobusmedinaaza/public_html
+PATH ABS____________: /home/autobusmedinaaza/public_html
+PATH WPCONFIG_______: /home/autobusmedinaaza/public_html
+PATH WPCONTENT______: /home/autobusmedinaaza/public_html/wp-content
+PATH UPLOADS________: /home/autobusmedinaaza/public_html/wp-content/uploads
+PATH PLUGINS________: /home/autobusmedinaaza/public_html/wp-content/plugins
+PATH MUPLUGINS______: /home/autobusmedinaaza/public_html/wp-content/mu-plugins
+PATH THEMES_________: /home/autobusmedinaaza/public_html/wp-content/themes
+
+SUBSITES
+SUBSITE [ID:   1] "autobusmedinaazahara.com/"
+
+PLUGINS
+PLUGIN [SLUG:advanced-custom-fields-pro/acf.php                ][ON:true ]  Advanced Custom Fields PRO
+PLUGIN [SLUG:all-in-one-wp-migration/all-in-one-wp-migration.php][ON:true ]  All-in-One WP Migration and Backup
+PLUGIN [SLUG:complianz-gdpr/complianz-gpdr.php                 ][ON:false]  Complianz | GDPR/CCPA Cookie Consent
+PLUGIN [SLUG:console-monitor/console-monitor.php               ][ON:false]  Console Monitor Pro
+PLUGIN [SLUG:contact-form-7/wp-contact-form-7.php              ][ON:true ]  Contact Form 7
+PLUGIN [SLUG:duplicator/duplicator.php                         ][ON:true ]  Duplicator
+PLUGIN [SLUG:gtranslate/gtranslate.php                         ][ON:true ]  GTranslate
+PLUGIN [SLUG:litespeed-cache/litespeed-cache.php               ][ON:true ]  LiteSpeed Cache
+PLUGIN [SLUG:maintenance/maintenance.php                       ][ON:true ]  Maintenance
+PLUGIN [SLUG:seo-by-rank-math/rank-math.php                    ][ON:true ]  Rank Math SEO
+PLUGIN [SLUG:seo-by-rank-math-pro/rank-math-pro.php            ][ON:true ]  Rank Math SEO PRO
+PLUGIN [SLUG:sistema-reservas/sistema-reservas.php             ][ON:true ]  Sistema de Reservas
+PLUGIN [SLUG:wordfence/wordfence.php                           ][ON:true ]  Wordfence Security
+PLUGIN [SLUG:wp-file-manager/file_folder_manager.php           ][ON:true ]  WP File Manager
+
+********************************************************************************
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/ctrls/ctrl.base.php:227][DELTA:   0.05437]  MESSAGE:END RENDER PAGE
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+SECURITY CHECK:  Security Check Validation - No Token Found
+	FILE:/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/config/class.security.php[252]
+	TRACE:
+#0 /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php(84): DUPX_Security->check()
+#1 /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/main.installer.php(55): Duplicator\Installer\Core\Bootstrap::init()
+#2 {main}
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [sparam_s1] START
+AJAX ACTION [sparam_s1] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+STEP ACTION: "on-validate"
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/ctrls/ctrl.base.php:227][DELTA:   0.04867]  MESSAGE:END RENDER PAGE
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+SECURITY CHECK:  Security Check Validation - No Token Found
+	FILE:/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/config/class.security.php[252]
+	TRACE:
+#0 /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php(84): DUPX_Security->check()
+#1 /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/main.installer.php(55): Duplicator\Installer\Core\Bootstrap::init()
+#2 {main}
+
+
+-------------------------
+AJAX ACTION [validate] START
+START TEST "Archive Check" [CLASS: DUPX_Validation_test_archive_check]
+LOG-TIME[DELTA:   0.00007]  MESSAGE:TEST "Archive Check" RESULT: passed
+
+START TEST "Duplicator importer version" [CLASS: DUPX_Validation_test_importer_version]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "Duplicator importer version" RESULT: skip
+
+START TEST "Overwrite Install" [CLASS: DUPX_Validation_test_owrinstall]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "Overwrite Install" RESULT: skip
+
+START TEST "Recovery Point" [CLASS: DUPX_Validation_test_recovery]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "Recovery Point" RESULT: skip
+
+START TEST "Package is Importable" [CLASS: DUPX_Validation_test_importable]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "Package is Importable" RESULT: skip
+
+START TEST "REST API test" [CLASS: DUPX_Validation_test_rest_api]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "REST API test" RESULT: skip
+
+START TEST "Manual extraction detected" [CLASS: DUPX_Validation_test_manual_extraction]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "Manual extraction detected" RESULT: good
+
+START TEST "Database Only" [CLASS: DUPX_Validation_test_dbonly_iswordpress]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "Database Only" RESULT: skip
+
+START TEST "Package Age" [CLASS: DUPX_Validation_test_package_age]
+LOG-TIME[DELTA:   0.00002]  MESSAGE:TEST "Package Age" RESULT: good
+
+START TEST "Package Size" [CLASS: DUPX_Validation_test_package_size]
+LOG-TIME[DELTA:   0.00008]  MESSAGE:TEST "Package Size" RESULT: good
+
+START TEST "Replace PATHs in database" [CLASS: DUPX_Validation_test_replace_paths]
+LOG-TIME[DELTA:   0.00006]  MESSAGE:TEST "Replace PATHs in database" RESULT: skip
+
+START TEST "Managed hosting supported" [CLASS: DUPX_Validation_test_managed_supported]
+LOG-TIME[DELTA:   0.00028]  MESSAGE:TEST "Managed hosting supported" RESULT: skip
+
+START TEST "Siteground" [CLASS: DUPX_Validation_test_siteground]
+LOG-TIME[DELTA:   0.00010]  MESSAGE:TEST "Siteground" RESULT: skip
+
+START TEST "Addon Sites" [CLASS: DUPX_Validation_test_addon_sites]
+--------------------------------------
+PATHS MAPPING : "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+--------------------------------------
+LOG-TIME[DELTA:   0.06696]  MESSAGE:TEST "Addon Sites" RESULT: good
+
+START TEST "Wordfence" [CLASS: DUPX_Validation_test_wordfence]
+LOG-TIME[DELTA:   0.00043]  MESSAGE:TEST "Wordfence" RESULT: good
+
+START TEST "Table prefix of managed hosting" [CLASS: DUPX_Validation_test_managed_tprefix]
+LOG-TIME[DELTA:   0.00026]  MESSAGE:TEST "Table prefix of managed hosting" RESULT: skip
+
+START TEST "PHP Version Mismatch" [CLASS: DUPX_Validation_test_php_version]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "PHP Version Mismatch" RESULT: good
+
+START TEST "PHP Open Base" [CLASS: DUPX_Validation_test_open_basedir]
+LOG-TIME[DELTA:   0.00002]  MESSAGE:TEST "PHP Open Base" RESULT: good
+
+START TEST "PHP Memory Limit" [CLASS: DUPX_Validation_test_memory_limit]
+LOG-TIME[DELTA:   0.00002]  MESSAGE:TEST "PHP Memory Limit" RESULT: good
+
+START TEST "PHP Extensions" [CLASS: DUPX_Validation_test_extensions]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "PHP Extensions" RESULT: good
+
+START TEST "PHP Mysqli" [CLASS: DUPX_Validation_test_mysql_connect]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "PHP Mysqli" RESULT: passed
+
+START TEST "PHP Tokenizer" [CLASS: DUPX_Validation_test_tokenizer]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "PHP Tokenizer" RESULT: passed
+
+START TEST "PHP Timeout" [CLASS: DUPX_Validation_test_timeout]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "PHP Timeout" RESULT: good
+
+START TEST "Disk Space" [CLASS: DUPX_Validation_test_disk_space]
+LOG-TIME[DELTA:   0.00739]  MESSAGE:TEST "Disk Space" RESULT: good
+
+START TEST "Permissions: General" [CLASS: DUPX_Validation_test_iswritable]
+LOG-TIME[DELTA:   0.11967]  MESSAGE:TEST "Permissions: General" RESULT: passed
+
+START TEST "Permissions: Configs Files " [CLASS: DUPX_Validation_test_iswritable_configs]
+LOG-TIME[DELTA:   0.00036]  MESSAGE:TEST "Permissions: Configs Files " RESULT: passed
+
+START TEST "Host Name" [CLASS: DUPX_Validation_test_db_host_name]
+LOG-TIME[DELTA:   0.00003]  MESSAGE:TEST "Host Name" RESULT: passed
+
+START TEST "Host Connection" [CLASS: DUPX_Validation_test_db_connection]
+LOG-TIME[DELTA:   0.00031]  MESSAGE:TEST "Host Connection" RESULT: passed
+
+START TEST "Database Version" [CLASS: DUPX_Validation_test_db_version]
+LOG-TIME[DELTA:   0.00113]  MESSAGE:TEST "Database Version" RESULT: passed
+
+START TEST "Create New Database" [CLASS: DUPX_Validation_test_db_create]
+LOG-TIME[DELTA:   0.00002]  MESSAGE:TEST "Create New Database" RESULT: skip
+
+START TEST "Database Engine Support" [CLASS: DUPX_Validation_test_db_supported_engine]
+LOG-TIME[DELTA:   0.00023]  MESSAGE:TEST "Database Engine Support" RESULT: passed
+
+START TEST "Database GTID Mode" [CLASS: DUPX_Validation_test_db_gtid_mode]
+LOG-TIME[DELTA:   0.00058]  MESSAGE:TEST "Database GTID Mode" RESULT: passed
+
+START TEST "Privileges: User Visibility" [CLASS: DUPX_Validation_test_db_visibility]
+LOG-TIME[DELTA:   0.00009]  MESSAGE:TEST "Privileges: User Visibility" RESULT: passed
+
+START TEST "Manual Table Check" [CLASS: DUPX_Validation_test_db_manual_tabels_count]
+LOG-TIME[DELTA:   0.00002]  MESSAGE:TEST "Manual Table Check" RESULT: skip
+
+START TEST "Multiple WordPress Installs" [CLASS: DUPX_Validation_test_db_multiple_wp_installs]
+LOG-TIME[DELTA:   0.00035]  MESSAGE:TEST "Multiple WordPress Installs" RESULT: passed
+
+START TEST "Privileges: User Resources" [CLASS: DUPX_Validation_test_db_user_resources]
+DB QUERY [ERROR][/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/database/class.db.php:645] MSG: SELECT command denied to user 'user_admin_bravobravo2parte'@'localhost' for table `mysql`.`user`
+	SQL: SELECT max_questions, max_updates, max_connections FROM mysql.user WHERE user = 'user_admin_bravobravo2parte' AND host = 'localhost'
+TRACE[1] CLASS___: DUPX_DB::mysqli_query      FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/validation/class.validation.database.service.php[763]
+TRACE[2] CLASS___: DUPX_Validation_database_service->getUserResources FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/validation/database-tests/class.validation.test.db.user.resources.php[28]
+TRACE[3] CLASS___: DUPX_Validation_test_db_user_resources->runTest FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/validation/class.validation.abstract.item.php[46]
+TRACE[4] CLASS___: DUPX_Validation_abstract_item->test FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/validation/class.validation.manager.php[232]
+TRACE[5] CLASS___: DUPX_Validation_manager->runTests FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/validation/class.validation.manager.php[205]
+TRACE[6] CLASS___: DUPX_Validation_manager->getValidateData FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/ctrls/classes/class.ctrl.ajax.php[173]
+TRACE[7] CLASS___: DUPX_Ctrl_ajax::actions    FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/ctrls/classes/class.ctrl.ajax.php[95]
+TRACE[8] CLASS___: DUPX_Ctrl_ajax::controller FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/main.installer.php[60]
+
+LOG-TIME[DELTA:   0.00017]  MESSAGE:TEST "Privileges: User Resources" RESULT: passed
+
+START TEST "Privileges: User Table Access" [CLASS: DUPX_Validation_test_db_user_perms]
+LOG-TIME[DELTA:   0.01882]  MESSAGE:TEST "Privileges: User Table Access" RESULT: passed
+
+START TEST "Privileges: 'Show Variables' Query" [CLASS: DUPX_Validation_test_db_custom_queries]
+LOG-TIME[DELTA:   0.00046]  MESSAGE:TEST "Privileges: 'Show Variables' Query" RESULT: passed
+
+START TEST "Source Database Triggers" [CLASS: DUPX_Validation_test_db_triggers]
+LOG-TIME[DELTA:   0.00002]  MESSAGE:TEST "Source Database Triggers" RESULT: passed
+
+START TEST "Character Set and Collation Support" [CLASS: DUPX_Validation_test_db_supported_default_charset]
+LOG-TIME[DELTA:   0.00075]  MESSAGE:TEST "Character Set and Collation Support" RESULT: passed
+
+START TEST "Character Set and  Collation Capability" [CLASS: DUPX_Validation_test_db_supported_charset]
+LOG-TIME[DELTA:   0.00009]  MESSAGE:TEST "Character Set and  Collation Capability" RESULT: passed
+
+START TEST "Tables Case Sensitivity" [CLASS: DUPX_Validation_test_db_case_sensitive_tables]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "Tables Case Sensitivity" RESULT: skip
+
+START TEST "Tables Flagged for Removal or Backup" [CLASS: DUPX_Validation_test_db_affected_tables]
+LOG-TIME[DELTA:   0.00030]  MESSAGE:TEST "Tables Flagged for Removal or Backup" RESULT: passed
+
+START TEST "Prefix too long" [CLASS: DUPX_Validation_test_db_prefix_too_long]
+LOG-TIME[DELTA:   0.00020]  MESSAGE:TEST "Prefix too long" RESULT: passed
+
+START TEST "Database cleanup" [CLASS: DUPX_Validation_test_db_cleanup]
+LOG-TIME[DELTA:   0.00001]  MESSAGE:TEST "Database cleanup" RESULT: skip
+
+
+CTRL PARAMS AFTER VALIDATION
+AJAX ACTION [validate] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [proceed_confirm_dialog] START
+AJAX ACTION [proceed_confirm_dialog] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [sparam_s1] START
+AJAX ACTION [sparam_s1] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [extract] START
+INITIALIZE FILTERS
+--------------------------------------
+PATHS MAPPING : "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+--------------------------------------
+********************************************************************************
+* DUPLICATOR LITE: Install-Log
+* STEP-1 START @ 10:54:15
+* NOTICE: Do NOT post to public sites or forums!!
+********************************************************************************
+USER INPUTS
+INSTALL TYPE________: single site
+BLOG NAME___________: "AUTOCARES BRAVO"
+HOME URL NEW________: "https://dev.tictac-comunicacion.es/bravobravo2parte"
+SITE URL NEW________: "https://dev.tictac-comunicacion.es/bravobravo2parte"
+CONTENT URL NEW_____: "https://dev.tictac-comunicacion.es/bravobravo2parte/wp-content"
+UPLOAD URL NEW______: "https://dev.tictac-comunicacion.es/bravobravo2parte/wp-content/uploads"
+PLUGINS URL NEW_____: "https://dev.tictac-comunicacion.es/bravobravo2parte/wp-content/plugins"
+MUPLUGINS URL NEW___: "https://dev.tictac-comunicacion.es/bravobravo2parte/wp-content/mu-plugins"
+HOME PATH NEW_______: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+SITE PATH NEW_______: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+CONTENT PATH NEW____: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content"
+UPLOAD PATH NEW_____: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/uploads"
+PLUGINS PATH NEW____: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/plugins"
+MUPLUGINS PATH NEW__: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/mu-plugins"
+ARCHIVE ACTION______: "donothing"
+SKIP WP FILES_______: "none"
+ARCHIVE ENGINE______: "ziparchivechunking"
+SET DIR PERMS_______: true
+DIR PERMS VALUE_____: 0755
+SET FILE PERMS______: true
+FILE PERMS VALUE____: 0644
+SAFE MODE___________: 0
+LOGGING_____________: 1
+ZIP THROTTLING______: false
+WP CONFIG___________: "modify"
+HTACCESS CONFIG_____: "new"
+OTHER CONFIG________: "new"
+FILE TIME___________: "current"
+********************************************************************************
+
+REMOVE FILTERS
+	DIR : "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer"
+	FILE: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/20250707_autocaresbravo_[HASH]_20251001104923_installer-backup.php"
+	FILE: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/20250707_autocaresbravo_[HASH]_20251001104923_archive.zip"
+	FILE: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/installer.php"
+	FILE: "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer-bootlog__01b9698-01104923.txt"
+EXTRACTION FILTERS
+	DIR : "dup-installer"
+	FILE: "20250707_autocaresbravo_[HASH]_20251001104923_installer-backup.php"
+--------------------------------------
+
+
+EXTRACTION: ZIP CHUNKING >>> START
+MAINTENANCE MODE ENABLE
+BEFORE EXTRACION ACTIONS
+
+*** RESET CONFIG FILES IN CURRENT HOSTING >>> START
+
+*** RESET CONFIG FILES IN CURRENT HOSTING >>> END
+MAINTENANCE MODE ENABLE
+
+*** CREATE FOLDER AND PERMISSION PREPARE
+FOLDER PREPARE DONE
+ARCHIVE OFFSET 0
+CHUNK COMPLETE - RUNTIME: 5.0047 sec. - Files processed: 5,166 of 15,522
+AJAX ACTION [extract] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [extract] START
+MAINTENANCE MODE ENABLE
+ARCHIVE OFFSET 5166
+--------------------------------------
+PATHS MAPPING : "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+--------------------------------------
+CHUNK COMPLETE - RUNTIME: 5.0054 sec. - Files processed: 9,694 of 15,522
+AJAX ACTION [extract] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [extract] START
+MAINTENANCE MODE ENABLE
+ARCHIVE OFFSET 9694
+--------------------------------------
+PATHS MAPPING : "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+--------------------------------------
+CHUNK COMPLETE - RUNTIME: 5.0037 sec. - Files processed: 14,650 of 15,522
+AJAX ACTION [extract] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [extract] START
+MAINTENANCE MODE ENABLE
+ARCHIVE OFFSET 14650
+--------------------------------------
+PATHS MAPPING : "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+--------------------------------------
+FILE EXTRACTION: done processing last file in list of 16131
+
+EXTRACTION: ZIP CHUNKING >>> DONE
+
+EXTRACTION COMPLETE @ 10:54:32 - RUNTIME: 16.9617 sec. - Files processed: 15,522 of 15,522
+AJAX ACTION [extract] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [dbinstall] START
+ADD PREFIX META MAP ID 0 wp_
+
+
+
+********************************************************************************
+* DUPLICATOR LITE: INSTALL-LOG
+* STEP-2 START @ 10:54:32
+* NOTICE: Do NOT post to public sites or forums!!
+********************************************************************************
+USER INPUTS
+DB ENGINE___________: "chunk"
+VIEW MODE___________: "basic"
+DB ACTION___________: "empty"
+DB HOST_____________: "**OBSCURED**"
+DB NAME_____________: "**OBSCURED**"
+DB PASS_____________: "**OBSCURED**"
+DB PORT_____________: "**OBSCURED**"
+USER MODE___________: "overwrite"
+TABLE PREFIX________: "wp_"
+MYSQL MODE__________: "DEFAULT"
+MYSQL MODE OPTS_____: ""
+CHARSET_____________: "utf8mb4"
+COLLATE_____________: ""
+CUNKING_____________: true
+VIEW CREATION_______: true
+STORED PROCEDURE____: true
+FUNCTIONS___________: true
+REMOVE DEFINER______: false
+SPLIT CREATES_______: true
+--------------------------------------
+TABLES
+--------------------------------------
+TABLE "wp_actionscheduler_actions"______________________[ROWS:      72] [EXTRACT|REPLACE] [INST NAME: wp_actionscheduler_actions]
+TABLE "wp_actionscheduler_claims"_______________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_actionscheduler_claims]
+TABLE "wp_actionscheduler_groups"_______________________[ROWS:       5] [EXTRACT|REPLACE] [INST NAME: wp_actionscheduler_groups]
+TABLE "wp_actionscheduler_logs"_________________________[ROWS:     219] [EXTRACT|REPLACE] [INST NAME: wp_actionscheduler_logs]
+TABLE "wp_cmplz_cookiebanners"__________________________[ROWS:       1] [EXTRACT|REPLACE] [INST NAME: wp_cmplz_cookiebanners]
+TABLE "wp_cmplz_cookies"________________________________[ROWS:      40] [EXTRACT|REPLACE] [INST NAME: wp_cmplz_cookies]
+TABLE "wp_cmplz_dnsmpd"_________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_cmplz_dnsmpd]
+TABLE "wp_cmplz_services"_______________________________[ROWS:      16] [EXTRACT|REPLACE] [INST NAME: wp_cmplz_services]
+TABLE "wp_commentmeta"__________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_commentmeta]
+TABLE "wp_comments"_____________________________________[ROWS:      25] [EXTRACT|REPLACE] [INST NAME: wp_comments]
+TABLE "wp_duplicator_packages"__________________________[ROWS:       4] [EXTRACT|REPLACE] [INST NAME: wp_duplicator_packages]
+TABLE "wp_links"________________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_links]
+TABLE "wp_litespeed_url"________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_litespeed_url]
+TABLE "wp_litespeed_url_file"___________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_litespeed_url_file]
+TABLE "wp_options"______________________________________[ROWS:    1988] [EXTRACT|REPLACE] [INST NAME: wp_options]
+TABLE "wp_postmeta"_____________________________________[ROWS:     459] [EXTRACT|REPLACE] [INST NAME: wp_postmeta]
+TABLE "wp_posts"________________________________________[ROWS:     300] [EXTRACT|REPLACE] [INST NAME: wp_posts]
+TABLE "wp_rank_math_analytics_objects"__________________[ROWS:      12] [EXTRACT|REPLACE] [INST NAME: wp_rank_math_analytics_objects]
+TABLE "wp_rank_math_internal_links"_____________________[ROWS:      32] [EXTRACT|REPLACE] [INST NAME: wp_rank_math_internal_links]
+TABLE "wp_rank_math_internal_meta"______________________[ROWS:      19] [EXTRACT|REPLACE] [INST NAME: wp_rank_math_internal_meta]
+TABLE "wp_reservas_agencies"____________________________[ROWS:      14] [EXTRACT|REPLACE] [INST NAME: wp_reservas_agencies]
+TABLE "wp_reservas_configuration"_______________________[ROWS:      31] [EXTRACT|REPLACE] [INST NAME: wp_reservas_configuration]
+TABLE "wp_reservas_discount_rules"______________________[ROWS:       1] [EXTRACT|REPLACE] [INST NAME: wp_reservas_discount_rules]
+TABLE "wp_reservas_reservas"____________________________[ROWS:    1482] [EXTRACT|REPLACE] [INST NAME: wp_reservas_reservas]
+TABLE "wp_reservas_servicios"___________________________[ROWS:     277] [EXTRACT|REPLACE] [INST NAME: wp_reservas_servicios]
+TABLE "wp_reservas_users"_______________________________[ROWS:       2] [EXTRACT|REPLACE] [INST NAME: wp_reservas_users]
+TABLE "wp_termmeta"_____________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_termmeta]
+TABLE "wp_terms"________________________________________[ROWS:      16] [EXTRACT|REPLACE] [INST NAME: wp_terms]
+TABLE "wp_term_relationships"___________________________[ROWS:       5] [EXTRACT|REPLACE] [INST NAME: wp_term_relationships]
+TABLE "wp_term_taxonomy"________________________________[ROWS:      16] [EXTRACT|REPLACE] [INST NAME: wp_term_taxonomy]
+TABLE "wp_usermeta"_____________________________________[ROWS:      37] [EXTRACT|REPLACE] [INST NAME: wp_usermeta]
+TABLE "wp_users"________________________________________[ROWS:       1] [EXTRACT|REPLACE] [INST NAME: wp_users]
+TABLE "wp_wc_admin_notes"_______________________________[ROWS:      65] [EXTRACT|REPLACE] [INST NAME: wp_wc_admin_notes]
+TABLE "wp_wc_admin_note_actions"________________________[ROWS:      93] [EXTRACT|REPLACE] [INST NAME: wp_wc_admin_note_actions]
+TABLE "wp_wc_category_lookup"___________________________[ROWS:       1] [EXTRACT|REPLACE] [INST NAME: wp_wc_category_lookup]
+TABLE "wp_wc_customer_lookup"___________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_customer_lookup]
+TABLE "wp_wc_download_log"______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_download_log]
+TABLE "wp_wc_orders"____________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_orders]
+TABLE "wp_wc_orders_meta"_______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_orders_meta]
+TABLE "wp_wc_order_addresses"___________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_order_addresses]
+TABLE "wp_wc_order_coupon_lookup"_______________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_order_coupon_lookup]
+TABLE "wp_wc_order_operational_data"____________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_order_operational_data]
+TABLE "wp_wc_order_product_lookup"______________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_order_product_lookup]
+TABLE "wp_wc_order_stats"_______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_order_stats]
+TABLE "wp_wc_order_tax_lookup"__________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_order_tax_lookup]
+TABLE "wp_wc_product_attributes_lookup"_________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_product_attributes_lookup]
+TABLE "wp_wc_product_download_directories"______________[ROWS:       2] [EXTRACT|REPLACE] [INST NAME: wp_wc_product_download_directories]
+TABLE "wp_wc_product_meta_lookup"_______________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_product_meta_lookup]
+TABLE "wp_wc_rate_limits"_______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_rate_limits]
+TABLE "wp_wc_reserved_stock"____________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_reserved_stock]
+TABLE "wp_wc_tax_rate_classes"__________________________[ROWS:       2] [EXTRACT|REPLACE] [INST NAME: wp_wc_tax_rate_classes]
+TABLE "wp_wc_webhooks"__________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wc_webhooks]
+TABLE "wp_wfauditevents"________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfauditevents]
+TABLE "wp_wfblockediplog"_______________________________[ROWS:      13] [EXTRACT|REPLACE] [INST NAME: wp_wfblockediplog]
+TABLE "wp_wfblocks7"____________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfblocks7]
+TABLE "wp_wfconfig"_____________________________________[ROWS:     278] [EXTRACT|REPLACE] [INST NAME: wp_wfconfig]
+TABLE "wp_wfcrawlers"___________________________________[ROWS:      10] [EXTRACT|REPLACE] [INST NAME: wp_wfcrawlers]
+TABLE "wp_wffilechanges"________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wffilechanges]
+TABLE "wp_wffilemods"___________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wffilemods]
+TABLE "wp_wfhits"_______________________________________[ROWS:      46] [EXTRACT|REPLACE] [INST NAME: wp_wfhits]
+TABLE "wp_wfhoover"_____________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfhoover]
+TABLE "wp_wfissues"_____________________________________[ROWS:      11] [EXTRACT|REPLACE] [INST NAME: wp_wfissues]
+TABLE "wp_wfknownfilelist"______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfknownfilelist]
+TABLE "wp_wflivetraffichuman"___________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wflivetraffichuman]
+TABLE "wp_wflocs"_______________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wflocs]
+TABLE "wp_wflogins"_____________________________________[ROWS:      34] [EXTRACT|REPLACE] [INST NAME: wp_wflogins]
+TABLE "wp_wfls_2fa_secrets"_____________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfls_2fa_secrets]
+TABLE "wp_wfls_role_counts"_____________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfls_role_counts]
+TABLE "wp_wfls_settings"________________________________[ROWS:      30] [EXTRACT|REPLACE] [INST NAME: wp_wfls_settings]
+TABLE "wp_wfnotifications"______________________________[ROWS:       2] [EXTRACT|REPLACE] [INST NAME: wp_wfnotifications]
+TABLE "wp_wfpendingissues"______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfpendingissues]
+TABLE "wp_wfreversecache"_______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfreversecache]
+TABLE "wp_wfsecurityevents"_____________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfsecurityevents]
+TABLE "wp_wfsnipcache"__________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfsnipcache]
+TABLE "wp_wfstatus"_____________________________________[ROWS:     983] [EXTRACT|REPLACE] [INST NAME: wp_wfstatus]
+TABLE "wp_wftrafficrates"_______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wftrafficrates]
+TABLE "wp_wfwaffailures"________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wfwaffailures]
+TABLE "wp_woocommerce_api_keys"_________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_api_keys]
+TABLE "wp_woocommerce_attribute_taxonomies"_____________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_attribute_taxonomies]
+TABLE "wp_woocommerce_downloadable_product_permissions"_[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_downloadable_product_permissions]
+TABLE "wp_woocommerce_log"______________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_log]
+TABLE "wp_woocommerce_order_itemmeta"___________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_order_itemmeta]
+TABLE "wp_woocommerce_order_items"______________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_order_items]
+TABLE "wp_woocommerce_payment_tokenmeta"________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_payment_tokenmeta]
+TABLE "wp_woocommerce_payment_tokens"___________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_payment_tokens]
+TABLE "wp_woocommerce_sessions"_________________________[ROWS:       1] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_sessions]
+TABLE "wp_woocommerce_shipping_zones"___________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_shipping_zones]
+TABLE "wp_woocommerce_shipping_zone_locations"__________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_shipping_zone_locations]
+TABLE "wp_woocommerce_shipping_zone_methods"____________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_shipping_zone_methods]
+TABLE "wp_woocommerce_tax_rates"________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_tax_rates]
+TABLE "wp_woocommerce_tax_rate_locations"_______________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_woocommerce_tax_rate_locations]
+TABLE "wp_wpfm_backup"__________________________________[ROWS:       0] [EXTRACT|REPLACE] [INST NAME: wp_wpfm_backup]
+TABLE "wp_wpmailsmtp_debug_events"______________________[ROWS:      11] [EXTRACT|REPLACE] [INST NAME: wp_wpmailsmtp_debug_events]
+TABLE "wp_wpmailsmtp_tasks_meta"________________________[ROWS:       2] [EXTRACT|REPLACE] [INST NAME: wp_wpmailsmtp_tasks_meta]
+********************************************************************************
+
+--------------------------------------
+DATABASE-ENVIRONMENT
+--------------------------------------
+MYSQL VERSION:	This Server: 10.6.22 -- Build Server: 10.6.23
+FILE SIZE:	dup-database__[HASH].sql (4.62MB)
+TIMEOUT:	5000
+MAXPACK:	16777216
+SQLMODE-GLOBAL:	ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+SQLMODE-SESSION:NO_AUTO_VALUE_ON_ZERO
+DROP ALL TABLES
+--------------------------------------
+DATABASE RESULTS
+--------------------------------------
+QUERY FIXES
+GLOBAL RULES ADDED: PROC AND VIEWS
+
+QUERY FIXES GLOBAL RULES
+	SEARCH  => /^(\s*(?:\/\*!\d+\s)?\s*(?:CREATE.+)?DEFINER\s*=)([^\*\s]+)(.*)$/m
+	REPLACE => $1`user_admin_bravobravo2parte`@`localhost`$3
+
+	SEARCH  => /^(\s*CREATE.+(?:PROCEDURE|FUNCTION)[\s\S]*)(BEGIN)([\s\S]*)$/
+	REPLACE => $1SQL SECURITY INVOKER
+$2$3
+
+--------------------------------------
+** DATABASE CHUNK install start
+--------------------------------------
+DATABASE CHUNK SEEK POSITION: 0
+Auto Commit set to false successfully
+NO TABLE TO SKIP
+Auto Commit set to true successfully
+--------------------------------------
+** DATABASE CHUNK install end
+--------------------------------------
+ERRORS FOUND:	0
+DROPPED TABLES:	0
+RENAMED TABLES:	0
+QUERIES RAN:	807
+
+TABLES ROWS IN DATABASE AFTER EXTRACTION
+
+TABLE "wp_actionscheduler_actions"______________________[ROWS:    72]
+TABLE "wp_actionscheduler_claims"_______________________[ROWS:     0]
+TABLE "wp_actionscheduler_groups"_______________________[ROWS:     5]
+TABLE "wp_actionscheduler_logs"_________________________[ROWS:   219]
+TABLE "wp_cmplz_cookiebanners"__________________________[ROWS:     1]
+TABLE "wp_cmplz_cookies"________________________________[ROWS:    40]
+TABLE "wp_cmplz_dnsmpd"_________________________________[ROWS:     0]
+TABLE "wp_cmplz_services"_______________________________[ROWS:    16]
+TABLE "wp_commentmeta"__________________________________[ROWS:     0]
+TABLE "wp_comments"_____________________________________[ROWS:    25]
+TABLE "wp_duplicator_packages"__________________________[ROWS:     4]
+TABLE "wp_links"________________________________________[ROWS:     0]
+TABLE "wp_litespeed_url"________________________________[ROWS:     0]
+TABLE "wp_litespeed_url_file"___________________________[ROWS:     0]
+TABLE "wp_options"______________________________________[ROWS:  1988]
+TABLE "wp_postmeta"_____________________________________[ROWS:   459]
+TABLE "wp_posts"________________________________________[ROWS:   300]
+TABLE "wp_rank_math_analytics_objects"__________________[ROWS:    12]
+TABLE "wp_rank_math_internal_links"_____________________[ROWS:    32]
+TABLE "wp_rank_math_internal_meta"______________________[ROWS:    19]
+TABLE "wp_reservas_agencies"____________________________[ROWS:    14]
+TABLE "wp_reservas_configuration"_______________________[ROWS:    31]
+TABLE "wp_reservas_discount_rules"______________________[ROWS:     1]
+TABLE "wp_reservas_reservas"____________________________[ROWS:  1482]
+TABLE "wp_reservas_servicios"___________________________[ROWS:   277]
+TABLE "wp_reservas_users"_______________________________[ROWS:     2]
+TABLE "wp_term_relationships"___________________________[ROWS:     5]
+TABLE "wp_term_taxonomy"________________________________[ROWS:    16]
+TABLE "wp_termmeta"_____________________________________[ROWS:     0]
+TABLE "wp_terms"________________________________________[ROWS:    16]
+TABLE "wp_usermeta"_____________________________________[ROWS:    37]
+TABLE "wp_users"________________________________________[ROWS:     1]
+TABLE "wp_wc_admin_note_actions"________________________[ROWS:    93]
+TABLE "wp_wc_admin_notes"_______________________________[ROWS:    65]
+TABLE "wp_wc_category_lookup"___________________________[ROWS:     1]
+TABLE "wp_wc_customer_lookup"___________________________[ROWS:     0]
+TABLE "wp_wc_download_log"______________________________[ROWS:     0]
+TABLE "wp_wc_order_addresses"___________________________[ROWS:     0]
+TABLE "wp_wc_order_coupon_lookup"_______________________[ROWS:     0]
+TABLE "wp_wc_order_operational_data"____________________[ROWS:     0]
+TABLE "wp_wc_order_product_lookup"______________________[ROWS:     0]
+TABLE "wp_wc_order_stats"_______________________________[ROWS:     0]
+TABLE "wp_wc_order_tax_lookup"__________________________[ROWS:     0]
+TABLE "wp_wc_orders"____________________________________[ROWS:     0]
+TABLE "wp_wc_orders_meta"_______________________________[ROWS:     0]
+TABLE "wp_wc_product_attributes_lookup"_________________[ROWS:     0]
+TABLE "wp_wc_product_download_directories"______________[ROWS:     2]
+TABLE "wp_wc_product_meta_lookup"_______________________[ROWS:     0]
+TABLE "wp_wc_rate_limits"_______________________________[ROWS:     0]
+TABLE "wp_wc_reserved_stock"____________________________[ROWS:     0]
+TABLE "wp_wc_tax_rate_classes"__________________________[ROWS:     2]
+TABLE "wp_wc_webhooks"__________________________________[ROWS:     0]
+TABLE "wp_wfauditevents"________________________________[ROWS:     0]
+TABLE "wp_wfblockediplog"_______________________________[ROWS:    13]
+TABLE "wp_wfblocks7"____________________________________[ROWS:     0]
+TABLE "wp_wfconfig"_____________________________________[ROWS:   278]
+TABLE "wp_wfcrawlers"___________________________________[ROWS:    10]
+TABLE "wp_wffilechanges"________________________________[ROWS:     0]
+TABLE "wp_wffilemods"___________________________________[ROWS:     0]
+TABLE "wp_wfhits"_______________________________________[ROWS:    46]
+TABLE "wp_wfhoover"_____________________________________[ROWS:     0]
+TABLE "wp_wfissues"_____________________________________[ROWS:    11]
+TABLE "wp_wfknownfilelist"______________________________[ROWS:     0]
+TABLE "wp_wflivetraffichuman"___________________________[ROWS:     0]
+TABLE "wp_wflocs"_______________________________________[ROWS:     0]
+TABLE "wp_wflogins"_____________________________________[ROWS:    34]
+TABLE "wp_wfls_2fa_secrets"_____________________________[ROWS:     0]
+TABLE "wp_wfls_role_counts"_____________________________[ROWS:     0]
+TABLE "wp_wfls_settings"________________________________[ROWS:    30]
+TABLE "wp_wfnotifications"______________________________[ROWS:     2]
+TABLE "wp_wfpendingissues"______________________________[ROWS:     0]
+TABLE "wp_wfreversecache"_______________________________[ROWS:     0]
+TABLE "wp_wfsecurityevents"_____________________________[ROWS:     0]
+TABLE "wp_wfsnipcache"__________________________________[ROWS:     0]
+TABLE "wp_wfstatus"_____________________________________[ROWS:   983]
+TABLE "wp_wftrafficrates"_______________________________[ROWS:     0]
+TABLE "wp_wfwaffailures"________________________________[ROWS:     0]
+TABLE "wp_woocommerce_api_keys"_________________________[ROWS:     0]
+TABLE "wp_woocommerce_attribute_taxonomies"_____________[ROWS:     0]
+TABLE "wp_woocommerce_downloadable_product_permissions"_[ROWS:     0]
+TABLE "wp_woocommerce_log"______________________________[ROWS:     0]
+TABLE "wp_woocommerce_order_itemmeta"___________________[ROWS:     0]
+TABLE "wp_woocommerce_order_items"______________________[ROWS:     0]
+TABLE "wp_woocommerce_payment_tokenmeta"________________[ROWS:     0]
+TABLE "wp_woocommerce_payment_tokens"___________________[ROWS:     0]
+TABLE "wp_woocommerce_sessions"_________________________[ROWS:     1]
+TABLE "wp_woocommerce_shipping_zone_locations"__________[ROWS:     0]
+TABLE "wp_woocommerce_shipping_zone_methods"____________[ROWS:     0]
+TABLE "wp_woocommerce_shipping_zones"___________________[ROWS:     0]
+TABLE "wp_woocommerce_tax_rate_locations"_______________[ROWS:     0]
+TABLE "wp_woocommerce_tax_rates"________________________[ROWS:     0]
+TABLE "wp_wpfm_backup"__________________________________[ROWS:     0]
+TABLE "wp_wpmailsmtp_debug_events"______________________[ROWS:    11]
+TABLE "wp_wpmailsmtp_tasks_meta"________________________[ROWS:     2]
+
+INSERT DATA RUNTIME: 0.6705 sec.
+STEP-2 COMPLETE @ 10:54:33 - RUNTIME: 0.6706 sec.
+AJAX ACTION [dbinstall] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [webupdate] START
+
+====================================
+SET SEARCH AND REPLACE LIST INSTALL TYPE single site
+====================================
+SEARCH ITEM[T:path |P:12] SEARCH: /home/autobusmedinaaza/public_html REPLACE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte [SCOPE: ALL]
+SEARCH ITEM[T:urlnd|P:12] SEARCH: https://autobusmedinaazahara.com REPLACE: https://dev.tictac-comunicacion.es/bravobravo2parte [SCOPE: ALL]
+CHUNK LOAD DATA: IS NULL 
+CHUNK ACTION: CURRENT [start][][]
+
+
+********************************************************************************
+DUPLICATOR LITE: INSTALL-LOG
+STEP-3 START @ 10:54:33
+NOTICE: Do NOT post to public sites or forums
+********************************************************************************
+CHARSET SERVER:	"utf8mb4"
+CHARSET CLIENT:	"utf8mb4"
+********************************************************************************
+OPTIONS:
+SKIP PATH REPLACE_____: false
+DISALLOW_FILE_EDIT____: [value = ], [inWpConfig = ]
+DISALLOW_FILE_MODS____: [value = ], [inWpConfig = ]
+AUTOSAVE_INTERVAL_____: [value = 60], [inWpConfig = ]
+WP_POST_REVISIONS_____: [value = 1], [inWpConfig = ]
+FORCE_SSL_ADMIN_______: [value = 1], [inWpConfig = ]
+WP_AUTO_UPDATE_CORE___: [value = false], [inWpConfig = ]
+WP_CACHE______________: [value = 1], [inWpConfig = 1]
+WPCACHEHOME___________: [value = /], [inWpConfig = ]
+WP_DEBUG______________: [value = 1], [inWpConfig = 1]
+WP_DEBUG_LOG__________: [value = 1], [inWpConfig = 1]
+WP_DEBUG_DISPLAY______: [value = ], [inWpConfig = 1]
+WP_DISABLE_FATAL_ERROR_HANDLER: [value = ], [inWpConfig = ]
+SCRIPT_DEBUG__________: [value = 1], [inWpConfig = 1]
+CONCATENATE_SCRIPTS___: [value = ], [inWpConfig = ]
+SAVEQUERIES___________: [value = ], [inWpConfig = ]
+ALTERNATE_WP_CRON_____: [value = ], [inWpConfig = ]
+DISABLE_WP_CRON_______: [value = ], [inWpConfig = ]
+WP_CRON_LOCK_TIMEOUT__: [value = 60], [inWpConfig = ]
+COOKIE_DOMAIN_________: [value = ], [inWpConfig = ]
+WP_MEMORY_LIMIT_______: [value = 40M], [inWpConfig = ]
+WP_MAX_MEMORY_LIMIT___: [value = 256M], [inWpConfig = ]
+WP_TEMP_DIR___________: [value = ], [inWpConfig = ]
+********************************************************************************
+
+********************************************************************************
+CHUNK PARAMS:
+maxIteration__________: 0
+timeOut_______________: 5000
+throttling____________: 2
+rowsPerPage___________: 1000
+********************************************************************************
+
+CHUNK ACTION: CURRENT [cleanup_trans][][]
+[PHP ERR][E_WARNING] MSG:foreach() argument must be of type array|object, string given [CODE:2|FILE:/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Deploy/Database/DbCleanup.php|LINE:95]
+CLEAN OPTIONS [wp_options]
+	`option_name` = "duplicator_plugin_data_stats"
+	`option_name` LIKE "\_transient%"
+	`option_name` LIKE "\_site\_transient%"
+DATABASE OPTIONS DELETED [ROWS:    39]
+CHUNK ACTION: CURRENT [cleanup_extra][][]
+CLEANUP EXTRA
+	- SKIP DROP VIEWS
+	- SKIP DROP PROCS
+	- SKIP DROP FUNCS
+CHUNK ACTION: CURRENT [cleanup_packages][][]
+EMPTY PACKAGES TABLE
+CLEAN PACKAGES
+DATABASE PACKAGE DELETED [ROWS:     4]
+CHUNK ACTION: CURRENT [init][][]
+
+EVALUATE TABLE: "wp_actionscheduler_actions"______________________[ROWS:    72][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_actionscheduler_actions][0]
+
+EVALUATE TABLE: "wp_actionscheduler_claims"_______________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_actionscheduler_groups"_______________________[ROWS:     5][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_actionscheduler_groups][0]
+
+EVALUATE TABLE: "wp_actionscheduler_logs"_________________________[ROWS:   219][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_actionscheduler_logs][0]
+
+EVALUATE TABLE: "wp_cmplz_cookiebanners"__________________________[ROWS:     1][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_cmplz_cookiebanners][0]
+
+EVALUATE TABLE: "wp_cmplz_cookies"________________________________[ROWS:    40][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_cmplz_cookies][0]
+
+EVALUATE TABLE: "wp_cmplz_dnsmpd"_________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_cmplz_services"_______________________________[ROWS:    16][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_cmplz_services][0]
+
+EVALUATE TABLE: "wp_commentmeta"__________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_comments"_____________________________________[ROWS:    25][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_comments][0]
+
+EVALUATE TABLE: "wp_duplicator_packages"__________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_links"________________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_litespeed_url"________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_litespeed_url_file"___________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_options"______________________________________[ROWS:  1949][PG:   2][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_options][0]
+	CHUNK ACTION: CURRENT [search_replace][wp_options][1]
+
+EVALUATE TABLE: "wp_postmeta"_____________________________________[ROWS:   459][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_postmeta][0]
+
+EVALUATE TABLE: "wp_posts"________________________________________[ROWS:   300][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_posts][0]
+
+EVALUATE TABLE: "wp_rank_math_analytics_objects"__________________[ROWS:    12][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_rank_math_analytics_objects][0]
+
+EVALUATE TABLE: "wp_rank_math_internal_links"_____________________[ROWS:    32][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_rank_math_internal_links][0]
+
+EVALUATE TABLE: "wp_rank_math_internal_meta"______________________[ROWS:    19][PG:   1][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_reservas_agencies"____________________________[ROWS:    14][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_reservas_agencies][0]
+
+EVALUATE TABLE: "wp_reservas_configuration"_______________________[ROWS:    31][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_reservas_configuration][0]
+
+EVALUATE TABLE: "wp_reservas_discount_rules"______________________[ROWS:     1][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_reservas_discount_rules][0]
+
+EVALUATE TABLE: "wp_reservas_reservas"____________________________[ROWS:  1482][PG:   2][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_reservas_reservas][0]
+	CHUNK ACTION: CURRENT [search_replace][wp_reservas_reservas][1]
+
+EVALUATE TABLE: "wp_reservas_servicios"___________________________[ROWS:   277][PG:   1][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_reservas_users"_______________________________[ROWS:     2][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_reservas_users][0]
+
+EVALUATE TABLE: "wp_termmeta"_____________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_terms"________________________________________[ROWS:    16][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_terms][0]
+
+EVALUATE TABLE: "wp_term_relationships"___________________________[ROWS:     5][PG:   1][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_term_taxonomy"________________________________[ROWS:    16][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_term_taxonomy][0]
+
+EVALUATE TABLE: "wp_usermeta"_____________________________________[ROWS:    37][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_usermeta][0]
+
+EVALUATE TABLE: "wp_users"________________________________________[ROWS:     1][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_users][0]
+
+EVALUATE TABLE: "wp_wc_admin_notes"_______________________________[ROWS:    65][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wc_admin_notes][0]
+
+EVALUATE TABLE: "wp_wc_admin_note_actions"________________________[ROWS:    93][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wc_admin_note_actions][0]
+
+EVALUATE TABLE: "wp_wc_category_lookup"___________________________[ROWS:     1][PG:   1][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_customer_lookup"___________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_download_log"______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_orders"____________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_orders_meta"_______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_order_addresses"___________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_order_coupon_lookup"_______________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_order_operational_data"____________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_order_product_lookup"______________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_order_stats"_______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_order_tax_lookup"__________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_product_attributes_lookup"_________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_product_download_directories"______________[ROWS:     2][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wc_product_download_directories][0]
+
+EVALUATE TABLE: "wp_wc_product_meta_lookup"_______________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_rate_limits"_______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_reserved_stock"____________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wc_tax_rate_classes"__________________________[ROWS:     2][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wc_tax_rate_classes][0]
+
+EVALUATE TABLE: "wp_wc_webhooks"__________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfauditevents"________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfblockediplog"_______________________________[ROWS:    13][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wfblockediplog][0]
+
+EVALUATE TABLE: "wp_wfblocks7"____________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfconfig"_____________________________________[ROWS:   278][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wfconfig][0]
+
+EVALUATE TABLE: "wp_wfcrawlers"___________________________________[ROWS:    10][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wfcrawlers][0]
+
+EVALUATE TABLE: "wp_wffilechanges"________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wffilemods"___________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfhits"_______________________________________[ROWS:    46][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wfhits][0]
+
+EVALUATE TABLE: "wp_wfhoover"_____________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfissues"_____________________________________[ROWS:    11][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wfissues][0]
+
+EVALUATE TABLE: "wp_wfknownfilelist"______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wflivetraffichuman"___________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wflocs"_______________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wflogins"_____________________________________[ROWS:    34][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wflogins][0]
+
+EVALUATE TABLE: "wp_wfls_2fa_secrets"_____________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfls_role_counts"_____________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfls_settings"________________________________[ROWS:    30][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wfls_settings][0]
+
+EVALUATE TABLE: "wp_wfnotifications"______________________________[ROWS:     2][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wfnotifications][0]
+
+EVALUATE TABLE: "wp_wfpendingissues"______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfreversecache"_______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfsecurityevents"_____________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfsnipcache"__________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfstatus"_____________________________________[ROWS:   983][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wfstatus][0]
+
+EVALUATE TABLE: "wp_wftrafficrates"_______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wfwaffailures"________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_api_keys"_________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_attribute_taxonomies"_____________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_downloadable_product_permissions"_[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_log"______________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_order_itemmeta"___________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_order_items"______________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_payment_tokenmeta"________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_payment_tokens"___________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_sessions"_________________________[ROWS:     1][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_woocommerce_sessions][0]
+
+EVALUATE TABLE: "wp_woocommerce_shipping_zones"___________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_shipping_zone_locations"__________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_shipping_zone_methods"____________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_tax_rates"________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_woocommerce_tax_rate_locations"_______________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wpfm_backup"__________________________________[ROWS:     0][PG:   0][SCAN:no columns  ]
+
+EVALUATE TABLE: "wp_wpmailsmtp_debug_events"______________________[ROWS:    11][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wpmailsmtp_debug_events][0]
+
+EVALUATE TABLE: "wp_wpmailsmtp_tasks_meta"________________________[ROWS:     2][PG:   1][SCAN:text columns]
+	--- BASE STRINGS ---
+	SEARCH[path ]  1:"/home/autobusmedinaaza/public_html" ==============> "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+	SEARCH[urlnd]  2:"https://autobusmedinaazahara.com" ================> "https://dev.tictac-comunicacion.es/bravobravo2parte"
+	CHUNK ACTION: CURRENT [search_replace][wp_wpmailsmtp_tasks_meta][0]
+--------------------------------------
+SCANNED:	Tables:94 	|	 Rows:6313 	|	 Cells:71942 
+UPDATED:	Tables:11 	|	 Rows:425 	|	 Cells:508 
+ERRORS:		0 
+RUNTIME:	0.498900 sec
+CHUNK ACTION: CURRENT [rem_maintenance][][]
+
+====================================
+REMOVE MAINTENANCE MODE
+====================================
+MAINTENANCE MODE DISABLE
+CHUNK ACTION: CURRENT [config_update][][]
+SET CONFIG FILES
+Retained original entry wpconfig target:/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-config.php
+New htaccess file created:/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/.htaccess
+
+====================================
+CONFIGURATION FILE UPDATES
+====================================
+	UPDATE ABSPATH "__DIR__ . '/'"
+	UPDATE DB_NAME ""admin_bravobravo2parte""
+	UPDATE DB_USER "** OBSCURED **"
+	UPDATE DB_PASSWORD "** OBSCURED **"
+	UPDATE DB_HOST ""localhost""
+	UPDATE DB_CHARSET "utf8mb4"
+	UPDATE DB_COLLATE ""
+	WP CONFIG UPDATE WP_CACHE "true"
+	WP CONFIG UPDATE WP_DEBUG "true"
+	WP CONFIG UPDATE WP_DEBUG_LOG "true"
+	WP CONFIG UPDATE WP_DEBUG_DISPLAY "false"
+	WP CONFIG UPDATE SCRIPT_DEBUG "true"
+	
+*** UPDATED WP CONFIG FILE ***
+
+====================================
+HTACCESS UPDATE
+====================================
+
+WEB SERVER CONFIGURATION FILE UPDATED:
+- Preparing .htaccess file with basic setup.
+HTACCESS FILE - Successfully updated the .htaccess file setting.
+
+====================================
+INDEX.PHP UPDATE
+====================================
+INDEX.PHP updated with new blog header "__DIR__ . '/wp-blog-header.php'"
+
+CHUNK ACTION: CURRENT [gen_update][][]
+
+====================================
+GENERAL UPDATES
+====================================
+
+====================================
+MANAGE PLUGINS
+====================================
+CHUNK ACTION: CURRENT [gen_clean][][]
+
+====================================
+GENERAL CLEANUP
+====================================
+RESET ALL USERS SESSION TOKENS
+MIGRATION INFO SET
+CHUNK ACTION: CURRENT [create_admin][][]
+
+====================================
+RESET USERS PASSWORD
+====================================
+CHUNK ACTION: CURRENT [notice_test][][]
+
+====================================
+CHECK FOR INDEX.HTML
+====================================
+NO INDEX.HTML WAS FOUND
+
+====================================
+NOTICES TEST
+====================================
+No General Notices Found
+
+CHUNK ACTION: CURRENT [cleanup_tmp_files][][]
+
+====================================
+CLEANUP TMP FILES
+====================================
+CHUNK ACTION: CURRENT [set_files_perms][][]
+
+====================================
+SET PARAMS PERMISSION
+====================================
+
+*** SET FOLDER PERMISSION AFTER EXTRACTION
+--------------------------------------
+PATHS MAPPING : "/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte"
+--------------------------------------
+SET FOLDER PERMISSION DONE
+CHUNK ACTION: CURRENT [final_report][][]
+
+====================================
+FINAL REPORT NOTICES
+====================================
+
+STEP-3 COMPLETE @ 10:54:34 - RUNTIME: 1.0751 sec. 
+
+
+AJAX ACTION [webupdate] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [finalpre] START
+AJAX ACTION [finalpre] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+-------------------------
+AJAX ACTION [finalafter] START
+AJAX ACTION [finalafter] SUCCESS
+-------------------------
+
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+====================================
+FINAL REPORT NOTICES LIST
+====================================
+-----------------------
+[NOTICE] Warnings or notices on WordPress front-end tests!
+	SECTIONS: general
+	LONG MSG: SCRIPT FILE TEST: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/index.php
+E_USER_NOTICE Function _load_textdomain_just_in_time was called incorrectly. Translation loading for the acf domain was triggered too early. This is usually an indicator for some code in the plugin or theme running too early. Translations should be loaded at the init action or later. Please see Debugging in WordPress for more information. (This message was added in version 6.7.0.)
+	FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/functions.php[6121]
+	--- TRACE ---
+	FUNCTION: trigger_error                 FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/functions.php[6121]
+	FUNCTION: wp_trigger_error              FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/functions.php[6061]
+	FUNCTION: _doing_it_wrong               FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/l10n.php[1371]
+	FUNCTION: _load_textdomain_just_in_time FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/l10n.php[1409]
+	FUNCTION: get_translations_for_domain   FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/l10n.php[195]
+	FUNCTION: translate                     FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/l10n.php[307]
+	FUNCTION: __                            FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/plugins/advanced-custom-fields-pro/acf.php[94]
+	CLASS___: ACF->initialize               FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/plugins/advanced-custom-fields-pro/acf.php[780]
+	FUNCTION: acf                           FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/plugins/advanced-custom-fields-pro/acf.php[786]
+	FUNCTION: include_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-settings.php[545]
+	FUNCTION: require_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-config.php[116]
+	FUNCTION: require_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-load.php[50]
+	FUNCTION: require_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-blog-header.php[13]
+	FUNCTION: require                       FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/index.php[17]
+	FUNCTION: require_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/wp_test_script_01b9698-01104923.php[117]
+-----
+For solutions to these issues see the online FAQs 
+https://duplicator.com/knowledge-base/ 
+
+
+-----------------------
+[NOTICE] Warnings or notices on WordPress backend tests!
+	SECTIONS: general
+	LONG MSG: SCRIPT FILE TEST: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-login.php
+E_USER_NOTICE Function _load_textdomain_just_in_time was called incorrectly. Translation loading for the acf domain was triggered too early. This is usually an indicator for some code in the plugin or theme running too early. Translations should be loaded at the init action or later. Please see Debugging in WordPress for more information. (This message was added in version 6.7.0.)
+	FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/functions.php[6121]
+	--- TRACE ---
+	FUNCTION: trigger_error                 FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/functions.php[6121]
+	FUNCTION: wp_trigger_error              FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/functions.php[6061]
+	FUNCTION: _doing_it_wrong               FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/l10n.php[1371]
+	FUNCTION: _load_textdomain_just_in_time FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/l10n.php[1409]
+	FUNCTION: get_translations_for_domain   FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/l10n.php[195]
+	FUNCTION: translate                     FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-includes/l10n.php[307]
+	FUNCTION: __                            FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/plugins/advanced-custom-fields-pro/acf.php[94]
+	CLASS___: ACF->initialize               FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/plugins/advanced-custom-fields-pro/acf.php[780]
+	FUNCTION: acf                           FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/plugins/advanced-custom-fields-pro/acf.php[786]
+	FUNCTION: include_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-settings.php[545]
+	FUNCTION: require_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-config.php[116]
+	FUNCTION: require_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-load.php[50]
+	FUNCTION: require                       FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-login.php[12]
+	FUNCTION: require_once                  FILE: /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/wp-content/wp_test_script_01b9698-01104923.php[117]
+-----
+For solutions to these issues see the online FAQs 
+https://duplicator.com/knowledge-base/ 
+
+
+====================================
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/ctrls/ctrl.base.php:227][DELTA:   0.04185]  MESSAGE:END RENDER PAGE
+LOG-TIME[/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php:71] RESET TIME
+
+SECURITY CHECK:  Security Check Validation - No Token Found
+	FILE:/var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/classes/config/class.security.php[252]
+	TRACE:
+#0 /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/src/Core/Bootstrap.php(84): DUPX_Security->check()
+#1 /var/www/vhosts/dev.tictac-comunicacion.es/httpdocs/bravobravo2parte/dup-installer/main.installer.php(55): Duplicator\Installer\Core\Bootstrap::init()
+#2 {main}
+

@@ -1,0 +1,1191 @@
+{
+    "dup_type": "lite",
+    "created": "2025-10-01 10:49:23",
+    "version_dup": "1.5.12",
+    "version_wp": "6.8.3",
+    "version_db": "10.6.23",
+    "version_php": "8.1.33",
+    "version_os": "Linux",
+    "blogname": "AUTOCARES BRAVO",
+    "exportOnlyDB": 0,
+    "secure_on": 0,
+    "secure_pass": "$2a$08$8UvgSyXLkXnOpwaovZQBCOfjYD4iVb1kAGLyAYGLZU2TWWuNuOdbe",
+    "dbhost": null,
+    "dbname": null,
+    "dbuser": null,
+    "cpnl_host": null,
+    "cpnl_user": null,
+    "cpnl_pass": null,
+    "cpnl_enable": null,
+    "wp_tableprefix": "wp_",
+    "mu_mode": 0,
+    "mu_generation": 0,
+    "mu_siteadmins": [
+        "admin"
+    ],
+    "subsites": [
+        {
+            "id": 1,
+            "domain": "autobusmedinaazahara.com",
+            "path": "\/",
+            "blogname": "AUTOCARES BRAVO",
+            "blog_prefix": "wp_",
+            "filteredTables": [],
+            "adminUsers": [
+                {
+                    "ID": "1",
+                    "user_login": "tictac",
+                    "id": "1"
+                }
+            ],
+            "fullHomeUrl": "https:\/\/autobusmedinaazahara.com",
+            "fullSiteUrl": "https:\/\/autobusmedinaazahara.com",
+            "uploadPath": "wp-content\/uploads",
+            "fullUploadPath": "\/home\/autobusmedinaaza\/public_html\/wp-content\/uploads",
+            "fullUploadSafePath": "\/home\/autobusmedinaaza\/public_html\/wp-content\/uploads",
+            "fullUploadUrl": "https:\/\/autobusmedinaazahara.com\/wp-content\/uploads",
+            "filteredPaths": []
+        }
+    ],
+    "main_site_id": null,
+    "mu_is_filtered": false,
+    "license_limit": 0,
+    "license_type": 0,
+    "dbInfo": {
+        "buildMode": "MYSQLDUMP",
+        "charSetList": [
+            "utf8mb4",
+            "utf8mb3",
+            "latin1"
+        ],
+        "collationList": [
+            "latin1_swedish_ci",
+            "utf8mb3_general_ci",
+            "utf8mb4_unicode_520_ci",
+            "utf8mb4_unicode_ci"
+        ],
+        "engineList": [
+            "InnoDB",
+            "MEMORY"
+        ],
+        "isTablesUpperCase": 0,
+        "isNameUpperCase": 0,
+        "name": "autobusmedinaaza_admin",
+        "tablesBaseCount": 94,
+        "tablesFinalCount": 94,
+        "muFilteredTableCount": 0,
+        "tablesRowCount": 5659,
+        "tablesSizeOnDisk": 11845632,
+        "tablesList": {
+            "wp_actionscheduler_actions": {
+                "inaccurateRows": 120,
+                "insertedRows": 72,
+                "size": 180224
+            },
+            "wp_actionscheduler_claims": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_actionscheduler_groups": {
+                "inaccurateRows": 4,
+                "insertedRows": 5,
+                "size": 32768
+            },
+            "wp_actionscheduler_logs": {
+                "inaccurateRows": 351,
+                "insertedRows": 219,
+                "size": 98304
+            },
+            "wp_cmplz_cookiebanners": {
+                "inaccurateRows": 0,
+                "insertedRows": 1,
+                "size": 16384
+            },
+            "wp_cmplz_cookies": {
+                "inaccurateRows": 40,
+                "insertedRows": 40,
+                "size": 16384
+            },
+            "wp_cmplz_dnsmpd": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_cmplz_services": {
+                "inaccurateRows": 16,
+                "insertedRows": 16,
+                "size": 16384
+            },
+            "wp_commentmeta": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_comments": {
+                "inaccurateRows": 25,
+                "insertedRows": 25,
+                "size": 114688
+            },
+            "wp_duplicator_packages": {
+                "inaccurateRows": 4,
+                "insertedRows": 4,
+                "size": 131072
+            },
+            "wp_links": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_litespeed_url": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_litespeed_url_file": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 98304
+            },
+            "wp_options": {
+                "inaccurateRows": 1890,
+                "insertedRows": 1988,
+                "size": 2490368
+            },
+            "wp_postmeta": {
+                "inaccurateRows": 510,
+                "insertedRows": 459,
+                "size": 344064
+            },
+            "wp_posts": {
+                "inaccurateRows": 308,
+                "insertedRows": 300,
+                "size": 2703360
+            },
+            "wp_rank_math_analytics_objects": {
+                "inaccurateRows": 12,
+                "insertedRows": 12,
+                "size": 32768
+            },
+            "wp_rank_math_internal_links": {
+                "inaccurateRows": 30,
+                "insertedRows": 32,
+                "size": 49152
+            },
+            "wp_rank_math_internal_meta": {
+                "inaccurateRows": 19,
+                "insertedRows": 19,
+                "size": 16384
+            },
+            "wp_reservas_agencies": {
+                "inaccurateRows": 11,
+                "insertedRows": 14,
+                "size": 114688
+            },
+            "wp_reservas_configuration": {
+                "inaccurateRows": 31,
+                "insertedRows": 31,
+                "size": 81920
+            },
+            "wp_reservas_discount_rules": {
+                "inaccurateRows": 0,
+                "insertedRows": 1,
+                "size": 49152
+            },
+            "wp_reservas_reservas": {
+                "inaccurateRows": 391,
+                "insertedRows": 1482,
+                "size": 262144
+            },
+            "wp_reservas_servicios": {
+                "inaccurateRows": 271,
+                "insertedRows": 277,
+                "size": 163840
+            },
+            "wp_reservas_users": {
+                "inaccurateRows": 2,
+                "insertedRows": 2,
+                "size": 49152
+            },
+            "wp_termmeta": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_terms": {
+                "inaccurateRows": 16,
+                "insertedRows": 16,
+                "size": 49152
+            },
+            "wp_term_relationships": {
+                "inaccurateRows": 5,
+                "insertedRows": 5,
+                "size": 32768
+            },
+            "wp_term_taxonomy": {
+                "inaccurateRows": 16,
+                "insertedRows": 16,
+                "size": 49152
+            },
+            "wp_usermeta": {
+                "inaccurateRows": 36,
+                "insertedRows": 37,
+                "size": 49152
+            },
+            "wp_users": {
+                "inaccurateRows": 0,
+                "insertedRows": 1,
+                "size": 65536
+            },
+            "wp_wc_admin_notes": {
+                "inaccurateRows": 65,
+                "insertedRows": 65,
+                "size": 65536
+            },
+            "wp_wc_admin_note_actions": {
+                "inaccurateRows": 93,
+                "insertedRows": 93,
+                "size": 65536
+            },
+            "wp_wc_category_lookup": {
+                "inaccurateRows": 0,
+                "insertedRows": 1,
+                "size": 16384
+            },
+            "wp_wc_customer_lookup": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_wc_download_log": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_wc_orders": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 131072
+            },
+            "wp_wc_orders_meta": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_wc_order_addresses": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 81920
+            },
+            "wp_wc_order_coupon_lookup": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_wc_order_operational_data": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_wc_order_product_lookup": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 98304
+            },
+            "wp_wc_order_stats": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 65536
+            },
+            "wp_wc_order_tax_lookup": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_wc_product_attributes_lookup": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_wc_product_download_directories": {
+                "inaccurateRows": 2,
+                "insertedRows": 2,
+                "size": 32768
+            },
+            "wp_wc_product_meta_lookup": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 131072
+            },
+            "wp_wc_rate_limits": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_wc_reserved_stock": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wc_tax_rate_classes": {
+                "inaccurateRows": 2,
+                "insertedRows": 2,
+                "size": 32768
+            },
+            "wp_wc_webhooks": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_wfauditevents": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wfblockediplog": {
+                "inaccurateRows": 15,
+                "insertedRows": 13,
+                "size": 16384
+            },
+            "wp_wfblocks7": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 65536
+            },
+            "wp_wfconfig": {
+                "inaccurateRows": 273,
+                "insertedRows": 278,
+                "size": 1540096
+            },
+            "wp_wfcrawlers": {
+                "inaccurateRows": 10,
+                "insertedRows": 10,
+                "size": 16384
+            },
+            "wp_wffilechanges": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wffilemods": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wfhits": {
+                "inaccurateRows": 45,
+                "insertedRows": 46,
+                "size": 65536
+            },
+            "wp_wfhoover": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_wfissues": {
+                "inaccurateRows": 11,
+                "insertedRows": 11,
+                "size": 81920
+            },
+            "wp_wfknownfilelist": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wflivetraffichuman": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_wflocs": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wflogins": {
+                "inaccurateRows": 31,
+                "insertedRows": 34,
+                "size": 49152
+            },
+            "wp_wfls_2fa_secrets": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_wfls_role_counts": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 0
+            },
+            "wp_wfls_settings": {
+                "inaccurateRows": 27,
+                "insertedRows": 30,
+                "size": 16384
+            },
+            "wp_wfnotifications": {
+                "inaccurateRows": 0,
+                "insertedRows": 2,
+                "size": 16384
+            },
+            "wp_wfpendingissues": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 81920
+            },
+            "wp_wfreversecache": {
+                "inaccurateRows": 1,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wfsecurityevents": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wfsnipcache": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 65536
+            },
+            "wp_wfstatus": {
+                "inaccurateRows": 963,
+                "insertedRows": 983,
+                "size": 262144
+            },
+            "wp_wftrafficrates": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wfwaffailures": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_woocommerce_api_keys": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_woocommerce_attribute_taxonomies": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_woocommerce_downloadable_product_permissions": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 81920
+            },
+            "wp_woocommerce_log": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_woocommerce_order_itemmeta": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_woocommerce_order_items": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_woocommerce_payment_tokenmeta": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_woocommerce_payment_tokens": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 32768
+            },
+            "wp_woocommerce_sessions": {
+                "inaccurateRows": 0,
+                "insertedRows": 1,
+                "size": 32768
+            },
+            "wp_woocommerce_shipping_zones": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_woocommerce_shipping_zone_locations": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_woocommerce_shipping_zone_methods": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_woocommerce_tax_rates": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 81920
+            },
+            "wp_woocommerce_tax_rate_locations": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 49152
+            },
+            "wp_wpfm_backup": {
+                "inaccurateRows": 0,
+                "insertedRows": 0,
+                "size": 16384
+            },
+            "wp_wpmailsmtp_debug_events": {
+                "inaccurateRows": 11,
+                "insertedRows": 11,
+                "size": 16384
+            },
+            "wp_wpmailsmtp_tasks_meta": {
+                "inaccurateRows": 2,
+                "insertedRows": 2,
+                "size": 16384
+            }
+        },
+        "lowerCaseTableNames": 0,
+        "dbEngine": "MariaDB",
+        "version": "10.6.23",
+        "versionComment": "MariaDB Server",
+        "viewCount": 0,
+        "procCount": 0,
+        "funcCount": 0,
+        "triggerList": []
+    },
+    "packInfo": {
+        "packageId": 5,
+        "packageName": "20250707_autocaresbravo",
+        "packageHash": "a24ab82-01104923",
+        "secondaryHash": "6d2dd46-01104923"
+    },
+    "fileInfo": {
+        "dirCount": 2055,
+        "fileCount": 13467,
+        "size": 266303795
+    },
+    "wpInfo": {
+        "version": "6.8.3",
+        "is_multisite": false,
+        "network_id": 1,
+        "targetRoot": "\/home\/autobusmedinaaza\/public_html",
+        "targetPaths": [
+            "\/home\/autobusmedinaaza\/public_html"
+        ],
+        "adminUsers": [
+            {
+                "ID": "1",
+                "user_login": "tictac",
+                "id": "1"
+            }
+        ],
+        "configs": {
+            "defines": {
+                "ABSPATH": {
+                    "value": "\/home\/autobusmedinaaza\/public_html\/",
+                    "inWpConfig": true
+                },
+                "DB_CHARSET": {
+                    "value": "utf8mb4",
+                    "inWpConfig": true
+                },
+                "DB_COLLATE": {
+                    "value": "",
+                    "inWpConfig": true
+                },
+                "AUTH_KEY": {
+                    "value": "ST],mz7B^k1<$j3V>*SMT`{v$jC\/3L74PkA`9K.,oEAH-bm`l8yR]Q%-xf{s.Lfl",
+                    "inWpConfig": true
+                },
+                "SECURE_AUTH_KEY": {
+                    "value": "8>N4]C0eI,!e@?PI[6)~LptC:;:V2V_Vyuj~Y*j:Y\/(ngU1)**}%;J=1qH?)X6Ss",
+                    "inWpConfig": true
+                },
+                "LOGGED_IN_KEY": {
+                    "value": "#0n1sL]SaDt8K|t)AJdup~Hnnohj^C@dU2gDj}`y;Wa8b)Dru|qj({oUX|<QeU<A",
+                    "inWpConfig": true
+                },
+                "NONCE_KEY": {
+                    "value": "Ww#MbnrCR>e8VA1:rX@]a>=`F@j`&D;yc<uFy?q*Voc`4+M(cTtiF@pe^<v[=6#Q",
+                    "inWpConfig": true
+                },
+                "AUTH_SALT": {
+                    "value": "N|EA[.D.W0u<o6pqhwgI=JT%S=9T7;jm3W(PZJ>w%r|S n: LPO+#s[x]9hF8YM=",
+                    "inWpConfig": true
+                },
+                "SECURE_AUTH_SALT": {
+                    "value": "rAL\/d}8}1\/ho2O=\/Y]#lv@|F\/Xwu<^]2,4]oiPEUfti?i7IZ`Ge}M>uFQx+y^-iW",
+                    "inWpConfig": true
+                },
+                "LOGGED_IN_SALT": {
+                    "value": "K|C:N,S+&6a^xrq|U\/pUZO0JG41W]X53eaKwhefi@TJI1=|F;c;54S-9kkxgc jN",
+                    "inWpConfig": true
+                },
+                "NONCE_SALT": {
+                    "value": "TTd iAd1)@c$vwB7F$U|m.Jft9~R+h*pg 7^=:sJq1vaGE3m+ApA&U.?*6xVV5[%",
+                    "inWpConfig": true
+                },
+                "WP_CONTENT_DIR": {
+                    "value": "\/home\/autobusmedinaaza\/public_html\/wp-content",
+                    "inWpConfig": false
+                },
+                "WP_CONTENT_URL": {
+                    "value": "https:\/\/autobusmedinaazahara.com\/wp-content",
+                    "inWpConfig": false
+                },
+                "WP_PLUGIN_DIR": {
+                    "value": "\/home\/autobusmedinaaza\/public_html\/wp-content\/plugins",
+                    "inWpConfig": false
+                },
+                "WP_PLUGIN_URL": {
+                    "value": "https:\/\/autobusmedinaazahara.com\/wp-content\/plugins",
+                    "inWpConfig": false
+                },
+                "PLUGINDIR": {
+                    "value": "wp-content\/plugins",
+                    "inWpConfig": false
+                },
+                "AUTOSAVE_INTERVAL": {
+                    "value": 60,
+                    "inWpConfig": false
+                },
+                "WP_POST_REVISIONS": {
+                    "value": true,
+                    "inWpConfig": false
+                },
+                "COOKIE_DOMAIN": {
+                    "value": "",
+                    "inWpConfig": false
+                },
+                "MULTISITE": {
+                    "value": false,
+                    "inWpConfig": false
+                },
+                "WP_DEBUG": {
+                    "value": true,
+                    "inWpConfig": true
+                },
+                "SCRIPT_DEBUG": {
+                    "value": true,
+                    "inWpConfig": true
+                },
+                "WP_DEBUG_LOG": {
+                    "value": true,
+                    "inWpConfig": true
+                },
+                "WP_DEBUG_DISPLAY": {
+                    "value": false,
+                    "inWpConfig": true
+                },
+                "WP_MEMORY_LIMIT": {
+                    "value": "40M",
+                    "inWpConfig": false
+                },
+                "WP_MAX_MEMORY_LIMIT": {
+                    "value": "256M",
+                    "inWpConfig": false
+                },
+                "WP_CACHE": {
+                    "value": true,
+                    "inWpConfig": true
+                },
+                "WP_LANG_DIR": {
+                    "value": "\/home\/autobusmedinaaza\/public_html\/wp-content\/languages",
+                    "inWpConfig": false
+                },
+                "FS_CHMOD_DIR": {
+                    "value": 493,
+                    "inWpConfig": false
+                },
+                "FS_CHMOD_FILE": {
+                    "value": 420,
+                    "inWpConfig": false
+                },
+                "WP_CRON_LOCK_TIMEOUT": {
+                    "value": 60,
+                    "inWpConfig": false
+                },
+                "COOKIEPATH": {
+                    "value": "\/",
+                    "inWpConfig": false
+                },
+                "SITECOOKIEPATH": {
+                    "value": "\/",
+                    "inWpConfig": false
+                },
+                "ADMIN_COOKIE_PATH": {
+                    "value": "\/wp-admin",
+                    "inWpConfig": false
+                },
+                "PLUGINS_COOKIE_PATH": {
+                    "value": "\/wp-content\/plugins",
+                    "inWpConfig": false
+                },
+                "TEMPLATEPATH": {
+                    "value": "\/home\/autobusmedinaaza\/public_html\/wp-content\/themes\/storefront",
+                    "inWpConfig": false
+                },
+                "STYLESHEETPATH": {
+                    "value": "\/home\/autobusmedinaaza\/public_html\/wp-content\/themes\/tictac",
+                    "inWpConfig": false
+                },
+                "EMPTY_TRASH_DAYS": {
+                    "value": 30,
+                    "inWpConfig": false
+                },
+                "FORCE_SSL_ADMIN": {
+                    "value": true,
+                    "inWpConfig": false
+                },
+                "WPMU_PLUGIN_DIR": {
+                    "value": "\/home\/autobusmedinaaza\/public_html\/wp-content\/mu-plugins",
+                    "inWpConfig": false
+                },
+                "WPMU_PLUGIN_URL": {
+                    "value": "https:\/\/autobusmedinaazahara.com\/wp-content\/mu-plugins",
+                    "inWpConfig": false
+                },
+                "MUPLUGINDIR": {
+                    "value": "wp-content\/mu-plugins",
+                    "inWpConfig": false
+                }
+            },
+            "realValues": {
+                "siteUrl": "https:\/\/autobusmedinaazahara.com",
+                "homeUrl": "https:\/\/autobusmedinaazahara.com",
+                "loginUrl": "https:\/\/autobusmedinaazahara.com\/wp-login.php",
+                "contentUrl": "https:\/\/autobusmedinaazahara.com\/wp-content",
+                "uploadBaseUrl": "https:\/\/autobusmedinaazahara.com\/wp-content\/uploads",
+                "pluginsUrl": "https:\/\/autobusmedinaazahara.com\/wp-content\/plugins",
+                "mupluginsUrl": "https:\/\/autobusmedinaazahara.com\/wp-content\/mu-plugins",
+                "themesUrl": "https:\/\/autobusmedinaazahara.com\/wp-content\/themes",
+                "originalPaths": {
+                    "home": "\/home\/autobusmedinaaza\/public_html",
+                    "abs": "\/home\/autobusmedinaaza\/public_html",
+                    "wpconfig": "\/home\/autobusmedinaaza\/public_html",
+                    "wpcontent": "\/home\/autobusmedinaaza\/public_html\/wp-content",
+                    "uploads": "\/home\/autobusmedinaaza\/public_html\/wp-content\/uploads",
+                    "plugins": "\/home\/autobusmedinaaza\/public_html\/wp-content\/plugins",
+                    "muplugins": "\/home\/autobusmedinaaza\/public_html\/wp-content\/mu-plugins",
+                    "themes": "\/home\/autobusmedinaaza\/public_html\/wp-content\/themes"
+                },
+                "archivePaths": {
+                    "home": "\/home\/autobusmedinaaza\/public_html",
+                    "abs": "\/home\/autobusmedinaaza\/public_html",
+                    "wpconfig": "\/home\/autobusmedinaaza\/public_html",
+                    "wpcontent": "\/home\/autobusmedinaaza\/public_html\/wp-content",
+                    "uploads": "\/home\/autobusmedinaaza\/public_html\/wp-content\/uploads",
+                    "plugins": "\/home\/autobusmedinaaza\/public_html\/wp-content\/plugins",
+                    "muplugins": "\/home\/autobusmedinaaza\/public_html\/wp-content\/mu-plugins",
+                    "themes": "\/home\/autobusmedinaaza\/public_html\/wp-content\/themes"
+                }
+            }
+        },
+        "plugins": {
+            "advanced-custom-fields-pro\/acf.php": {
+                "slug": "advanced-custom-fields-pro\/acf.php",
+                "name": "Advanced Custom Fields PRO",
+                "version": "6.2.7",
+                "pluginURI": "https:\/\/www.advancedcustomfields.com",
+                "author": "WP Engine",
+                "authorURI": "https:\/\/wpengine.com\/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_directory&utm_content=advanced_custom_fields",
+                "description": "Customize WordPress with powerful, professional and intuitive fields.",
+                "title": "Advanced Custom Fields PRO",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "all-in-one-wp-migration\/all-in-one-wp-migration.php": {
+                "slug": "all-in-one-wp-migration\/all-in-one-wp-migration.php",
+                "name": "All-in-One WP Migration and Backup",
+                "version": "7.99",
+                "pluginURI": "https:\/\/servmask.com\/",
+                "author": "ServMask",
+                "authorURI": "https:\/\/servmask.com\/",
+                "description": "All-in-One WP Migration makes moving your entire WordPress site simple. Export or import your database, media, plugins, and themes with just a few clicks.",
+                "title": "All-in-One WP Migration and Backup",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "complianz-gdpr\/complianz-gpdr.php": {
+                "slug": "complianz-gdpr\/complianz-gpdr.php",
+                "name": "Complianz | GDPR\/CCPA Cookie Consent",
+                "version": "7.4.1",
+                "pluginURI": "https:\/\/www.wordpress.org\/plugins\/complianz-gdpr",
+                "author": "Really Simple Plugins",
+                "authorURI": "https:\/\/www.complianz.io",
+                "description": "Complianz Privacy Suite for GDPR, CaCPA, DSVGO, AVG with a conditional cookie warning and customized cookie policy",
+                "title": "Complianz | GDPR\/CCPA Cookie Consent",
+                "networkActive": false,
+                "active": false,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "console-monitor\/console-monitor.php": {
+                "slug": "console-monitor\/console-monitor.php",
+                "name": "Console Monitor Pro",
+                "version": "2.1.0",
+                "pluginURI": "https:\/\/github.com\/tu-usuario\/console-monitor-pro",
+                "author": "Tu Nombre",
+                "authorURI": "https:\/\/tu-website.com",
+                "description": "Terminal de debugging flotante con filtros avanzados y simulador de dispositivos m\u00f3viles. Detecta errores de PHP, JavaScript, CORS, AJAX, Database, Plugins, Themes y m\u00e1s.",
+                "title": "Console Monitor Pro",
+                "networkActive": false,
+                "active": false,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "contact-form-7\/wp-contact-form-7.php": {
+                "slug": "contact-form-7\/wp-contact-form-7.php",
+                "name": "Contact Form 7",
+                "version": "6.1",
+                "pluginURI": "https:\/\/contactform7.com\/",
+                "author": "Takayuki Miyoshi",
+                "authorURI": "https:\/\/ideasilo.wordpress.com\/",
+                "description": "Just another contact form plugin. Simple but flexible.",
+                "title": "Contact Form 7",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "duplicator\/duplicator.php": {
+                "slug": "duplicator\/duplicator.php",
+                "name": "Duplicator",
+                "version": "1.5.12",
+                "pluginURI": "https:\/\/duplicator.com\/",
+                "author": "Duplicator",
+                "authorURI": "https:\/\/duplicator.com\/",
+                "description": "Migrate and backup a copy of your WordPress files and database. Duplicate and move a site from one location to another quickly.",
+                "title": "Duplicator",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "gtranslate\/gtranslate.php": {
+                "slug": "gtranslate\/gtranslate.php",
+                "name": "GTranslate",
+                "version": "3.0.9",
+                "pluginURI": "https:\/\/gtranslate.io\/?xyz=998",
+                "author": "Translate AI Multilingual Solutions",
+                "authorURI": "https:\/\/gtranslate.io",
+                "description": "Translate your website and make it multilingual. For support visit <a href=\"https:\/\/wordpress.org\/support\/plugin\/gtranslate\">GTranslate Support Forum<\/a>.",
+                "title": "GTranslate",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "litespeed-cache\/litespeed-cache.php": {
+                "slug": "litespeed-cache\/litespeed-cache.php",
+                "name": "LiteSpeed Cache",
+                "version": "7.2",
+                "pluginURI": "https:\/\/www.litespeedtech.com\/products\/cache-plugins\/wordpress-acceleration",
+                "author": "LiteSpeed Technologies",
+                "authorURI": "https:\/\/www.litespeedtech.com",
+                "description": "High-performance page caching and site optimization from LiteSpeed",
+                "title": "LiteSpeed Cache",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "maintenance\/maintenance.php": {
+                "slug": "maintenance\/maintenance.php",
+                "name": "Maintenance",
+                "version": "4.17",
+                "pluginURI": "https:\/\/wpmaintenancemode.com\/",
+                "author": "WebFactory Ltd",
+                "authorURI": "https:\/\/www.webfactoryltd.com\/",
+                "description": "Put your site in maintenance mode, away from the public view. Use maintenance plugin if your website is in development or you need to change a few things, run an upgrade. Make it only accessible to logged in users.",
+                "title": "Maintenance",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "seo-by-rank-math\/rank-math.php": {
+                "slug": "seo-by-rank-math\/rank-math.php",
+                "name": "Rank Math SEO",
+                "version": "1.0.247",
+                "pluginURI": "https:\/\/rankmath.com\/",
+                "author": "Rank Math SEO",
+                "authorURI": "https:\/\/rankmath.com\/?utm_source=Plugin&utm_medium=Readme%20Author%20URI&utm_campaign=WP",
+                "description": "Rank Math SEO is the Best WordPress SEO plugin with the features of many SEO and AI SEO tools in a single package to help multiply your SEO traffic.",
+                "title": "Rank Math SEO",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "seo-by-rank-math-pro\/rank-math-pro.php": {
+                "slug": "seo-by-rank-math-pro\/rank-math-pro.php",
+                "name": "Rank Math SEO PRO",
+                "version": "3.0.56",
+                "pluginURI": "https:\/\/rankmath.com\/wordpress\/plugin\/seo-suite\/",
+                "author": "Rank Math",
+                "authorURI": "https:\/\/rankmath.com\/?utm_source=Plugin&utm_medium=Readme%20Author%20URI&utm_campaign=WP",
+                "description": "Super-charge your website\u2019s SEO with the Rank Math PRO options like Site Analytics, SEO Performance, Custom Schema Templates, News\/Video Sitemaps, etc.",
+                "title": "Rank Math SEO PRO",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "sistema-reservas\/sistema-reservas.php": {
+                "slug": "sistema-reservas\/sistema-reservas.php",
+                "name": "Sistema de Reservas",
+                "version": "1.000",
+                "pluginURI": "",
+                "author": "",
+                "authorURI": "",
+                "description": "Sistema completo de reservas para servicios de transporte - CON RECORDATORIOS AUTOM\u00c1TICOS",
+                "title": "Sistema de Reservas",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "wordfence\/wordfence.php": {
+                "slug": "wordfence\/wordfence.php",
+                "name": "Wordfence Security",
+                "version": "8.0.5",
+                "pluginURI": "https:\/\/www.wordfence.com\/",
+                "author": "Wordfence",
+                "authorURI": "https:\/\/www.wordfence.com\/",
+                "description": "Wordfence Security - Anti-virus, Firewall and Malware Scan",
+                "title": "Wordfence Security",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            },
+            "wp-file-manager\/file_folder_manager.php": {
+                "slug": "wp-file-manager\/file_folder_manager.php",
+                "name": "WP File Manager",
+                "version": "8.0.2",
+                "pluginURI": "https:\/\/wordpress.org\/plugins\/wp-file-manager",
+                "author": "mndpsingh287",
+                "authorURI": "https:\/\/profiles.wordpress.org\/mndpsingh287",
+                "description": "Manage your WP files.",
+                "title": "WP File Manager",
+                "networkActive": false,
+                "active": true,
+                "mustUse": false,
+                "dropIns": false
+            }
+        },
+        "themes": {
+            "storefront": {
+                "slug": "storefront",
+                "themeName": "",
+                "version": "",
+                "themeURI": "",
+                "parentTheme": false,
+                "template": "storefront",
+                "stylesheet": "storefront",
+                "description": "",
+                "author": "",
+                "authorURI": "",
+                "tags": [],
+                "isAllowed": true,
+                "isActive": false,
+                "defaultTheme": false
+            },
+            "tictac": {
+                "slug": "tictac",
+                "themeName": "Tictac Child",
+                "version": "",
+                "themeURI": "",
+                "parentTheme": "storefront",
+                "template": "storefront",
+                "stylesheet": "tictac",
+                "description": "Storefront is the perfect theme for your next WooCommerce project. Designed and developed by WooCommerce Core developers, it features a bespoke integration with WooCommerce itself plus many of the most popular customer facing WooCommerce extensions. There are several layout",
+                "author": "Automattic",
+                "authorURI": "",
+                "tags": [],
+                "isAllowed": true,
+                "isActive": true,
+                "defaultTheme": false
+            },
+            "twentytwentyfive": {
+                "slug": "twentytwentyfive",
+                "themeName": "Twenty Twenty-Five",
+                "version": "1.2",
+                "themeURI": "https:\/\/wordpress.org\/themes\/twentytwentyfive\/",
+                "parentTheme": false,
+                "template": "twentytwentyfive",
+                "stylesheet": "twentytwentyfive",
+                "description": "Twenty Twenty-Five emphasizes simplicity and adaptability. It offers flexible design options, supported by a variety of patterns for different page types, such as services and landing pages, making it ideal for building personal blogs, professional portfolios, online magazines, or business websites. Its templates cater to various blog styles, from text-focused to image-heavy layouts. Additionally, it supports international typography and diverse color palettes, ensuring accessibility and customization for users worldwide.",
+                "author": "the WordPress team",
+                "authorURI": "https:\/\/wordpress.org",
+                "tags": [
+                    "one-column",
+                    "custom-colors",
+                    "custom-menu",
+                    "custom-logo",
+                    "editor-style",
+                    "featured-images",
+                    "full-site-editing",
+                    "block-patterns",
+                    "rtl-language-support",
+                    "sticky-post",
+                    "threaded-comments",
+                    "translation-ready",
+                    "wide-blocks",
+                    "block-styles",
+                    "style-variations",
+                    "accessibility-ready",
+                    "blog",
+                    "portfolio",
+                    "news"
+                ],
+                "isAllowed": true,
+                "isActive": false,
+                "defaultTheme": true
+            },
+            "twentytwentyfour": {
+                "slug": "twentytwentyfour",
+                "themeName": "Twenty Twenty-Four",
+                "version": "1.3",
+                "themeURI": "https:\/\/wordpress.org\/themes\/twentytwentyfour\/",
+                "parentTheme": false,
+                "template": "twentytwentyfour",
+                "stylesheet": "twentytwentyfour",
+                "description": "Twenty Twenty-Four is designed to be flexible, versatile and applicable to any website. Its collection of templates and patterns tailor to different needs, such as presenting a business, blogging and writing or showcasing work. A multitude of possibilities open up with just a few adjustments to color and typography. Twenty Twenty-Four comes with style variations and full page designs to help speed up the site building process, is fully compatible with the site editor, and takes advantage of new design tools introduced in WordPress 6.4.",
+                "author": "the WordPress team",
+                "authorURI": "https:\/\/wordpress.org",
+                "tags": [
+                    "one-column",
+                    "custom-colors",
+                    "custom-menu",
+                    "custom-logo",
+                    "editor-style",
+                    "featured-images",
+                    "full-site-editing",
+                    "block-patterns",
+                    "rtl-language-support",
+                    "sticky-post",
+                    "threaded-comments",
+                    "translation-ready",
+                    "wide-blocks",
+                    "block-styles",
+                    "style-variations",
+                    "accessibility-ready",
+                    "blog",
+                    "portfolio",
+                    "news"
+                ],
+                "isAllowed": true,
+                "isActive": false,
+                "defaultTheme": false
+            },
+            "twentytwentythree": {
+                "slug": "twentytwentythree",
+                "themeName": "Twenty Twenty-Three",
+                "version": "1.6",
+                "themeURI": "https:\/\/wordpress.org\/themes\/twentytwentythree",
+                "parentTheme": false,
+                "template": "twentytwentythree",
+                "stylesheet": "twentytwentythree",
+                "description": "Twenty Twenty-Three is designed to take advantage of the new design tools introduced in WordPress 6.1. With a clean, blank base as a starting point, this default theme includes ten diverse style variations created by members of the WordPress community. Whether you want to build a complex or incredibly simple website, you can do it quickly and intuitively through the bundled styles or dive into creation and full customization yourself.",
+                "author": "the WordPress team",
+                "authorURI": "https:\/\/wordpress.org",
+                "tags": [
+                    "one-column",
+                    "custom-colors",
+                    "custom-menu",
+                    "custom-logo",
+                    "editor-style",
+                    "featured-images",
+                    "full-site-editing",
+                    "block-patterns",
+                    "rtl-language-support",
+                    "sticky-post",
+                    "threaded-comments",
+                    "translation-ready",
+                    "wide-blocks",
+                    "block-styles",
+                    "style-variations",
+                    "accessibility-ready",
+                    "blog",
+                    "portfolio",
+                    "news"
+                ],
+                "isAllowed": true,
+                "isActive": false,
+                "defaultTheme": false
+            },
+            "twentytwentytwo": {
+                "slug": "twentytwentytwo",
+                "themeName": "Twenty Twenty-Two",
+                "version": "2.0",
+                "themeURI": "https:\/\/wordpress.org\/themes\/twentytwentytwo\/",
+                "parentTheme": false,
+                "template": "twentytwentytwo",
+                "stylesheet": "twentytwentytwo",
+                "description": "Built on a solidly designed foundation, Twenty Twenty-Two embraces the idea that everyone deserves a truly unique website. The theme\u2019s subtle styles are inspired by the diversity and versatility of birds: its typography is lightweight yet strong, its color palette is drawn from nature, and its layout elements sit gently on the page. The true richness of Twenty Twenty-Two lies in its opportunity for customization. The theme is built to take advantage of the Site Editor features introduced in WordPress 5.9, which means that colors, typography, and the layout of every single page on your site can be customized to suit your vision. It also includes dozens of block patterns, opening the door to a wide range of professionally designed layouts in just a few clicks. Whether you\u2019re building a single-page website, a blog, a business website, or a portfolio, Twenty Twenty-Two will help you create a site that is uniquely yours.",
+                "author": "the WordPress team",
+                "authorURI": "https:\/\/wordpress.org\/",
+                "tags": [
+                    "one-column",
+                    "custom-colors",
+                    "custom-menu",
+                    "custom-logo",
+                    "editor-style",
+                    "featured-images",
+                    "full-site-editing",
+                    "block-patterns",
+                    "rtl-language-support",
+                    "sticky-post",
+                    "threaded-comments",
+                    "style-variations",
+                    "wide-blocks",
+                    "block-styles",
+                    "accessibility-ready",
+                    "blog",
+                    "portfolio",
+                    "news"
+                ],
+                "isAllowed": true,
+                "isActive": false,
+                "defaultTheme": false
+            }
+        }
+    },
+    "defaultStorageId": -1,
+    "components": [
+        "package_component_db",
+        "package_component_core",
+        "package_component_plugins",
+        "package_component_themes",
+        "package_component_uploads",
+        "package_component_other"
+    ],
+    "opts_delete": "[\"duplicator_ui_view_state\",\"duplicator_package_active\",\"duplicator_settings\",\"duplicator_is_pro_enable_notice_dismissed\"]",
+    "brand": {
+        "name": "Duplicator",
+        "isDefault": true,
+        "logo": "<i class=\"fa fa-bolt fa-sm\"><\/i> Duplicator",
+        "enabled": false,
+        "style": []
+    },
+    "overwriteInstallerParams": {
+        "blogname": {
+            "value": "AUTOCARES BRAVO"
+        }
+    },
+    "installer_base_name": "installer.php.bak",
+    "installer_backup_name": "20250707_autocaresbravo_a24ab828775a4bac5097_20251001104923_installer-backup.php",
+    "package_name": "20250707_autocaresbravo_a24ab828775a4bac5097_20251001104923_archive.zip",
+    "package_hash": "a24ab82-01104923",
+    "package_notes": ""
+}

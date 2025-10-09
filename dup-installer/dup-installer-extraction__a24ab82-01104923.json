@@ -1,0 +1,49 @@
+{
+    "CL_-=_-=": "DUP_Extraction",
+    "zip_filetime": "current",
+    "archive_action": "donothing",
+    "archive_engine": "ziparchivechunking",
+    "extractonStart": 1759316055.746967,
+    "chunkStart": 1759316066.222185,
+    "root_path": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/",
+    "archive_path": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/20250707_autocaresbravo_a24ab828775a4bac5097_20251001104923_archive.zip",
+    "ajax1_error_level": 32767,
+    "dawn_status": null,
+    "archive_offset": 14650,
+    "do_chunking": false,
+    "chunkedExtractionCompleted": false,
+    "num_files": 16131,
+    "sub_folder_archive": "",
+    "max_size_extract_at_a_time": 2097152,
+    "zip_arc_chunk_notice_no": -1,
+    "zip_arc_chunk_notice_change_last_time": 0,
+    "zip_arc_chunks_extract_rates": [
+        15498884.489347206,
+        46265493.08264699,
+        17883315.957166813
+    ],
+    "archive_items_count": 15522,
+    "filters": {
+        "CL_-=_-=": "Duplicator\\Installer\\Core\\Deploy\\Files\\Filters",
+        "files": [
+            "20250707_autocaresbravo_a24ab828775a4bac5097_20251001104923_installer-backup.php"
+        ],
+        "dirsWithoutChilds": [],
+        "dirs": [
+            "dup-installer"
+        ]
+    },
+    "removeFilters": {
+        "CL_-=_-=": "Duplicator\\Installer\\Core\\Deploy\\Files\\Filters",
+        "files": [
+            "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/20250707_autocaresbravo_a24ab828775a4bac5097_20251001104923_installer-backup.php",
+            "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/20250707_autocaresbravo_a24ab828775a4bac5097_20251001104923_archive.zip",
+            "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/installer.php",
+            "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/dup-installer-bootlog__01b9698-01104923.txt"
+        ],
+        "dirsWithoutChilds": [],
+        "dirs": [
+            "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/dup-installer"
+        ]
+    }
+}

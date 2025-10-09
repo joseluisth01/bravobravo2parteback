@@ -1,0 +1,79 @@
+{
+    "CL_-=_-=": "DUPX_DBInstall",
+    "post": {
+        "view_mode": "basic",
+        "dbname": "admin_bravobravo2parte",
+        "dbuser": "user_admin_bravobravo2parte",
+        "dbpass": "L!VzBmlmy2hus_90",
+        "dbport": null,
+        "dbmysqlmode": "DEFAULT",
+        "dbmysqlmode_opts": "",
+        "pos": 4842994,
+        "pass": 1,
+        "first_chunk": false,
+        "dbchunk_retry": 0,
+        "continue_chunking": false,
+        "progress": 100,
+        "delimiter": ";",
+        "is_error": 0,
+        "error_msg": ""
+    },
+    "dbaction": "empty",
+    "dbcharset": "utf8mb4",
+    "dbcollate": "",
+    "dbvar_maxtime": "5000",
+    "dbvar_maxpacks": "16777216",
+    "dbvar_sqlmode": "ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION",
+    "sql_file_path": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/dup-installer\/dup-database__a24ab82-01104923.sql",
+    "table_count": 0,
+    "table_rows": 0,
+    "query_errs": 0,
+    "drop_tbl_log": 0,
+    "rename_tbl_log": 0,
+    "dbquery_errs": 0,
+    "dbquery_rows": 807,
+    "dbtable_count": 94,
+    "dbtable_rows": 6659,
+    "profile_start": 1759316072.87578,
+    "start_microtime": 1759316072.875699,
+    "thread_start_time": 1759316072.886981,
+    "dbsplit_creates": true,
+    "dbFileSize": 4842994,
+    "setQueries": [
+        "\/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE *\/;",
+        "\/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 *\/;",
+        "\/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 *\/;",
+        "\/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' *\/;",
+        "\/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 *\/;",
+        "\/*!40101 SET @saved_cs_client     = @@character_set_client *\/;"
+    ],
+    "dbUserMode": {
+        "CL_-=_-=": "Duplicator\\Installer\\Core\\Deploy\\Database\\DbUserMode",
+        "targetUsersById": [],
+        "usersAutoIncrement": -1,
+        "usersMetaAutoIncrement": -1,
+        "addedUsers": [],
+        "mappingIds": [],
+        "existingsMetaIsd": [],
+        "userTableNumCols": 0,
+        "userMode": "overwrite",
+        "prefixMetaRegexCheck": "\/^wp_(?:(\\d+)_)?(.*)$\/",
+        "prefixMetaMapping": [
+            "wp_"
+        ]
+    },
+    "queryFixes": {
+        "CL_-=_-=": "Duplicator\\Installer\\Core\\Deploy\\Database\\QueryFixes",
+        "globalRules": {
+            "search": [
+                "\/^(\\s*(?:\\\/\\*!\\d+\\s)?\\s*(?:CREATE.+)?DEFINER\\s*=)([^\\*\\s]+)(.*)$\/m",
+                "\/^(\\s*CREATE.+(?:PROCEDURE|FUNCTION)[\\s\\S]*)(BEGIN)([\\s\\S]*)$\/"
+            ],
+            "replace": [
+                "$1`user_admin_bravobravo2parte`@`localhost`$3",
+                "$1SQL SECURITY INVOKER\n$2$3"
+            ]
+        },
+        "tablesPrefixRules": []
+    }
+}

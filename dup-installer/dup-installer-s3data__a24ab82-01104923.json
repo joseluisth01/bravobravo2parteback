@@ -1,0 +1,53 @@
+{
+    "report": {
+        "pass": 0,
+        "chunk": 1,
+        "chunkPos": {
+            "l0": "final_report",
+            "l1": null,
+            "l2": null
+        },
+        "progress_perc": 100,
+        "scan_tables": 94,
+        "scan_rows": 6313,
+        "scan_cells": 71942,
+        "updt_tables": 11,
+        "updt_rows": 425,
+        "updt_cells": 508,
+        "errsql": [],
+        "errser": [],
+        "errkey": [],
+        "errsql_sum": 0,
+        "errser_sum": 0,
+        "errkey_sum": 0,
+        "profile_start": 1759316073.708694,
+        "profile_end": 1759316074.207577,
+        "time": "0.4989 sec.",
+        "err_all": 0,
+        "warn_all": 0,
+        "warnlist": []
+    },
+    "cTableParams": null,
+    "replaceData": [
+        {
+            "id": 0,
+            "prority": 12,
+            "scope": [
+                "___!GLOBAL!___!SCOPE!___"
+            ],
+            "type": "path",
+            "search": "\/home\/autobusmedinaaza\/public_html",
+            "replace": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte"
+        },
+        {
+            "id": 1,
+            "prority": 12,
+            "scope": [
+                "___!GLOBAL!___!SCOPE!___"
+            ],
+            "type": "urlnd",
+            "search": "https:\/\/autobusmedinaazahara.com",
+            "replace": "https:\/\/dev.tictac-comunicacion.es\/bravobravo2parte"
+        }
+    ]
+}

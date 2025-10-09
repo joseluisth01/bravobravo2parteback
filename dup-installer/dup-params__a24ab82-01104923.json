@@ -1,0 +1,1181 @@
+{
+    "url_old": {
+        "value": "https:\/\/autobusmedinaazahara.com",
+        "status": "init"
+    },
+    "wpaddon_sites": {
+        "value": [],
+        "status": "init"
+    },
+    "url_new": {
+        "value": "https:\/\/dev.tictac-comunicacion.es\/bravobravo2parte",
+        "status": "init"
+    },
+    "path_old": {
+        "value": "\/home\/autobusmedinaaza\/public_html",
+        "status": "init"
+    },
+    "path_new": {
+        "value": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte",
+        "status": "init"
+    },
+    "siteurl_old": {
+        "value": "https:\/\/autobusmedinaazahara.com",
+        "status": "init"
+    },
+    "siteurl": {
+        "value": "https:\/\/dev.tictac-comunicacion.es\/bravobravo2parte",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "path_cont_old": {
+        "value": "\/home\/autobusmedinaaza\/public_html\/wp-content",
+        "status": "init"
+    },
+    "path_cont_new": {
+        "value": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/wp-content",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "path_core_old": {
+        "value": "\/home\/autobusmedinaaza\/public_html",
+        "status": "init"
+    },
+    "path_core_new": {
+        "value": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "path_upl_old": {
+        "value": "\/home\/autobusmedinaaza\/public_html\/wp-content\/uploads",
+        "status": "init"
+    },
+    "path_upl_new": {
+        "value": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/wp-content\/uploads",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "url_cont_old": {
+        "value": "https:\/\/autobusmedinaazahara.com\/wp-content",
+        "status": "init"
+    },
+    "url_cont_new": {
+        "value": "https:\/\/dev.tictac-comunicacion.es\/bravobravo2parte\/wp-content",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "url_upl_old": {
+        "value": "https:\/\/autobusmedinaazahara.com\/wp-content\/uploads",
+        "status": "init"
+    },
+    "url_upl_new": {
+        "value": "https:\/\/dev.tictac-comunicacion.es\/bravobravo2parte\/wp-content\/uploads",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "url_plug_old": {
+        "value": "https:\/\/autobusmedinaazahara.com\/wp-content\/plugins",
+        "status": "init"
+    },
+    "url_plug_new": {
+        "value": "https:\/\/dev.tictac-comunicacion.es\/bravobravo2parte\/wp-content\/plugins",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "path_plug_old": {
+        "value": "\/home\/autobusmedinaaza\/public_html\/wp-content\/plugins",
+        "status": "init"
+    },
+    "path_plug_new": {
+        "value": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/wp-content\/plugins",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "url_muplug_old": {
+        "value": "https:\/\/autobusmedinaazahara.com\/wp-content\/mu-plugins",
+        "status": "init"
+    },
+    "url_muplug_new": {
+        "value": "https:\/\/dev.tictac-comunicacion.es\/bravobravo2parte\/wp-content\/mu-plugins",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "path_muplug_old": {
+        "value": "\/home\/autobusmedinaaza\/public_html\/wp-content\/mu-plugins",
+        "status": "init"
+    },
+    "path_muplug_new": {
+        "value": "\/var\/www\/vhosts\/dev.tictac-comunicacion.es\/httpdocs\/bravobravo2parte\/wp-content\/mu-plugins",
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "final_report": {
+        "value": {
+            "extraction": {
+                "table_count": 94,
+                "table_rows": 6659,
+                "query_errs": 0
+            },
+            "replace": {
+                "scan_tables": 94,
+                "scan_rows": 6313,
+                "scan_cells": 71942,
+                "updt_tables": 11,
+                "updt_rows": 425,
+                "updt_cells": 508,
+                "errsql": [],
+                "errser": [],
+                "errkey": [],
+                "errsql_sum": 0,
+                "errser_sum": 0,
+                "errkey_sum": 0,
+                "err_all": 0,
+                "warn_all": 0,
+                "warnlist": []
+            }
+        },
+        "status": "init"
+    },
+    "inst_mode": {
+        "value": 0,
+        "status": "init"
+    },
+    "ovr_site_data": {
+        "value": {
+            "dupVersion": "0",
+            "wpVersion": "0",
+            "dbhost": "",
+            "dbname": "",
+            "dbuser": "",
+            "dbpass": "",
+            "table_prefix": "",
+            "restUrl": "",
+            "restNonce": "",
+            "restAuthUser": "",
+            "restAuthPassword": "",
+            "ustatIdentifier": "",
+            "isMultisite": false,
+            "subdomain": false,
+            "subsites": [],
+            "nextSubsiteIdAI": -1,
+            "adminUsers": [],
+            "paths": [],
+            "urls": []
+        },
+        "status": "init"
+    },
+    "debug": {
+        "value": false,
+        "status": "init"
+    },
+    "debug_params": {
+        "value": false,
+        "status": "init"
+    },
+    "ctrl_action": {
+        "value": "ctrl-step4",
+        "status": "updinp"
+    },
+    "ctrl_csrf_token": {
+        "value": "",
+        "status": "init"
+    },
+    "template": {
+        "value": "base",
+        "status": "init"
+    },
+    "secure-ok": {
+        "value": false,
+        "status": "init"
+    },
+    "file_perms_value": {
+        "value": "644",
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "set_file_perms": {
+        "value": true,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "dir_perms_value": {
+        "value": "755",
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "set_dir_perms": {
+        "value": true,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "exe_safe_mode": {
+        "value": 0,
+        "status": "init"
+    },
+    "zip_filetime": {
+        "value": "current",
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "logging": {
+        "value": 1,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "remove-redundant": {
+        "value": false,
+        "status": "init",
+        "formStatus": "st_disabled"
+    },
+    "remove-users-without-permissions": {
+        "value": false,
+        "status": "init",
+        "formStatus": "st_disabled"
+    },
+    "recovery-link": {
+        "value": "",
+        "status": "init"
+    },
+    "import-info": {
+        "value": [],
+        "status": "init"
+    },
+    "auto-delete": {
+        "value": true,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "subscribe_email": {
+        "value": "",
+        "status": "init"
+    },
+    "install-type": {
+        "value": -1,
+        "status": "updinp",
+        "formStatus": "st_enabled"
+    },
+    "wp_config": {
+        "value": "modify",
+        "status": "init"
+    },
+    "ht_config": {
+        "value": "new",
+        "status": "init"
+    },
+    "other_config": {
+        "value": "new",
+        "status": "init"
+    },
+    "archive_action": {
+        "value": "donothing",
+        "status": "init"
+    },
+    "archive_engine_wpskip": {
+        "value": "none",
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "archive_engine": {
+        "value": "ziparchivechunking",
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "zip_throttling": {
+        "value": false,
+        "status": "init"
+    },
+    "dbaction": {
+        "value": "empty",
+        "status": "updinp"
+    },
+    "db-engine": {
+        "value": "chunk",
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "dbchunk": {
+        "value": true,
+        "status": "init"
+    },
+    "mode_chunking": {
+        "value": 2,
+        "status": "updinp"
+    },
+    "skip_path_replace": {
+        "value": false,
+        "status": "init"
+    },
+    "valid-level": {
+        "value": 4,
+        "status": "init"
+    },
+    "valid-act": {
+        "value": "normal",
+        "status": "init"
+    },
+    "valid-show-all": {
+        "value": false,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "accept-warnings": {
+        "value": true,
+        "status": "updinp",
+        "formStatus": "st_enabled"
+    },
+    "db-display-overwarn": {
+        "value": true,
+        "status": "init"
+    },
+    "view_mode": {
+        "value": "basic",
+        "status": "updinp",
+        "formStatus": "st_enabled"
+    },
+    "dbhost": {
+        "value": "localhost",
+        "status": "updinp",
+        "formStatus": "st_enabled"
+    },
+    "dbname": {
+        "value": "admin_bravobravo2parte",
+        "status": "updinp",
+        "formStatus": "st_enabled"
+    },
+    "dbuser": {
+        "value": "user_admin_bravobravo2parte",
+        "status": "updinp",
+        "formStatus": "st_enabled"
+    },
+    "dbpass": {
+        "value": "L!VzBmlmy2hus_90",
+        "status": "updinp",
+        "formStatus": "st_enabled"
+    },
+    "dbflag": {
+        "value": 0,
+        "status": "init"
+    },
+    "dbcharset": {
+        "value": "utf8mb4",
+        "status": "init"
+    },
+    "dbcollate": {
+        "value": "",
+        "status": "init"
+    },
+    "t_prefix": {
+        "value": "wp_",
+        "status": "init"
+    },
+    "dbobj_views": {
+        "value": true,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "dbobj_procs": {
+        "value": true,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "dbobj_funcs": {
+        "value": true,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "db_remove_definer": {
+        "value": false,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "dbsplit_creates": {
+        "value": true,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "dbmysqlmode_opts": {
+        "value": "",
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "dbmysqlmode": {
+        "value": "DEFAULT",
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "tables": {
+        "value": {
+            "wp_actionscheduler_actions": {
+                "name": "wp_actionscheduler_actions",
+                "extract": true,
+                "replace": true
+            },
+            "wp_actionscheduler_claims": {
+                "name": "wp_actionscheduler_claims",
+                "extract": true,
+                "replace": true
+            },
+            "wp_actionscheduler_groups": {
+                "name": "wp_actionscheduler_groups",
+                "extract": true,
+                "replace": true
+            },
+            "wp_actionscheduler_logs": {
+                "name": "wp_actionscheduler_logs",
+                "extract": true,
+                "replace": true
+            },
+            "wp_cmplz_cookiebanners": {
+                "name": "wp_cmplz_cookiebanners",
+                "extract": true,
+                "replace": true
+            },
+            "wp_cmplz_cookies": {
+                "name": "wp_cmplz_cookies",
+                "extract": true,
+                "replace": true
+            },
+            "wp_cmplz_dnsmpd": {
+                "name": "wp_cmplz_dnsmpd",
+                "extract": true,
+                "replace": true
+            },
+            "wp_cmplz_services": {
+                "name": "wp_cmplz_services",
+                "extract": true,
+                "replace": true
+            },
+            "wp_commentmeta": {
+                "name": "wp_commentmeta",
+                "extract": true,
+                "replace": true
+            },
+            "wp_comments": {
+                "name": "wp_comments",
+                "extract": true,
+                "replace": true
+            },
+            "wp_duplicator_packages": {
+                "name": "wp_duplicator_packages",
+                "extract": true,
+                "replace": true
+            },
+            "wp_links": {
+                "name": "wp_links",
+                "extract": true,
+                "replace": true
+            },
+            "wp_litespeed_url": {
+                "name": "wp_litespeed_url",
+                "extract": true,
+                "replace": true
+            },
+            "wp_litespeed_url_file": {
+                "name": "wp_litespeed_url_file",
+                "extract": true,
+                "replace": true
+            },
+            "wp_options": {
+                "name": "wp_options",
+                "extract": true,
+                "replace": true
+            },
+            "wp_postmeta": {
+                "name": "wp_postmeta",
+                "extract": true,
+                "replace": true
+            },
+            "wp_posts": {
+                "name": "wp_posts",
+                "extract": true,
+                "replace": true
+            },
+            "wp_rank_math_analytics_objects": {
+                "name": "wp_rank_math_analytics_objects",
+                "extract": true,
+                "replace": true
+            },
+            "wp_rank_math_internal_links": {
+                "name": "wp_rank_math_internal_links",
+                "extract": true,
+                "replace": true
+            },
+            "wp_rank_math_internal_meta": {
+                "name": "wp_rank_math_internal_meta",
+                "extract": true,
+                "replace": true
+            },
+            "wp_reservas_agencies": {
+                "name": "wp_reservas_agencies",
+                "extract": true,
+                "replace": true
+            },
+            "wp_reservas_configuration": {
+                "name": "wp_reservas_configuration",
+                "extract": true,
+                "replace": true
+            },
+            "wp_reservas_discount_rules": {
+                "name": "wp_reservas_discount_rules",
+                "extract": true,
+                "replace": true
+            },
+            "wp_reservas_reservas": {
+                "name": "wp_reservas_reservas",
+                "extract": true,
+                "replace": true
+            },
+            "wp_reservas_servicios": {
+                "name": "wp_reservas_servicios",
+                "extract": true,
+                "replace": true
+            },
+            "wp_reservas_users": {
+                "name": "wp_reservas_users",
+                "extract": true,
+                "replace": true
+            },
+            "wp_termmeta": {
+                "name": "wp_termmeta",
+                "extract": true,
+                "replace": true
+            },
+            "wp_terms": {
+                "name": "wp_terms",
+                "extract": true,
+                "replace": true
+            },
+            "wp_term_relationships": {
+                "name": "wp_term_relationships",
+                "extract": true,
+                "replace": true
+            },
+            "wp_term_taxonomy": {
+                "name": "wp_term_taxonomy",
+                "extract": true,
+                "replace": true
+            },
+            "wp_usermeta": {
+                "name": "wp_usermeta",
+                "extract": true,
+                "replace": true
+            },
+            "wp_users": {
+                "name": "wp_users",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_admin_notes": {
+                "name": "wp_wc_admin_notes",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_admin_note_actions": {
+                "name": "wp_wc_admin_note_actions",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_category_lookup": {
+                "name": "wp_wc_category_lookup",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_customer_lookup": {
+                "name": "wp_wc_customer_lookup",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_download_log": {
+                "name": "wp_wc_download_log",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_orders": {
+                "name": "wp_wc_orders",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_orders_meta": {
+                "name": "wp_wc_orders_meta",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_order_addresses": {
+                "name": "wp_wc_order_addresses",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_order_coupon_lookup": {
+                "name": "wp_wc_order_coupon_lookup",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_order_operational_data": {
+                "name": "wp_wc_order_operational_data",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_order_product_lookup": {
+                "name": "wp_wc_order_product_lookup",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_order_stats": {
+                "name": "wp_wc_order_stats",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_order_tax_lookup": {
+                "name": "wp_wc_order_tax_lookup",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_product_attributes_lookup": {
+                "name": "wp_wc_product_attributes_lookup",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_product_download_directories": {
+                "name": "wp_wc_product_download_directories",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_product_meta_lookup": {
+                "name": "wp_wc_product_meta_lookup",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_rate_limits": {
+                "name": "wp_wc_rate_limits",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_reserved_stock": {
+                "name": "wp_wc_reserved_stock",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_tax_rate_classes": {
+                "name": "wp_wc_tax_rate_classes",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wc_webhooks": {
+                "name": "wp_wc_webhooks",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfauditevents": {
+                "name": "wp_wfauditevents",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfblockediplog": {
+                "name": "wp_wfblockediplog",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfblocks7": {
+                "name": "wp_wfblocks7",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfconfig": {
+                "name": "wp_wfconfig",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfcrawlers": {
+                "name": "wp_wfcrawlers",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wffilechanges": {
+                "name": "wp_wffilechanges",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wffilemods": {
+                "name": "wp_wffilemods",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfhits": {
+                "name": "wp_wfhits",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfhoover": {
+                "name": "wp_wfhoover",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfissues": {
+                "name": "wp_wfissues",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfknownfilelist": {
+                "name": "wp_wfknownfilelist",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wflivetraffichuman": {
+                "name": "wp_wflivetraffichuman",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wflocs": {
+                "name": "wp_wflocs",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wflogins": {
+                "name": "wp_wflogins",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfls_2fa_secrets": {
+                "name": "wp_wfls_2fa_secrets",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfls_role_counts": {
+                "name": "wp_wfls_role_counts",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfls_settings": {
+                "name": "wp_wfls_settings",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfnotifications": {
+                "name": "wp_wfnotifications",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfpendingissues": {
+                "name": "wp_wfpendingissues",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfreversecache": {
+                "name": "wp_wfreversecache",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfsecurityevents": {
+                "name": "wp_wfsecurityevents",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfsnipcache": {
+                "name": "wp_wfsnipcache",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfstatus": {
+                "name": "wp_wfstatus",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wftrafficrates": {
+                "name": "wp_wftrafficrates",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wfwaffailures": {
+                "name": "wp_wfwaffailures",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_api_keys": {
+                "name": "wp_woocommerce_api_keys",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_attribute_taxonomies": {
+                "name": "wp_woocommerce_attribute_taxonomies",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_downloadable_product_permissions": {
+                "name": "wp_woocommerce_downloadable_product_permissions",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_log": {
+                "name": "wp_woocommerce_log",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_order_itemmeta": {
+                "name": "wp_woocommerce_order_itemmeta",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_order_items": {
+                "name": "wp_woocommerce_order_items",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_payment_tokenmeta": {
+                "name": "wp_woocommerce_payment_tokenmeta",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_payment_tokens": {
+                "name": "wp_woocommerce_payment_tokens",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_sessions": {
+                "name": "wp_woocommerce_sessions",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_shipping_zones": {
+                "name": "wp_woocommerce_shipping_zones",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_shipping_zone_locations": {
+                "name": "wp_woocommerce_shipping_zone_locations",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_shipping_zone_methods": {
+                "name": "wp_woocommerce_shipping_zone_methods",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_tax_rates": {
+                "name": "wp_woocommerce_tax_rates",
+                "extract": true,
+                "replace": true
+            },
+            "wp_woocommerce_tax_rate_locations": {
+                "name": "wp_woocommerce_tax_rate_locations",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wpfm_backup": {
+                "name": "wp_wpfm_backup",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wpmailsmtp_debug_events": {
+                "name": "wp_wpmailsmtp_debug_events",
+                "extract": true,
+                "replace": true
+            },
+            "wp_wpmailsmtp_tasks_meta": {
+                "name": "wp_wpmailsmtp_tasks_meta",
+                "extract": true,
+                "replace": true
+            }
+        },
+        "status": "init"
+    },
+    "blogname": {
+        "value": "AUTOCARES BRAVO",
+        "status": "updinp"
+    },
+    "search_replace_email_domain": {
+        "value": false,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "fullsearch": {
+        "value": false,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "postguid": {
+        "value": false,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "mstrlim": {
+        "value": 4,
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "plugins": {
+        "value": [
+            "advanced-custom-fields-pro\/acf.php",
+            "all-in-one-wp-migration\/all-in-one-wp-migration.php",
+            "contact-form-7\/wp-contact-form-7.php",
+            "duplicator\/duplicator.php",
+            "gtranslate\/gtranslate.php",
+            "litespeed-cache\/litespeed-cache.php",
+            "maintenance\/maintenance.php",
+            "seo-by-rank-math\/rank-math.php",
+            "seo-by-rank-math-pro\/rank-math-pro.php",
+            "sistema-reservas\/sistema-reservas.php",
+            "wordfence\/wordfence.php",
+            "wp-file-manager\/file_folder_manager.php"
+        ],
+        "status": "init"
+    },
+    "ignore_plugins": {
+        "value": [],
+        "status": "init"
+    },
+    "fd_plugins": {
+        "value": [],
+        "status": "init"
+    },
+    "users_mode": {
+        "value": "overwrite",
+        "status": "init"
+    },
+    "users_pwd_reset": {
+        "value": {
+            "1": ""
+        },
+        "status": "init"
+    },
+    "wp_new_admin": {
+        "value": false,
+        "status": "init"
+    },
+    "wp_username": {
+        "value": "",
+        "status": "init"
+    },
+    "wp_password": {
+        "value": "",
+        "status": "init"
+    },
+    "wp_mail": {
+        "value": "",
+        "status": "init"
+    },
+    "wp_nickname": {
+        "value": "",
+        "status": "init"
+    },
+    "wp_first_name": {
+        "value": "",
+        "status": "init"
+    },
+    "wp_last_name": {
+        "value": "",
+        "status": "init"
+    },
+    "auth_keys_and_salts": {
+        "value": false,
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_DISALLOW_FILE_EDIT": {
+        "value": {
+            "value": false,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_DISALLOW_FILE_MODS": {
+        "value": {
+            "value": false,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_AUTOSAVE_INTERVAL": {
+        "value": {
+            "value": 60,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_WP_POST_REVISIONS": {
+        "value": {
+            "value": true,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_FORCE_SSL_ADMIN": {
+        "value": {
+            "value": true,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "wpc_AUTOMATIC_UPDATER_DISABLED": {
+        "value": {
+            "value": false,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_WP_AUTO_UPDATE_CORE": {
+        "value": {
+            "value": "false",
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_IMAGE_EDIT_OVERWRITE": {
+        "value": {
+            "value": true,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_WP_CACHE": {
+        "value": {
+            "value": true,
+            "inWpConfig": true
+        },
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "wpc_WPCACHEHOME": {
+        "value": {
+            "value": "\/",
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "wpc_WP_TEMP_DIR": {
+        "value": {
+            "value": "",
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "wpc_WP_DEBUG": {
+        "value": {
+            "value": true,
+            "inWpConfig": true
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_WP_DEBUG_LOG": {
+        "value": {
+            "value": true,
+            "inWpConfig": true
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_WP_DISABLE_FATAL_ERROR_HANDLER": {
+        "value": {
+            "value": false,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_WP_DEBUG_DISPLAY": {
+        "value": {
+            "value": false,
+            "inWpConfig": true
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_SCRIPT_DEBUG": {
+        "value": {
+            "value": true,
+            "inWpConfig": true
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_CONCATENATE_SCRIPTS": {
+        "value": {
+            "value": false,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_SAVEQUERIES": {
+        "value": {
+            "value": false,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_ALTERNATE_WP_CRON": {
+        "value": {
+            "value": false,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_DISABLE_WP_CRON": {
+        "value": {
+            "value": false,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_WP_CRON_LOCK_TIMEOUT": {
+        "value": {
+            "value": 60,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_EMPTY_TRASH_DAYS": {
+        "value": {
+            "value": 30,
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_COOKIE_DOMAIN": {
+        "value": {
+            "value": "",
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_enabled"
+    },
+    "wpc_WP_MEMORY_LIMIT": {
+        "value": {
+            "value": "40M",
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_WP_MAX_MEMORY_LIMIT": {
+        "value": {
+            "value": "256M",
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    },
+    "wpc_MYSQL_CLIENT_FLAGS": {
+        "value": {
+            "value": [],
+            "inWpConfig": false
+        },
+        "status": "init",
+        "formStatus": "st_infoonly"
+    }
+}
