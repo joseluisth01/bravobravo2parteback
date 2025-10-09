@@ -758,6 +758,7 @@ class ReservasDashboard
                                 <button class="action-btn" onclick="loadDiscountsConfigSection()">💰 Configurar Descuentos</button>
                                 <button class="action-btn" onclick="loadConfigurationSection()">⚙️ Configuración</button>
                                 <button class="action-btn" onclick="loadReportsSection()">📊 Informes y Reservas</button>
+                                <button class="action-btn" onclick="loadVisitasReportsSection()">📊 Informes Visitas Guiadas</button>
                                 <button class="action-btn" onclick="loadAdminReservaRapida()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-left: 4px solid #155724;">⚡ Reserva Rápida</button>
                                 <button class="action-btn" onclick="loadAdminReservaRetroactiva()" style="background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%); border-left: 4px solid #c25500;">📅 Reserva Retroactiva</button>
                                 <button class="action-btn" onclick="loadAgenciesSection()">🏢 Gestionar Agencias</button>
