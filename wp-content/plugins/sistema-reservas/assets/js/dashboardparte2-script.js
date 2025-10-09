@@ -45,10 +45,8 @@ jQuery(document).ready(function($) {
  * Cargar configuración de servicio cuando se abre modal de edición
  */
 function loadAgencyServiceConfigForEdit(agencyId) {
-    console.log('=== LOAD AGENCY SERVICE CONFIG ===');
+    console.log('=== LOAD AGENCY SERVICE CONFIG FOR EDIT ===');
     console.log('Agency ID:', agencyId);
-    console.log('AJAX URL:', reservasAjax.ajax_url);
-    console.log('Nonce:', reservasAjax.nonce);
     
     currentAgencyIdForService = agencyId;
     
@@ -67,18 +65,37 @@ function loadAgencyServiceConfigForEdit(agencyId) {
         success: function(response) {
             console.log('✅ SUCCESS Response:', response);
             if (response.success) {
-                populateServiceForm(response.data, true);
+                // ✅ CRÍTICO: Asegurarse de que los datos existen antes de popular
+                if (response.data && typeof response.data === 'object') {
+                    populateServiceForm(response.data, true);
+                } else {
+                    console.warn('⚠️ Datos vacíos, cargando formulario vacío');
+                    populateServiceForm({
+                        servicio_activo: 0,
+                        horarios_disponibles: {},
+                        precio_adulto: 0,
+                        precio_nino: 0,
+                        precio_nino_menor: 0,
+                        logo_url: '',
+                        portada_url: '',
+                        descripcion: '',
+                        titulo: '',
+                        orden_prioridad: 999
+                    }, true);
+                }
             } else {
                 console.error('❌ Error en respuesta:', response.data);
-                // Cargar valores por defecto
                 populateServiceForm({
                     servicio_activo: 0,
-                    dias_disponibles: [],
+                    horarios_disponibles: {},
                     precio_adulto: 0,
                     precio_nino: 0,
+                    precio_nino_menor: 0,
                     logo_url: '',
                     portada_url: '',
-                    descripcion: ''
+                    descripcion: '',
+                    titulo: '',
+                    orden_prioridad: 999
                 }, true);
             }
         },
@@ -88,7 +105,20 @@ function loadAgencyServiceConfigForEdit(agencyId) {
             console.error('Error:', error);
             console.error('Response Text:', xhr.responseText);
             console.error('Status Code:', xhr.status);
-            console.error('Ready State:', xhr.readyState);
+            
+            // Cargar formulario vacío en caso de error
+            populateServiceForm({
+                servicio_activo: 0,
+                horarios_disponibles: {},
+                precio_adulto: 0,
+                precio_nino: 0,
+                precio_nino_menor: 0,
+                logo_url: '',
+                portada_url: '',
+                descripcion: '',
+                titulo: '',
+                orden_prioridad: 999
+            }, true);
         }
     });
 }
@@ -184,62 +214,126 @@ function collectHorariosData() {
 
 
 /**
- * Rellenar formulario con datos del servicio (CORREGIDO)
+ * Rellenar formulario con datos del servicio (CORREGIDO Y MEJORADO)
  */
 function populateServiceForm(serviceData, isEdit) {
-    console.log('Poblando formulario con datos:', serviceData);
+    console.log('=== POPULATE SERVICE FORM ===');
+    console.log('Service Data recibido:', serviceData);
+    console.log('Is Edit:', isEdit);
     
     const prefix = isEdit ? 'edit_' : '';
     const checkboxId = isEdit ? '#edit_servicio_activo' : '#servicio_activo';
     
+    // ✅ VALIDAR QUE serviceData existe y es un objeto
+    if (!serviceData || typeof serviceData !== 'object') {
+        console.error('❌ serviceData inválido:', serviceData);
+        serviceData = {
+            servicio_activo: 0,
+            horarios_disponibles: {},
+            precio_adulto: 0,
+            precio_nino: 0,
+            precio_nino_menor: 0,
+            logo_url: '',
+            portada_url: '',
+            descripcion: '',
+            titulo: '',
+            orden_prioridad: 999
+        };
+    }
+    
     // Checkbox principal
-    jQuery(checkboxId).prop('checked', serviceData.servicio_activo == 1);
+    const servicioActivo = serviceData.servicio_activo == 1;
+    jQuery(checkboxId).prop('checked', servicioActivo);
+    console.log('Checkbox servicio activo:', servicioActivo);
     
     // Mostrar/ocultar campos según estado
     if (isEdit) {
-        toggleServiceFieldsEdit(serviceData.servicio_activo == 1);
+        toggleServiceFieldsEdit(servicioActivo);
     } else {
-        toggleServiceFields(serviceData.servicio_activo == 1);
+        toggleServiceFields(servicioActivo);
     }
     
-    // ✅ CARGAR DÍAS Y HORARIOS CORREGIDO
+    // ✅ PRECIOS
+    jQuery('#' + prefix + 'precio_adulto_servicio').val(serviceData.precio_adulto || '');
+    jQuery('#' + prefix + 'precio_nino_servicio').val(serviceData.precio_nino || '');
+    jQuery('#' + prefix + 'precio_nino_menor_servicio').val(serviceData.precio_nino_menor || '');
+    
+    // ✅ DESCRIPCIÓN Y TÍTULO
+    jQuery('#' + prefix + 'descripcion_servicio').val(serviceData.descripcion || '');
+    jQuery('#' + prefix + 'titulo_servicio').val(serviceData.titulo || '');
+    jQuery('#' + prefix + 'orden_prioridad').val(serviceData.orden_prioridad || 999);
+    
+    // ✅ CARGAR DÍAS Y HORARIOS MEJORADO
     if (serviceData.horarios_disponibles) {
         let horarios;
+        
         try {
-            horarios = typeof serviceData.horarios_disponibles === 'string' 
-                ? JSON.parse(serviceData.horarios_disponibles) 
-                : serviceData.horarios_disponibles;
+            // Intentar parsear si es string
+            if (typeof serviceData.horarios_disponibles === 'string') {
+                horarios = JSON.parse(serviceData.horarios_disponibles);
+            } else {
+                horarios = serviceData.horarios_disponibles;
+            }
+            
+            console.log('✅ Horarios parseados correctamente:', horarios);
         } catch (e) {
-            console.error('Error parseando horarios:', e);
+            console.error('❌ Error parseando horarios:', e);
+            console.error('Dato recibido:', serviceData.horarios_disponibles);
             horarios = {};
         }
         
-        console.log('Horarios parseados:', horarios);
+        // ✅ VALIDAR QUE horarios es un objeto
+        if (!horarios || typeof horarios !== 'object') {
+            console.warn('⚠️ Horarios inválidos, usando objeto vacío');
+            horarios = {};
+        }
+        
+        // ✅ LIMPIAR TODOS LOS CHECKBOXES Y HORARIOS ANTES DE CARGAR
+        if (isEdit) {
+            jQuery('.edit-day-checkbox').prop('checked', false);
+            jQuery('[id^="edit-hours-"]').hide();
+            jQuery('.hours-list').empty();
+        } else {
+            jQuery('.day-checkbox input[type="checkbox"]').prop('checked', false);
+            jQuery('[id^="hours-"]').hide();
+            jQuery('.hours-list').empty();
+        }
         
         // Recorrer días y sus horarios
         Object.keys(horarios).forEach(day => {
+            console.log(`Procesando día: ${day}`);
+            
             const dayCheckbox = isEdit 
                 ? jQuery(`.edit-day-checkbox[value="${day}"]`)
-                : jQuery(`input[value="${day}"]`).not('.edit-day-checkbox');
+                : jQuery(`.day-checkbox input[value="${day}"]`).not('.edit-day-checkbox');
             
             if (dayCheckbox.length > 0) {
+                // Marcar checkbox
                 dayCheckbox.prop('checked', true);
+                console.log(`✅ Checkbox marcado para ${day}`);
+                
+                // Mostrar contenedor de horarios
                 toggleDayHours(dayCheckbox[0], isEdit);
                 
-                // Limpiar horarios existentes
+                // Obtener contenedor de horarios
                 const prefix2 = isEdit ? 'edit-' : '';
                 const hoursList = document.querySelector(`#${prefix2}hours-${day} .hours-list`);
                 
                 if (!hoursList) {
-                    console.error('No se encontró hours-list para el día:', day);
+                    console.error(`❌ No se encontró hours-list para el día: ${day}`);
                     return;
                 }
                 
+                // Limpiar horarios existentes
                 hoursList.innerHTML = '';
                 
-                // ✅ CORRECCIÓN: Añadir cada horario y asignar valor correctamente
-                horarios[day].forEach((hora, index) => {
-                    // Crear el slot de horario
+                // ✅ VALIDAR QUE horarios[day] es un array
+                const horasDelDia = Array.isArray(horarios[day]) ? horarios[day] : [];
+                
+                console.log(`Añadiendo ${horasDelDia.length} horarios para ${day}:`, horasDelDia);
+                
+                // Añadir cada horario
+                horasDelDia.forEach((hora, index) => {
                     const hourSlot = document.createElement('div');
                     hourSlot.className = 'hour-slot';
                     hourSlot.innerHTML = `
@@ -247,29 +341,19 @@ function populateServiceForm(serviceData, isEdit) {
                         <button type="button" class="btn-remove-hour" onclick="removeHourSlot(this)">✕</button>
                     `;
                     hoursList.appendChild(hourSlot);
-                    
-                    console.log(`✅ Horario añadido para ${day}: ${hora}`);
+                    console.log(`✅ Horario ${index + 1}/${horasDelDia.length} añadido para ${day}: ${hora}`);
                 });
+            } else {
+                console.warn(`⚠️ No se encontró checkbox para el día: ${day}`);
             }
         });
+        
+        console.log('✅ Todos los horarios cargados correctamente');
     } else {
-        console.log('No hay horarios disponibles en los datos');
+        console.log('ℹ️ No hay horarios disponibles en los datos');
     }
     
-    // Precios
-    // Precios
-jQuery('#' + prefix + 'precio_adulto_servicio').val(serviceData.precio_adulto || '');
-jQuery('#' + prefix + 'precio_nino_servicio').val(serviceData.precio_nino || '');
-jQuery('#' + prefix + 'precio_nino_menor_servicio').val(serviceData.precio_nino_menor || ''); // ✅ NUEVO
-    
-    // Descripción
-    jQuery('#' + prefix + 'descripcion_servicio').val(serviceData.descripcion || '');
-
-    jQuery('#' + prefix + 'titulo_servicio').val(serviceData.titulo || '');
-    jQuery('#' + prefix + 'orden_prioridad').val(serviceData.orden_prioridad || 999);
-    
-    
-    // Imágenes
+    // ✅ IMÁGENES
     if (serviceData.logo_url) {
         showExistingImage('logo', serviceData.logo_url, isEdit);
     } else {
@@ -281,6 +365,8 @@ jQuery('#' + prefix + 'precio_nino_menor_servicio').val(serviceData.precio_nino_
     } else {
         hideExistingImage('portada', isEdit);
     }
+    
+    console.log('=== POPULATE SERVICE FORM COMPLETADO ===');
 }
 
 /**
