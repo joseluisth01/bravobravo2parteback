@@ -309,6 +309,8 @@ class ReservasReportsAdmin
             $estado_filtro = sanitize_text_field($_POST['estado_filtro'] ?? 'confirmadas'); // 'todas', 'confirmadas', 'canceladas'
             $agency_filter = sanitize_text_field($_POST['agency_filter'] ?? 'todas'); // 'todas', 'sin_agencia', o ID de agencia
             $selected_schedules = $_POST['selected_schedules'] ?? ''; // ✅ NUEVO FILTRO
+            $reserva_rapida_filter = sanitize_text_field($_POST['reserva_rapida_filter'] ?? 'todas');
+
 
             $page = intval($_POST['page'] ?? 1);
             $per_page = 20;
@@ -355,6 +357,19 @@ class ReservasReportsAdmin
                             $where_conditions[] = "r.agency_id = %d";
                             $query_params[] = intval($agency_filter);
                         }
+                        break;
+                }
+
+                switch ($reserva_rapida_filter) {
+                    case 'solo_rapidas':
+                        $where_conditions[] = "r.es_reserva_rapida = 1";
+                        break;
+                    case 'sin_rapidas':
+                        $where_conditions[] = "r.es_reserva_rapida = 0";
+                        break;
+                    case 'todas':
+                    default:
+                        // No añadir condición
                         break;
                 }
 
@@ -407,28 +422,28 @@ class ReservasReportsAdmin
             }
 
             // Después de obtener otros filtros (línea ~60):
-$reserva_rapida_filter = sanitize_text_field($_POST['reserva_rapida_filter'] ?? 'todas');
+            $reserva_rapida_filter = sanitize_text_field($_POST['reserva_rapida_filter'] ?? 'todas');
 
-// En la construcción de WHERE conditions (antes del WHERE clause):
-// Filtro de reservas rápidas
-switch ($reserva_rapida_filter) {
-    case 'solo_rapidas':
-        $quick_ids = $this->get_quick_reservation_ids();
-        $ids_placeholder = implode(',', array_fill(0, count($quick_ids), '%d'));
-        $where_conditions[] = "r.id IN ($ids_placeholder)";
-        array_push($query_params, ...$quick_ids);
-        break;
-    case 'sin_rapidas':
-        $quick_ids = $this->get_quick_reservation_ids();
-        $ids_placeholder = implode(',', array_fill(0, count($quick_ids), '%d'));
-        $where_conditions[] = "r.id NOT IN ($ids_placeholder)";
-        array_push($query_params, ...$quick_ids);
-        break;
-    case 'todas':
-    default:
-        // No añadir condición
-        break;
-}
+            // En la construcción de WHERE conditions (antes del WHERE clause):
+            // Filtro de reservas rápidas
+            switch ($reserva_rapida_filter) {
+                case 'solo_rapidas':
+                    $quick_ids = $this->get_quick_reservation_ids();
+                    $ids_placeholder = implode(',', array_fill(0, count($quick_ids), '%d'));
+                    $where_conditions[] = "r.id IN ($ids_placeholder)";
+                    array_push($query_params, ...$quick_ids);
+                    break;
+                case 'sin_rapidas':
+                    $quick_ids = $this->get_quick_reservation_ids();
+                    $ids_placeholder = implode(',', array_fill(0, count($quick_ids), '%d'));
+                    $where_conditions[] = "r.id NOT IN ($ids_placeholder)";
+                    array_push($query_params, ...$quick_ids);
+                    break;
+                case 'todas':
+                default:
+                    // No añadir condición
+                    break;
+            }
 
             // ✅ CONSTRUIR CONDICIONES WHERE PARA LISTADO
             $listado_params = array();
@@ -614,14 +629,14 @@ switch ($reserva_rapida_filter) {
                     'per_page' => $per_page
                 ),
                 'filtros' => array(
-    'fecha_inicio' => $fecha_inicio,
-    'fecha_fin' => $fecha_fin,
-    'tipo_fecha' => $tipo_fecha,
-    'estado_filtro' => $estado_filtro,
-    'agency_filter' => $agency_filter,
-    'selected_schedules' => $selected_schedules,
-    'reserva_rapida_filter' => $reserva_rapida_filter // ✅ NUEVO
-),
+                    'fecha_inicio' => $fecha_inicio,
+                    'fecha_fin' => $fecha_fin,
+                    'tipo_fecha' => $tipo_fecha,
+                    'estado_filtro' => $estado_filtro,
+                    'agency_filter' => $agency_filter,
+                    'selected_schedules' => $selected_schedules,
+                    'reserva_rapida_filter' => $reserva_rapida_filter // ✅ NUEVO
+                ),
             );
 
             error_log('✅ Reports data loaded successfully with all filters including schedules');
@@ -632,31 +647,31 @@ switch ($reserva_rapida_filter) {
         }
     }
     /**
-     * Obtener IDs de reservas rápidas
+     * Obtener IDs de reservas rápidas - VERSIÓN MEJORADA
      */
-private function get_quick_reservation_ids()
-{
-    global $wpdb;
-    $table_rapidas = $wpdb->prefix . 'reservas_rapidas';
+    private function get_quick_reservation_ids()
+    {
+        global $wpdb;
+        $table_rapidas = $wpdb->prefix . 'reservas_rapidas';
 
-    // Verificar que la tabla existe
-    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_rapidas'") == $table_rapidas;
-    
-    if (!$table_exists) {
-        error_log('⚠️ Tabla de reservas rápidas no existe');
-        return array(0); // Devolver array con 0 para evitar errores SQL
+        // Verificar que la tabla existe
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_rapidas'") == $table_rapidas;
+
+        if (!$table_exists) {
+            error_log('⚠️ Tabla de reservas rápidas no existe');
+            return array(0); // Devolver array con 0 para evitar errores SQL
+        }
+
+        $ids = $wpdb->get_col("SELECT DISTINCT reserva_id FROM $table_rapidas WHERE reserva_id IS NOT NULL");
+
+        if (empty($ids)) {
+            error_log('⚠️ No hay reservas rápidas registradas');
+            return array(0); // Devolver array con 0 si está vacío para evitar errores SQL
+        }
+
+        error_log('✅ IDs de reservas rápidas encontrados: ' . count($ids));
+        return $ids;
     }
-
-    $ids = $wpdb->get_col("SELECT DISTINCT reserva_id FROM $table_rapidas WHERE reserva_id IS NOT NULL");
-
-    if (empty($ids)) {
-        error_log('⚠️ No hay reservas rápidas registradas');
-        return array(0); // Devolver array con 0 si está vacío para evitar errores SQL
-    }
-
-    error_log('✅ IDs de reservas rápidas encontrados: ' . count($ids));
-    return $ids;
-}
 
     /**
      * Obtener horarios disponibles para filtro de PDF

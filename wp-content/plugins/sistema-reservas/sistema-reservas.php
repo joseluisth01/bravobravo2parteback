@@ -759,6 +759,14 @@ dbDelta($sql_rapidas);
             error_log('✅ Campos de acumulación de descuentos añadidos');
         }
 
+        $es_reserva_rapida_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_reservas LIKE 'es_reserva_rapida'");
+
+if (empty($es_reserva_rapida_exists)) {
+    $wpdb->query("ALTER TABLE $table_reservas ADD COLUMN es_reserva_rapida TINYINT(1) DEFAULT 0 AFTER metodo_pago");
+    $wpdb->query("ALTER TABLE $table_reservas ADD INDEX es_reserva_rapida (es_reserva_rapida)");
+    error_log('✅ Campo es_reserva_rapida añadido a tabla de reservas');
+}
+
         // ✅ VERIFICAR Y AÑADIR CAMPO HORA_VUELTA A SERVICIOS
         $hora_vuelta_servicios_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_servicios LIKE 'hora_vuelta'");
 

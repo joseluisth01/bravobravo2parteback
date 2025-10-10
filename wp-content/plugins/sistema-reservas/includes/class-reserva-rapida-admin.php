@@ -488,30 +488,33 @@ class ReservasReservaRapidaAdmin
         return;
     }
 
-    error_log('=== REGISTRANDO RESERVA RÁPIDA ===');
-error_log('Reserva ID: ' . $reservation_result['reservation_id']);
-error_log('Localizador: ' . $reservation_result['localizador']);
-error_log('User: ' . print_r($user, true));
-error_log('User type: ' . $user_type);
+    // ✅✅✅ AÑADIR LOGS DETALLADOS ANTES DE REGISTRAR
+    error_log('=== PUNTO CRÍTICO: ANTES DE REGISTRAR RESERVA RÁPIDA ===');
+    error_log('Reserva creada con ID: ' . $reservation_result['reservation_id']);
+    error_log('Localizador: ' . $reservation_result['localizador']);
+    error_log('User data completo: ' . print_r($user, true));
+    error_log('User type: ' . $user_type);
+    error_log('¿Tiene user[id]?: ' . (isset($user['id']) ? 'SÍ - ' . $user['id'] : 'NO'));
+    error_log('¿Tiene user[username]?: ' . (isset($user['username']) ? 'SÍ - ' . $user['username'] : 'NO'));
 
-$registro_result = $this->register_quick_reservation(
-    $reservation_result['reservation_id'],
-    $reservation_result['localizador'],
-    $user,
-    $user_type
-);
-
-if (!$registro_result) {
-    error_log('⚠️ No se pudo registrar en tabla de reservas rápidas, pero la reserva fue creada');
-}
-
-    // ✅ REGISTRAR RESERVA RÁPIDA EN TABLA DE TRACKING
-    $this->register_quick_reservation(
+    // ✅ REGISTRAR Y VERIFICAR RESULTADO
+    $registro_result = $this->register_quick_reservation(
         $reservation_result['reservation_id'],
         $reservation_result['localizador'],
         $user,
         $user_type
     );
+
+    error_log('=== RESULTADO DEL REGISTRO ===');
+    error_log('Registro exitoso: ' . ($registro_result ? 'SÍ' : 'NO'));
+
+    if (!$registro_result) {
+        error_log('⚠️ ADVERTENCIA: No se pudo registrar en tabla de reservas rápidas');
+        error_log('Pero la reserva fue creada correctamente con ID: ' . $reservation_result['reservation_id']);
+        // ✅ NO FALLAR - La reserva ya está creada
+    } else {
+        error_log('✅ Reserva rápida registrada en tabla de tracking');
+    }
 
     // Actualizar plazas disponibles
     $update_result = $this->update_available_seats($datos['service_id'], $datos['total_personas']);
@@ -732,26 +735,27 @@ if (!$registro_result) {
         $localizador = $this->generate_localizador($user, $user_type);
 
         $reserva_data = array(
-            'localizador' => $localizador,
-            'servicio_id' => $datos['service_id'],
-            'fecha' => $datos['fecha'],
-            'hora' => $datos['hora'],
-            'nombre' => $datos['nombre'],
-            'apellidos' => $datos['apellidos'],
-            'email' => $datos['email'],
-            'telefono' => $datos['telefono'],
-            'adultos' => $datos['adultos'],
-            'residentes' => $datos['residentes'],
-            'ninos_5_12' => $datos['ninos_5_12'],
-            'ninos_menores' => $datos['ninos_menores'],
-            'total_personas' => $datos['total_personas'],
-            'precio_base' => $price_data['precio_base'],
-            'descuento_total' => $price_data['descuento_total'],
-            'precio_final' => $price_data['precio_final'],
-            'regla_descuento_aplicada' => $price_data['regla_descuento_aplicada'] ? json_encode($price_data['regla_descuento_aplicada']) : null,
-            'estado' => 'confirmada',
-            'metodo_pago' => $user_type === 'agency' ? 'reserva_rapida_agencia' : 'reserva_rapida_admin'
-        );
+    'localizador' => $localizador,
+    'servicio_id' => $datos['service_id'],
+    'fecha' => $datos['fecha'],
+    'hora' => $datos['hora'],
+    'nombre' => $datos['nombre'],
+    'apellidos' => $datos['apellidos'],
+    'email' => $datos['email'],
+    'telefono' => $datos['telefono'],
+    'adultos' => $datos['adultos'],
+    'residentes' => $datos['residentes'],
+    'ninos_5_12' => $datos['ninos_5_12'],
+    'ninos_menores' => $datos['ninos_menores'],
+    'total_personas' => $datos['total_personas'],
+    'precio_base' => $price_data['precio_base'],
+    'descuento_total' => $price_data['descuento_total'],
+    'precio_final' => $price_data['precio_final'],
+    'regla_descuento_aplicada' => $price_data['regla_descuento_aplicada'] ? json_encode($price_data['regla_descuento_aplicada']) : null,
+    'estado' => 'confirmada',
+    'metodo_pago' => $user_type === 'agency' ? 'reserva_rapida_agencia' : 'reserva_rapida_admin',
+    'es_reserva_rapida' => 1 // ✅ NUEVO CAMPO
+);
 
         // ✅ AÑADIR AGENCY_ID SI ES UNA AGENCIA
         if ($user_type === 'agency' && isset($user['id'])) {
@@ -774,69 +778,86 @@ if (!$registro_result) {
     }
 
 
-/**
- * Registrar reserva rápida en tabla de tracking
- */
-private function register_quick_reservation($reserva_id, $localizador, $user, $user_type)
-{
-    global $wpdb;
-    $table_quick = $wpdb->prefix . 'reservas_rapidas';
-    
-    error_log('=== INTENTANDO REGISTRAR RESERVA RÁPIDA ===');
-    error_log('Tabla: ' . $table_quick);
-    error_log('Reserva ID: ' . $reserva_id);
-    error_log('Localizador: ' . $localizador);
-    error_log('User ID: ' . ($user['id'] ?? 'NO DEFINIDO'));
-    error_log('Username: ' . ($user['username'] ?? 'NO DEFINIDO'));
-    error_log('User type: ' . $user_type);
-    
-    // Verificar que la tabla existe
-    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_quick'") == $table_quick;
-    
-    if (!$table_exists) {
-        error_log('❌ La tabla ' . $table_quick . ' no existe');
-        return false;
+    /**
+     * Registrar reserva rápida en tabla de tracking - VERSIÓN MEJORADA
+     */
+    private function register_quick_reservation($reserva_id, $localizador, $user, $user_type)
+    {
+        global $wpdb;
+        $table_quick = $wpdb->prefix . 'reservas_rapidas';
+
+        error_log('=== INTENTANDO REGISTRAR RESERVA RÁPIDA ===');
+        error_log('Tabla: ' . $table_quick);
+        error_log('Reserva ID: ' . $reserva_id);
+        error_log('Localizador: ' . $localizador);
+        error_log('User: ' . print_r($user, true));
+        error_log('User type: ' . $user_type);
+
+        // Verificar que la tabla existe
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_quick'") == $table_quick;
+
+        if (!$table_exists) {
+            error_log('❌ La tabla ' . $table_quick . ' no existe');
+            return false;
+        }
+
+        // ✅ VALIDAR DATOS ANTES DE INSERTAR
+        if (empty($reserva_id) || empty($localizador)) {
+            error_log('❌ Faltan datos obligatorios: reserva_id=' . $reserva_id . ', localizador=' . $localizador);
+            return false;
+        }
+
+        // ✅ OBTENER USER_ID CORRECTAMENTE SEGÚN EL TIPO
+        $user_id = null;
+        $username = '';
+
+        if ($user_type === 'agency' && isset($user['id'])) {
+            $user_id = $user['id'];
+            $username = $user['agency_name'] ?? $user['username'] ?? 'Agencia';
+        } elseif ($user_type === 'admin' && isset($user['id'])) {
+            $user_id = $user['id'];
+            $username = $user['username'] ?? 'Administrador';
+        }
+
+        if (empty($user_id) || empty($username)) {
+            error_log('❌ No se pudo obtener user_id o username');
+            error_log('User data: ' . print_r($user, true));
+            return false;
+        }
+
+        $insert_data = array(
+            'reserva_id' => intval($reserva_id),
+            'localizador' => $localizador,
+            'user_id' => intval($user_id),
+            'username' => $username,
+            'user_type' => $user_type,
+            'created_at' => current_time('mysql')
+        );
+
+        error_log('Datos a insertar: ' . print_r($insert_data, true));
+
+        $result = $wpdb->insert(
+            $table_quick,
+            $insert_data,
+            array('%d', '%s', '%d', '%s', '%s', '%s') // ✅ FORMATOS EXPLÍCITOS
+        );
+
+        if ($result === false) {
+            error_log('❌ Error SQL al insertar en reservas_rapidas: ' . $wpdb->last_error);
+            error_log('Query: ' . $wpdb->last_query);
+            return false;
+        }
+
+        $insert_id = $wpdb->insert_id;
+
+        if ($insert_id) {
+            error_log("✅ Reserva rápida registrada correctamente: ID=$insert_id, Localizador=$localizador, Reserva_ID=$reserva_id");
+            return true;
+        } else {
+            error_log('⚠️ Insert ejecutado pero sin insert_id');
+            return false;
+        }
     }
-    
-    // Verificar que tenemos todos los datos necesarios
-    if (empty($reserva_id) || empty($localizador) || empty($user['id']) || empty($user['username'])) {
-        error_log('❌ Faltan datos para registrar reserva rápida');
-        error_log('- reserva_id: ' . ($reserva_id ?? 'VACÍO'));
-        error_log('- localizador: ' . ($localizador ?? 'VACÍO'));
-        error_log('- user[id]: ' . ($user['id'] ?? 'VACÍO'));
-        error_log('- user[username]: ' . ($user['username'] ?? 'VACÍO'));
-        return false;
-    }
-    
-    $insert_data = array(
-        'reserva_id' => $reserva_id,
-        'localizador' => $localizador,
-        'user_id' => $user['id'],
-        'username' => $user['username'],
-        'user_type' => $user_type,
-        'created_at' => current_time('mysql')
-    );
-    
-    error_log('Datos a insertar: ' . print_r($insert_data, true));
-    
-    $result = $wpdb->insert($table_quick, $insert_data);
-    
-    if ($result === false) {
-        error_log('❌ Error SQL al insertar en reservas_rapidas: ' . $wpdb->last_error);
-        error_log('Query: ' . $wpdb->last_query);
-        return false;
-    }
-    
-    $insert_id = $wpdb->insert_id;
-    
-    if ($insert_id) {
-        error_log("✅ Reserva rápida registrada correctamente: ID=$insert_id, Localizador=$localizador, Reserva_ID=$reserva_id");
-        return true;
-    } else {
-        error_log('⚠️ Insert ejecutado pero sin insert_id');
-        return false;
-    }
-}
 
     /**
      * Actualizar plazas disponibles
@@ -1482,6 +1503,7 @@ private function register_quick_reservation($reserva_id, $localizador, $user, $u
                 'regla_descuento_aplicada' => $regla_descuento_json,
                 'estado' => 'confirmada',
                 'metodo_pago' => 'reserva_retroactiva_admin',
+                 'es_reserva_rapida' => 1, 
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql')
             );
