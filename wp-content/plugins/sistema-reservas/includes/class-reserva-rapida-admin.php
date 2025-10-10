@@ -482,6 +482,14 @@ class ReservasReservaRapidaAdmin
 
         // Crear reserva (incluye agency_id si es agencia)
         $reservation_result = $this->create_reservation($datos, $price_calculation['price_data'], $user, $user_type);
+        if ($reservation_result['success']) {
+    $this->register_quick_reservation(
+        $reservation_result['reservation_id'],
+        $reservation_result['localizador'],
+        $user,
+        $user_type
+    );
+}
         if (!$reservation_result['success']) {
             wp_send_json_error($reservation_result['error']);
             return;
@@ -749,6 +757,32 @@ class ReservasReservaRapidaAdmin
             'localizador' => $localizador
         );
     }
+
+
+    /**
+ * Registrar reserva rápida en tabla de tracking
+ */
+private function register_quick_reservation($reserva_id, $localizador, $user, $user_type)
+{
+    global $wpdb;
+    $table_quick = $wpdb->prefix . 'reservas_rapidas';
+    
+    $wpdb->insert(
+        $table_quick,
+        array(
+            'reserva_id' => $reserva_id,
+            'localizador' => $localizador,
+            'user_id' => $user['id'],
+            'username' => $user['username'],
+            'user_type' => $user_type, // 'admin' o 'agency'
+            'created_at' => current_time('mysql')
+        )
+    );
+    
+    if ($wpdb->insert_id) {
+        error_log("✅ Reserva rápida registrada: $localizador (ID: $reserva_id)");
+    }
+}
 
     /**
      * Actualizar plazas disponibles

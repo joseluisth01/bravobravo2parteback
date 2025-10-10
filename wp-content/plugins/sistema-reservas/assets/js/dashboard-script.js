@@ -2046,6 +2046,14 @@ function loadReportsSection() {
             <small style="color: #666; font-size: 11px;">Mantén Ctrl para seleccionar múltiples</small>
         </div>
         <div class="filter-group">
+    <label for="reserva-rapida-filtro">Reservas Rápidas:</label>
+    <select id="reserva-rapida-filtro">
+        <option value="todas">Todas</option>
+        <option value="solo_rapidas">Solo Reservas Rápidas</option>
+        <option value="sin_rapidas">Sin Reservas Rápidas</option>
+    </select>
+</div>
+        <div class="filter-group">
             <button class="btn-primary" onclick="loadReservationsByDateWithFilters()">🔍 Aplicar Filtros</button>
         </div>
         <div class="filter-group">
@@ -2564,6 +2572,8 @@ function loadReservationsByDateWithFilters(page = 1) {
     const tipoFecha = document.getElementById('tipo-fecha').value;
     const estadoFiltro = document.getElementById('estado-filtro').value;
     const agencyFiltro = document.getElementById('agency-filtro').value;
+    const reservaRapidaFiltro = document.getElementById('reserva-rapida-filtro').value;
+
 
     // ✅ OBTENER HORARIOS SELECCIONADOS DEL FILTRO
     const scheduleSelect = document.getElementById('schedule-filtro');
@@ -2604,6 +2614,8 @@ function loadReservationsByDateWithFilters(page = 1) {
     formData.append('tipo_fecha', tipoFecha);
     formData.append('estado_filtro', estadoFiltro);
     formData.append('agency_filter', agencyFiltro);
+    formData.append('reserva_rapida_filter', reservaRapidaFiltro);
+
 
     // ✅ AÑADIR FILTRO DE HORARIOS SI HAY ALGUNO SELECCIONADO ESPECÍFICAMENTE
     if (selectedSchedulesForList.length > 0) {
@@ -2798,6 +2810,18 @@ function renderReservationsReportWithFilters(data) {
             }
         }
     }
+
+    let reservaRapidaText = '';
+if (data.filtros.reserva_rapida_filter) {
+    switch(data.filtros.reserva_rapida_filter) {
+        case 'solo_rapidas':
+            reservaRapidaText = ' - Solo reservas rápidas';
+            break;
+        case 'sin_rapidas':
+            reservaRapidaText = ' - Sin reservas rápidas';
+            break;
+    }
+}
 
     // Mostrar tabla de reservas
     let tableHtml = `
@@ -3159,6 +3183,12 @@ function initReportsEvents() {
             downloadPDFReport();
         });
     }
+
+    document.getElementById('reserva-rapida-filtro').addEventListener('change', function() {
+    if (document.getElementById('fecha-inicio').value && document.getElementById('fecha-fin').value) {
+        loadReservationsByDateWithFilters();
+    }
+});
 
     // ✅ VERIFICAR QUE EL ELEMENTO EXISTE ANTES DE AÑADIR EVENT LISTENER
     const agencySelect = document.getElementById('agency-filtro');

@@ -499,6 +499,26 @@ class SistemaReservas
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql_servicios);
 
+        // Tabla de reservas rápidas (tracking)
+$table_rapidas = $wpdb->prefix . 'reservas_rapidas';
+$sql_rapidas = "CREATE TABLE $table_rapidas (
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
+    reserva_id mediumint(9) NOT NULL,
+    localizador varchar(20) NOT NULL,
+    user_id mediumint(9) NOT NULL,
+    username varchar(50) NOT NULL,
+    user_type varchar(20) NOT NULL,
+    created_at datetime DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY reserva_id (reserva_id),
+    KEY localizador (localizador),
+    KEY user_id (user_id),
+    KEY user_type (user_type)
+) $charset_collate;";
+
+require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+dbDelta($sql_rapidas);
+
 
         // Tabla de reservas de visitas guiadas
         $table_visitas = $wpdb->prefix . 'reservas_visitas';
