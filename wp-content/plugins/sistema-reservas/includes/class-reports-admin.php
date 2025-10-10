@@ -646,32 +646,7 @@ class ReservasReportsAdmin
             die(json_encode(['success' => false, 'data' => 'Server error: ' . $e->getMessage()]));
         }
     }
-    /**
-     * Obtener IDs de reservas rápidas - VERSIÓN MEJORADA
-     */
-    private function get_quick_reservation_ids()
-    {
-        global $wpdb;
-        $table_rapidas = $wpdb->prefix . 'reservas_rapidas';
-
-        // Verificar que la tabla existe
-        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_rapidas'") == $table_rapidas;
-
-        if (!$table_exists) {
-            error_log('⚠️ Tabla de reservas rápidas no existe');
-            return array(0); // Devolver array con 0 para evitar errores SQL
-        }
-
-        $ids = $wpdb->get_col("SELECT DISTINCT reserva_id FROM $table_rapidas WHERE reserva_id IS NOT NULL");
-
-        if (empty($ids)) {
-            error_log('⚠️ No hay reservas rápidas registradas');
-            return array(0); // Devolver array con 0 si está vacío para evitar errores SQL
-        }
-
-        error_log('✅ IDs de reservas rápidas encontrados: ' . count($ids));
-        return $ids;
-    }
+    
 
     /**
      * Obtener horarios disponibles para filtro de PDF
