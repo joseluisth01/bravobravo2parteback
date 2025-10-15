@@ -90,6 +90,13 @@ class ReservasAgencyServicesAdmin
             $wpdb->query("ALTER TABLE $table_name ADD COLUMN horarios_disponibles TEXT NULL AFTER dias_disponibles");
             error_log('✅ Columna horarios_disponibles añadida a tabla de servicios de agencias');
         }
+
+        $fechas_excluidas_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_name LIKE 'fechas_excluidas'");
+
+        if (empty($fechas_excluidas_exists)) {
+            $wpdb->query("ALTER TABLE $table_name ADD COLUMN fechas_excluidas TEXT NULL AFTER horarios_disponibles");
+            error_log('✅ Columna fechas_excluidas añadida a tabla de servicios de agencias');
+        }
     }
 
     public function debug_table_status()
@@ -233,6 +240,27 @@ class ReservasAgencyServicesAdmin
             $data['dias_disponibles'] = implode(',', $dias_disponibles);
             $data['horarios_disponibles'] = json_encode($horarios_json);
 
+            $fechas_excluidas = array();
+            if (isset($_POST['fechas_excluidas']) && !empty($_POST['fechas_excluidas'])) {
+                $fechas_raw = $_POST['fechas_excluidas'];
+
+                if (is_array($fechas_raw)) {
+                    foreach ($fechas_raw as $dia => $fechas) {
+                        if (!empty($fechas) && is_array($fechas)) {
+                            $fechas_validas = array_filter($fechas, function ($fecha) {
+                                return !empty($fecha) && strtotime($fecha) !== false;
+                            });
+
+                            if (!empty($fechas_validas)) {
+                                $fechas_excluidas[$dia] = array_values($fechas_validas);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $data['fechas_excluidas'] = !empty($fechas_excluidas) ? json_encode($fechas_excluidas) : null;
+
             // ✅ VALIDAR PRECIOS (AHORA CON PRECIO NIÑOS MENORES)
             $precio_adulto = floatval($_POST['precio_adulto'] ?? 0);
             $precio_nino = floatval($_POST['precio_nino'] ?? 0);
@@ -351,6 +379,19 @@ class ReservasAgencyServicesAdmin
 
             if (!in_array($dia_nombre, $dias_disponibles)) {
                 continue;
+            }
+
+            // ✅ VERIFICAR FECHAS EXCLUIDAS
+            if (!empty($service->fechas_excluidas)) {
+                $fechas_excluidas = json_decode($service->fechas_excluidas, true);
+
+                if (isset($fechas_excluidas[$dia_nombre]) && is_array($fechas_excluidas[$dia_nombre])) {
+                    // Verificar si la fecha actual está en las fechas excluidas para este día
+                    if (in_array($fecha, $fechas_excluidas[$dia_nombre])) {
+                        error_log('❌ Servicio excluido para esta fecha: ' . $service->agency_name . ' - ' . $fecha);
+                        continue; // Saltar este servicio para esta fecha específica
+                    }
+                }
             }
 
             // Verificar horarios

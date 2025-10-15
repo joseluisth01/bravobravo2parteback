@@ -6336,140 +6336,195 @@ function renderEditAgencyModal() {
                         <!-- Campos que se muestran cuando el servicio está activo -->
                         <div id="edit-service-fields-container" style="display: none;">
                             
-                            <!-- Días disponibles -->
-                            <!-- Días y Horarios disponibles -->
-<div class="form-group form-group-full">
-    <label>Días y Horarios Disponibles *</label>
-    <div class="days-hours-selector">
-        <div class="day-hours-item">
-            <label class="day-checkbox">
-                <input type="checkbox" class="edit-day-checkbox" value="lunes" onchange="toggleDayHours(this, true)">
-                <span>Lunes</span>
-            </label>
-            <div class="hours-container" id="edit-hours-lunes" style="display: none;">
-                <div class="hours-list" data-day="lunes"></div>
-                <button type="button" class="btn-add-hour" onclick="addHourSlot('lunes', true)">+ Añadir horario</button>
-            </div>
-        </div>
-        
-        <div class="day-hours-item">
-            <label class="day-checkbox">
-                <input type="checkbox" class="edit-day-checkbox" value="martes" onchange="toggleDayHours(this, true)">
-                <span>Martes</span>
-            </label>
-            <div class="hours-container" id="edit-hours-martes" style="display: none;">
-                <div class="hours-list" data-day="martes"></div>
-                <button type="button" class="btn-add-hour" onclick="addHourSlot('martes', true)">+ Añadir horario</button>
-            </div>
-        </div>
-        
-        <div class="day-hours-item">
-            <label class="day-checkbox">
-                <input type="checkbox" class="edit-day-checkbox" value="miercoles" onchange="toggleDayHours(this, true)">
-                <span>Miércoles</span>
-            </label>
-            <div class="hours-container" id="edit-hours-miercoles" style="display: none;">
-                <div class="hours-list" data-day="miercoles"></div>
-                <button type="button" class="btn-add-hour" onclick="addHourSlot('miercoles', true)">+ Añadir horario</button>
-            </div>
-        </div>
-        
-        <div class="day-hours-item">
-            <label class="day-checkbox">
-                <input type="checkbox" class="edit-day-checkbox" value="jueves" onchange="toggleDayHours(this, true)">
-                <span>Jueves</span>
-            </label>
-            <div class="hours-container" id="edit-hours-jueves" style="display: none;">
-                <div class="hours-list" data-day="jueves"></div>
-                <button type="button" class="btn-add-hour" onclick="addHourSlot('jueves', true)">+ Añadir horario</button>
-            </div>
-        </div>
-        
-        <div class="day-hours-item">
-            <label class="day-checkbox">
-                <input type="checkbox" class="edit-day-checkbox" value="viernes" onchange="toggleDayHours(this, true)">
-                <span>Viernes</span>
-            </label>
-            <div class="hours-container" id="edit-hours-viernes" style="display: none;">
-                <div class="hours-list" data-day="viernes"></div>
-                <button type="button" class="btn-add-hour" onclick="addHourSlot('viernes', true)">+ Añadir horario</button>
-            </div>
-        </div>
-        
-        <div class="day-hours-item">
-            <label class="day-checkbox">
-                <input type="checkbox" class="edit-day-checkbox" value="sabado" onchange="toggleDayHours(this, true)">
-                <span>Sábado</span>
-            </label>
-            <div class="hours-container" id="edit-hours-sabado" style="display: none;">
-                <div class="hours-list" data-day="sabado"></div>
-                <button type="button" class="btn-add-hour" onclick="addHourSlot('sabado', true)">+ Añadir horario</button>
-            </div>
-        </div>
-        
-        <div class="day-hours-item">
-            <label class="day-checkbox">
-                <input type="checkbox" class="edit-day-checkbox" value="domingo" onchange="toggleDayHours(this, true)">
-                <span>Domingo</span>
-            </label>
-            <div class="hours-container" id="edit-hours-domingo" style="display: none;">
-                <div class="hours-list" data-day="domingo"></div>
-                <button type="button" class="btn-add-hour" onclick="addHourSlot('domingo', true)">+ Añadir horario</button>
-            </div>
-        </div>
-    </div>
-    <small>Selecciona los días y añade los horarios específicos para cada día</small>
-</div>
+                            <!-- Días y Horarios disponibles CON FECHAS EXCLUIDAS -->
+                            <div class="form-group form-group-full">
+                                <label>Días y Horarios Disponibles *</label>
+                                <div class="days-hours-selector">
+                                    <!-- LUNES -->
+                                    <div class="day-hours-item">
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" class="edit-day-checkbox" value="lunes" onchange="toggleDayHours(this, true)">
+                                            <span>Lunes</span>
+                                        </label>
+                                        <div class="hours-container" id="edit-hours-lunes" style="display: none;">
+                                            <div class="hours-list" data-day="lunes"></div>
+                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('lunes', true)">+ Añadir horario</button>
+                                            
+                                            <!-- ✅ FECHAS EXCLUIDAS -->
+                                            <div class="excluded-dates-section">
+                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                                                <div class="excluded-dates-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                                                <button type="button" class="btn-add-excluded-date-edit" data-day="lunes">+ Añadir Fecha Excluida</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- MARTES -->
+                                    <div class="day-hours-item">
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" class="edit-day-checkbox" value="martes" onchange="toggleDayHours(this, true)">
+                                            <span>Martes</span>
+                                        </label>
+                                        <div class="hours-container" id="edit-hours-martes" style="display: none;">
+                                            <div class="hours-list" data-day="martes"></div>
+                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('martes', true)">+ Añadir horario</button>
+                                            
+                                            <div class="excluded-dates-section">
+                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                                                <div class="excluded-dates-list"></div>
+                                                <button type="button" class="btn-add-excluded-date-edit" data-day="martes">+ Añadir Fecha Excluida</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- MIÉRCOLES -->
+                                    <div class="day-hours-item">
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" class="edit-day-checkbox" value="miercoles" onchange="toggleDayHours(this, true)">
+                                            <span>Miércoles</span>
+                                        </label>
+                                        <div class="hours-container" id="edit-hours-miercoles" style="display: none;">
+                                            <div class="hours-list" data-day="miercoles"></div>
+                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('miercoles', true)">+ Añadir horario</button>
+                                            
+                                            <div class="excluded-dates-section">
+                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                                                <div class="excluded-dates-list"></div>
+                                                <button type="button" class="btn-add-excluded-date-edit" data-day="miercoles">+ Añadir Fecha Excluida</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- JUEVES -->
+                                    <div class="day-hours-item">
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" class="edit-day-checkbox" value="jueves" onchange="toggleDayHours(this, true)">
+                                            <span>Jueves</span>
+                                        </label>
+                                        <div class="hours-container" id="edit-hours-jueves" style="display: none;">
+                                            <div class="hours-list" data-day="jueves"></div>
+                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('jueves', true)">+ Añadir horario</button>
+                                            
+                                            <div class="excluded-dates-section">
+                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                                                <div class="excluded-dates-list"></div>
+                                                <button type="button" class="btn-add-excluded-date-edit" data-day="jueves">+ Añadir Fecha Excluida</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- VIERNES -->
+                                    <div class="day-hours-item">
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" class="edit-day-checkbox" value="viernes" onchange="toggleDayHours(this, true)">
+                                            <span>Viernes</span>
+                                        </label>
+                                        <div class="hours-container" id="edit-hours-viernes" style="display: none;">
+                                            <div class="hours-list" data-day="viernes"></div>
+                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('viernes', true)">+ Añadir horario</button>
+                                            
+                                            <div class="excluded-dates-section">
+                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                                                <div class="excluded-dates-list"></div>
+                                                <button type="button" class="btn-add-excluded-date-edit" data-day="viernes">+ Añadir Fecha Excluida</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- SÁBADO -->
+                                    <div class="day-hours-item">
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" class="edit-day-checkbox" value="sabado" onchange="toggleDayHours(this, true)">
+                                            <span>Sábado</span>
+                                        </label>
+                                        <div class="hours-container" id="edit-hours-sabado" style="display: none;">
+                                            <div class="hours-list" data-day="sabado"></div>
+                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('sabado', true)">+ Añadir horario</button>
+                                            
+                                            <div class="excluded-dates-section">
+                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                                                <div class="excluded-dates-list"></div>
+                                                <button type="button" class="btn-add-excluded-date-edit" data-day="sabado">+ Añadir Fecha Excluida</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- DOMINGO -->
+                                    <div class="day-hours-item">
+                                        <label class="day-checkbox">
+                                            <input type="checkbox" class="edit-day-checkbox" value="domingo" onchange="toggleDayHours(this, true)">
+                                            <span>Domingo</span>
+                                        </label>
+                                        <div class="hours-container" id="edit-hours-domingo" style="display: none;">
+                                            <div class="hours-list" data-day="domingo"></div>
+                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('domingo', true)">+ Añadir horario</button>
+                                            
+                                            <div class="excluded-dates-section">
+                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                                                <div class="excluded-dates-list"></div>
+                                                <button type="button" class="btn-add-excluded-date-edit" data-day="domingo">+ Añadir Fecha Excluida</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small>Selecciona los días y añade los horarios específicos para cada día</small>
+                            </div>
 
                             <!-- Precios -->
-                            <!-- Precios -->
-<div class="form-grid">
-    <div class="form-group">
-        <label for="edit_precio_adulto_servicio">Precio Adulto (€) *</label>
-        <input type="number" name="precio_adulto" id="edit_precio_adulto_servicio" 
-               step="0.01" min="0" placeholder="0.00">
-        <small>Precio por adulto (>12 años) para este servicio</small>
-    </div>
-    <div class="form-group">
-        <label for="edit_precio_nino_servicio">Precio Niño 5-12 años (€) *</label>
-        <input type="number" name="precio_nino" id="edit_precio_nino_servicio" 
-               step="0.01" min="0" placeholder="0.00">
-        <small>Precio por niño de 5 a 12 años</small>
-    </div>
-    <div class="form-group">
-        <label for="edit_precio_nino_menor_servicio">Precio Niño -5 años (€) *</label>
-        <input type="number" name="precio_nino_menor" id="edit_precio_nino_menor_servicio" 
-               step="0.01" min="0" placeholder="0.00">
-        <small>Precio por niño menor de 5 años</small>
-    </div>
-</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="edit_precio_adulto_servicio">Precio Adulto (€) *</label>
+                                    <input type="number" name="precio_adulto" id="edit_precio_adulto_servicio" 
+                                           step="0.01" min="0" placeholder="0.00">
+                                    <small>Precio por adulto (>12 años) para este servicio</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit_precio_nino_servicio">Precio Niño 5-12 años (€) *</label>
+                                    <input type="number" name="precio_nino" id="edit_precio_nino_servicio" 
+                                           step="0.01" min="0" placeholder="0.00">
+                                    <small>Precio por niño de 5 a 12 años</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit_precio_nino_menor_servicio">Precio Niño -5 años (€) *</label>
+                                    <input type="number" name="precio_nino_menor" id="edit_precio_nino_menor_servicio" 
+                                           step="0.01" min="0" placeholder="0.00">
+                                    <small>Precio por niño menor de 5 años</small>
+                                </div>
+                            </div>
 
                             <!-- Título y Descripción -->
-<div class="form-grid">
-    <div class="form-group form-group-full">
-        <label for="edit_titulo_servicio">Título del Servicio</label>
-        <input type="text" name="titulo" id="edit_titulo_servicio" 
-               placeholder="Ej: VISITA GUIADA POR MEDINA AZAHARA CON CÓRDOBA A PIE"
-               maxlength="255">
-        <small>Este título aparecerá en lugar del nombre de la agencia en la página de confirmación</small>
-    </div>
-</div>
+                            <div class="form-grid">
+                                <div class="form-group form-group-full">
+                                    <label for="edit_titulo_servicio">Título del Servicio</label>
+                                    <input type="text" name="titulo" id="edit_titulo_servicio" 
+                                           placeholder="Ej: VISITA GUIADA POR MEDINA AZAHARA CON CÓRDOBA A PIE"
+                                           maxlength="255">
+                                    <small>Este título aparecerá en lugar del nombre de la agencia en la página de confirmación</small>
+                                </div>
+                            </div>
 
-<div class="form-group form-group-full">
-    <label for="edit_descripcion_servicio">Descripción del Servicio</label>
-    <textarea name="descripcion" id="edit_descripcion_servicio" rows="3" 
-              placeholder="Describe brevemente qué incluye este servicio..."></textarea>
-    <small>Esta descripción se mostrará a los clientes junto con el servicio</small>
-</div>
+                            <div class="form-group form-group-full">
+                                <label for="edit_descripcion_servicio">Descripción del Servicio</label>
+                                <textarea name="descripcion" id="edit_descripcion_servicio" rows="3" 
+                                          placeholder="Describe brevemente qué incluye este servicio..."></textarea>
+                                <small>Esta descripción se mostrará a los clientes junto con el servicio</small>
+                            </div>
 
-<div class="form-grid">
-    <div class="form-group">
-        <label for="edit_orden_prioridad">Orden de Prioridad</label>
-        <input type="number" name="orden_prioridad" id="edit_orden_prioridad" 
-               value="999" min="1" max="999" required>
-        <small><strong>Importante:</strong> Prioridad 1 = aparece primero y destacado. Números mayores aparecen después</small>
-    </div>
-</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="edit_orden_prioridad">Orden de Prioridad</label>
+                                    <input type="number" name="orden_prioridad" id="edit_orden_prioridad" 
+                                           value="999" min="1" max="999" required>
+                                    <small><strong>Importante:</strong> Prioridad 1 = aparece primero y destacado. Números mayores aparecen después</small>
+                                </div>
+                            </div>
 
                             <!-- Imágenes -->
                             <div class="form-grid">
@@ -6515,6 +6570,67 @@ function renderEditAgencyModal() {
                     text-align: center;
                     margin-bottom: 30px;
                 }
+
+                .excluded-dates-section {
+    background: #fff9e6;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.excluded-date-slot {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.excluded-date-slot input[type="date"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-remove-excluded-date {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-remove-excluded-date:hover {
+    background: #b71c1c;
+    transform: scale(1.1);
+}
+
+.btn-add-excluded-date,
+.btn-add-excluded-date-edit {
+    background: #ff9800;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-add-excluded-date:hover,
+.btn-add-excluded-date-edit:hover {
+    background: #f57c00;
+    transform: translateY(-1px);
+}
 
                 .days-hours-selector {
     display: flex;
@@ -7030,6 +7146,7 @@ jQuery(document).off('submit', '#createAgencyForm').on('submit', '#createAgencyF
  */
 function saveAgencyServiceAfterCreate(agencyId) {
     const serviceFormData = new FormData();
+    const fechasExcluidas = collectFechasExcluidasData();
     serviceFormData.append('action', 'save_agency_service');
     serviceFormData.append('agency_id', agencyId);
     serviceFormData.append('nonce', reservasAjax.nonce);
@@ -7061,6 +7178,12 @@ function saveAgencyServiceAfterCreate(agencyId) {
     if (portadaFile) {
         serviceFormData.append('portada_image', portadaFile);
     }
+
+    Object.keys(fechasExcluidas).forEach(day => {
+    fechasExcluidas[day].forEach((fecha, index) => {
+        serviceFormData.append(`fechas_excluidas[${day}][]`, fecha);
+    });
+});
 
     jQuery.ajax({
         url: reservasAjax.ajax_url,
@@ -7143,6 +7266,7 @@ function saveAgencyServiceOnEdit(agencyId) {
     console.log('Agency ID:', agencyId);
 
     const servicioActivo = jQuery('#edit_servicio_activo').is(':checked');
+    const fechasExcluidas = collectFechasExcluidasData();
 
     // ✅ CREAR FormData CORRECTAMENTE
     const serviceFormData = new FormData();
@@ -7165,6 +7289,12 @@ function saveAgencyServiceOnEdit(agencyId) {
                 serviceFormData.append(`horarios[${day}][]`, hora);
             });
         });
+
+        Object.keys(fechasExcluidas).forEach(day => {
+    fechasExcluidas[day].forEach((fecha, index) => {
+        serviceFormData.append(`fechas_excluidas[${day}][]`, fecha);
+    });
+});
 
         // Validar y añadir precios
         const precioAdulto = parseFloat(jQuery('#edit_precio_adulto_servicio').val());
@@ -7265,6 +7395,35 @@ function collectHorariosData() {
     });
 
     return horarios;
+}
+
+/**
+ * Recopilar fechas excluidas del formulario
+ */
+function collectFechasExcluidasData() {
+    const fechasExcluidas = {};
+
+    // Buscar checkboxes marcados (tanto en crear como en editar)
+    const checkboxes = document.querySelectorAll('.day-checkbox input:checked, .edit-day-checkbox:checked');
+
+    checkboxes.forEach(checkbox => {
+        const day = checkbox.value;
+        const isEdit = checkbox.classList.contains('edit-day-checkbox');
+        const prefix = isEdit ? 'edit-' : '';
+        const dateInputs = document.querySelectorAll(`#${prefix}hours-${day} .excluded-dates-list input[type="date"]`);
+
+        if (dateInputs.length > 0) {
+            fechasExcluidas[day] = [];
+            dateInputs.forEach(input => {
+                if (input.value) {
+                    fechasExcluidas[day].push(input.value);
+                }
+            });
+        }
+    });
+
+    console.log('Fechas excluidas recopiladas:', fechasExcluidas);
+    return fechasExcluidas;
 }
 
 

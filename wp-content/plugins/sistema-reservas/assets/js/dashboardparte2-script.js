@@ -39,6 +39,21 @@ jQuery(document).ready(function($) {
     $(document).on('change', '#edit_portada_image', function() {
         previewImageFile(this, 'portada', true);
     });
+
+    $(document).on('click', '.btn-add-excluded-date', function() {
+    const day = $(this).data('day');
+    addExcludedDateSlot(day, false);
+});
+
+$(document).on('click', '.btn-remove-excluded-date', function() {
+    $(this).closest('.excluded-date-slot').remove();
+});
+
+// Event listeners para añadir/eliminar fechas excluidas - EDITAR
+$(document).on('click', '.btn-add-excluded-date-edit', function() {
+    const day = $(this).data('day');
+    addExcludedDateSlot(day, true);
+});
 });
 
 /**
@@ -125,6 +140,29 @@ function loadAgencyServiceConfigForEdit(agencyId) {
 
 
 /**
+ * Añadir slot de fecha excluida
+ */
+function addExcludedDateSlot(day, isEdit) {
+    const prefix = isEdit ? 'edit-' : '';
+    const excludedList = document.querySelector(`#${prefix}hours-${day} .excluded-dates-list`);
+    
+    if (!excludedList) {
+        console.error('No se encontró excluded-dates-list para el día:', day);
+        return;
+    }
+    
+    const dateSlot = document.createElement('div');
+    dateSlot.className = 'excluded-date-slot';
+    dateSlot.innerHTML = `
+        <input type="date" name="fechas_excluidas[${day}][]" required>
+        <button type="button" class="btn-remove-excluded-date" title="Eliminar fecha">✕</button>
+    `;
+    
+    excludedList.appendChild(dateSlot);
+}
+
+
+/**
  * Mostrar/ocultar contenedor de horarios al marcar día
  */
 function toggleDayHours(checkbox, isEdit) {
@@ -134,16 +172,30 @@ function toggleDayHours(checkbox, isEdit) {
     
     if (checkbox.checked) {
         hoursContainer.style.display = 'block';
+        
         // Añadir al menos un horario por defecto
         const hoursList = hoursContainer.querySelector('.hours-list');
         if (hoursList.children.length === 0) {
             addHourSlot(day, isEdit);
         }
+        
+        // ✅ MOSTRAR SECCIÓN DE FECHAS EXCLUIDAS
+        const excludedSection = hoursContainer.querySelector('.excluded-dates-section');
+        if (excludedSection) {
+            excludedSection.style.display = 'block';
+        }
     } else {
         hoursContainer.style.display = 'none';
+        
         // Limpiar horarios al desmarcar
         const hoursList = hoursContainer.querySelector('.hours-list');
         hoursList.innerHTML = '';
+        
+        // ✅ LIMPIAR FECHAS EXCLUIDAS
+        const excludedList = hoursContainer.querySelector('.excluded-dates-list');
+        if (excludedList) {
+            excludedList.innerHTML = '';
+        }
     }
 }
 
@@ -352,6 +404,54 @@ function populateServiceForm(serviceData, isEdit) {
     } else {
         console.log('ℹ️ No hay horarios disponibles en los datos');
     }
+
+    if (serviceData.fechas_excluidas) {
+    let fechas_excluidas;
+    
+    try {
+        if (typeof serviceData.fechas_excluidas === 'string') {
+            fechas_excluidas = JSON.parse(serviceData.fechas_excluidas);
+        } else {
+            fechas_excluidas = serviceData.fechas_excluidas;
+        }
+        
+        console.log('✅ Fechas excluidas parseadas:', fechas_excluidas);
+    } catch (e) {
+        console.error('❌ Error parseando fechas excluidas:', e);
+        fechas_excluidas = {};
+    }
+    
+    if (fechas_excluidas && typeof fechas_excluidas === 'object') {
+        Object.keys(fechas_excluidas).forEach(day => {
+            const fechas = fechas_excluidas[day];
+            
+            if (Array.isArray(fechas) && fechas.length > 0) {
+                const prefix2 = isEdit ? 'edit-' : '';
+                const excludedList = document.querySelector(`#${prefix2}hours-${day} .excluded-dates-list`);
+                
+                if (excludedList) {
+                    // Limpiar fechas existentes
+                    excludedList.innerHTML = '';
+                    
+                    console.log(`Añadiendo ${fechas.length} fechas excluidas para ${day}`);
+                    
+                    fechas.forEach((fecha, index) => {
+                        const dateSlot = document.createElement('div');
+                        dateSlot.className = 'excluded-date-slot';
+                        dateSlot.innerHTML = `
+                            <input type="date" name="fechas_excluidas[${day}][]" value="${fecha}" required>
+                            <button type="button" class="btn-remove-excluded-date" title="Eliminar fecha">✕</button>
+                        `;
+                        excludedList.appendChild(dateSlot);
+                        console.log(`✅ Fecha excluida ${index + 1} añadida: ${fecha}`);
+                    });
+                } else {
+                    console.warn(`⚠️ No se encontró excluded-dates-list para ${day}`);
+                }
+            }
+        });
+    }
+}
     
     // ✅ IMÁGENES
     if (serviceData.logo_url) {
