@@ -697,7 +697,7 @@ class ReservasReservaRapidaAdmin
         );
     }
 
-    private function create_reservation($datos, $price_data, $user, $user_type)
+private function create_reservation($datos, $price_data, $user, $user_type)
 {
     global $wpdb;
 
@@ -1377,29 +1377,29 @@ class ReservasReservaRapidaAdmin
             $table_reservas = $wpdb->prefix . 'reservas_reservas';
 
             $reserva_data = array(
-                'localizador' => $localizador,
-                'servicio_id' => $service_id,
-                'fecha' => $fecha,
-                'hora' => $hora_ida,
-                'nombre' => $nombre,
-                'apellidos' => $apellidos,
-                'email' => $email,
-                'telefono' => $telefono,
-                'adultos' => $adultos,
-                'residentes' => $residentes,
-                'ninos_5_12' => $ninos_5_12,
-                'ninos_menores' => $ninos_menores,
-                'total_personas' => $total_personas,
-                'precio_base' => $precio_adulto * $adultos + $precio_residente * $residentes + $precio_nino * $ninos_5_12,
-                'descuento_total' => $descuento_grupo,
-                'precio_final' => $total_price,
-                'regla_descuento_aplicada' => $regla_descuento_json,
-                'estado' => 'confirmada',
-                'metodo_pago' => 'reserva_retroactiva_admin',
-                'es_reserva_rapida' => 1,
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql')
-            );
+    'localizador' => $localizador,
+    'servicio_id' => $service_id,
+    'fecha' => $fecha,
+    'hora' => $hora_ida,
+    'nombre' => $nombre,
+    'apellidos' => $apellidos,
+    'email' => $email,
+    'telefono' => $telefono,
+    'adultos' => $adultos,
+    'residentes' => $residentes,
+    'ninos_5_12' => $ninos_5_12,
+    'ninos_menores' => $ninos_menores,
+    'total_personas' => $total_personas,
+    'precio_base' => $precio_adulto * $adultos + $precio_residente * $residentes + $precio_nino * $ninos_5_12,
+    'descuento_total' => $descuento_grupo,
+    'precio_final' => $total_price,
+    'regla_descuento_aplicada' => $regla_descuento_json,
+    'estado' => 'confirmada',
+    'metodo_pago' => 'reserva_retroactiva_admin',
+    'es_reserva_rapida' => 1, // ✅ MARCAR COMO RESERVA RÁPIDA
+    'created_at' => current_time('mysql'),
+    'updated_at' => current_time('mysql')
+);
 
             // ✅ AÑADIR AGENCY_ID SI ESTÁ SELECCIONADA
             if ($selected_agency_id) {

@@ -356,31 +356,32 @@ public function process_reservation()
         // ✅ PREPARAR DATOS PARA INSERTAR
         $total_personas = intval($reservation_data['adultos']) + intval($reservation_data['residentes']) + intval($reservation_data['ninos_5_12']);
 
-        $reserva_insert = array(
-            'localizador' => $localizador,
-            'redsys_order_id' => $data['order_id'] ?? null,
-            'servicio_id' => $reservation_data['service_id'],
-            'fecha' => $reservation_data['fecha'],
-            'hora' => $reservation_data['hora_ida'],
-            'hora_vuelta' => $reservation_data['hora_vuelta'] ?? null,
-            'nombre' => $data['nombre'],
-            'apellidos' => $data['apellidos'],
-            'email' => $data['email'],
-            'telefono' => $data['telefono'],
-            'adultos' => intval($reservation_data['adultos']),
-            'residentes' => intval($reservation_data['residentes']),
-            'ninos_5_12' => intval($reservation_data['ninos_5_12']),
-            'ninos_menores' => intval($reservation_data['ninos_menores']),
-            'total_personas' => $total_personas,
-            'precio_base' => floatval($reservation_data['total_price']) + floatval($reservation_data['descuento_grupo'] ?? 0),
-            'descuento_total' => floatval($reservation_data['descuento_grupo'] ?? 0),
-            'precio_final' => floatval($reservation_data['total_price']),
-            'regla_descuento_aplicada' => isset($reservation_data['regla_descuento_aplicada']) ?
-                json_encode($reservation_data['regla_descuento_aplicada']) : null,
-            'estado' => 'confirmada',
-            'metodo_pago' => $data['metodo_pago'] ?? 'redsys',
-            'created_at' => current_time('mysql')
-        );
+$reserva_insert = array(
+    'localizador' => $localizador,
+    'redsys_order_id' => $data['order_id'] ?? null,
+    'servicio_id' => $reservation_data['service_id'],
+    'fecha' => $reservation_data['fecha'],
+    'hora' => $reservation_data['hora_ida'],
+    'hora_vuelta' => $reservation_data['hora_vuelta'] ?? null,
+    'nombre' => $data['nombre'],
+    'apellidos' => $data['apellidos'],
+    'email' => $data['email'],
+    'telefono' => $data['telefono'],
+    'adultos' => intval($reservation_data['adultos']),
+    'residentes' => intval($reservation_data['residentes']),
+    'ninos_5_12' => intval($reservation_data['ninos_5_12']),
+    'ninos_menores' => intval($reservation_data['ninos_menores']),
+    'total_personas' => $total_personas,
+    'precio_base' => floatval($reservation_data['total_price']) + floatval($reservation_data['descuento_grupo'] ?? 0),
+    'descuento_total' => floatval($reservation_data['descuento_grupo'] ?? 0),
+    'precio_final' => floatval($reservation_data['total_price']),
+    'regla_descuento_aplicada' => isset($reservation_data['regla_descuento_aplicada']) ?
+        json_encode($reservation_data['regla_descuento_aplicada']) : null,
+    'estado' => 'confirmada',
+    'metodo_pago' => $data['metodo_pago'] ?? 'redsys',
+    'es_reserva_rapida' => 0, // ✅ AÑADIR ESTA LÍNEA - Reservas con pago también son normales
+    'created_at' => current_time('mysql')
+);
 
         error_log('✅ Datos preparados para insertar: ' . print_r($reserva_insert, true));
 
@@ -606,31 +607,32 @@ private function send_confirmation_emails_array($reserva_array)
             $datos_reserva['service_id']
         ));
 
-        // ✅ PREPARAR DATOS PARA INSERTAR SIN REDSYS
-        $reserva_data = array(
-            'localizador' => $localizador,
-            'redsys_order_id' => null, // No hay order ID de Redsys
-            'servicio_id' => $datos_reserva['service_id'],
-            'fecha' => $datos_reserva['fecha'],
-            'hora' => $datos_reserva['hora_ida'],
-            'hora_vuelta' => $servicio ? $servicio->hora_vuelta : null,
-            'nombre' => $datos_personales['nombre'],
-            'apellidos' => $datos_personales['apellidos'],
-            'email' => $datos_personales['email'],
-            'telefono' => $datos_personales['telefono'],
-            'adultos' => $datos_reserva['adultos'],
-            'residentes' => $datos_reserva['residentes'],
-            'ninos_5_12' => $datos_reserva['ninos_5_12'],
-            'ninos_menores' => $datos_reserva['ninos_menores'],
-            'total_personas' => $datos_reserva['total_personas'],
-            'precio_base' => $calculo_precio['precio_base'],
-            'descuento_total' => $calculo_precio['descuento_total'],
-            'precio_final' => $calculo_precio['precio_final'],
-            'regla_descuento_aplicada' => $calculo_precio['regla_descuento_aplicada'] ? json_encode($calculo_precio['regla_descuento_aplicada']) : null,
-            'estado' => 'confirmada',
-            'metodo_pago' => 'directo', // ✅ CAMBIAR A DIRECTO
-            'created_at' => current_time('mysql')
-        );
+// ✅ PREPARAR DATOS PARA INSERTAR SIN REDSYS
+$reserva_data = array(
+    'localizador' => $localizador,
+    'redsys_order_id' => null, // No hay order ID de Redsys
+    'servicio_id' => $datos_reserva['service_id'],
+    'fecha' => $datos_reserva['fecha'],
+    'hora' => $datos_reserva['hora_ida'],
+    'hora_vuelta' => $servicio ? $servicio->hora_vuelta : null,
+    'nombre' => $datos_personales['nombre'],
+    'apellidos' => $datos_personales['apellidos'],
+    'email' => $datos_personales['email'],
+    'telefono' => $datos_personales['telefono'],
+    'adultos' => $datos_reserva['adultos'],
+    'residentes' => $datos_reserva['residentes'],
+    'ninos_5_12' => $datos_reserva['ninos_5_12'],
+    'ninos_menores' => $datos_reserva['ninos_menores'],
+    'total_personas' => $datos_reserva['total_personas'],
+    'precio_base' => $calculo_precio['precio_base'],
+    'descuento_total' => $calculo_precio['descuento_total'],
+    'precio_final' => $calculo_precio['precio_final'],
+    'regla_descuento_aplicada' => $calculo_precio['regla_descuento_aplicada'] ? json_encode($calculo_precio['regla_descuento_aplicada']) : null,
+    'estado' => 'confirmada',
+    'metodo_pago' => 'directo', // ✅ CAMBIAR A DIRECTO
+    'es_reserva_rapida' => 0, // ✅ AÑADIR ESTA LÍNEA - Reservas normales = 0
+    'created_at' => current_time('mysql')
+);
 
         error_log('Datos de reserva a insertar: ' . print_r($reserva_data, true));
 

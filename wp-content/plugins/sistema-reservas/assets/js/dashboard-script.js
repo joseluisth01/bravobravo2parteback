@@ -2037,14 +2037,6 @@ function loadReportsSection() {
                 <option value="todas">🔄 Cargando agencias...</option>
             </select>
         </div>
-        <!-- ✅ NUEVO FILTRO DE HORARIOS -->
-        <div class="filter-group">
-            <label for="schedule-filtro">Filtrar por Horarios:</label>
-            <select id="schedule-filtro" multiple size="6" style="min-width: 200px;">
-                <option value="">Selecciona fechas primero</option>
-            </select>
-            <small style="color: #666; font-size: 11px;">Mantén Ctrl para seleccionar múltiples</small>
-        </div>
         <div class="filter-group">
     <label for="reserva-rapida-filtro">Reservas Rápidas:</label>
     <select id="reserva-rapida-filtro">
@@ -2053,6 +2045,15 @@ function loadReportsSection() {
         <option value="sin_rapidas">Sin Reservas Rápidas</option>
     </select>
 </div>
+        <!-- ✅ NUEVO FILTRO DE HORARIOS -->
+        <div class="filter-group">
+            <label for="schedule-filtro">Filtrar por Horarios:</label>
+            <select id="schedule-filtro" multiple size="6" style="min-width: 200px;">
+                <option value="">Selecciona fechas primero</option>
+            </select>
+            <small style="color: #666; font-size: 11px;">Mantén Ctrl para seleccionar múltiples</small>
+        </div>
+
         <div class="filter-group">
             <button class="btn-primary" onclick="loadReservationsByDateWithFilters()">🔍 Aplicar Filtros</button>
         </div>
@@ -2572,7 +2573,7 @@ function loadReservationsByDateWithFilters(page = 1) {
     const tipoFecha = document.getElementById('tipo-fecha').value;
     const estadoFiltro = document.getElementById('estado-filtro').value;
     const agencyFiltro = document.getElementById('agency-filtro').value;
-    const reservaRapidaFiltro = document.getElementById('reserva-rapida-filtro').value;
+const reservaRapidaFiltro = document.getElementById('reserva-rapida-filtro').value;
 
 
     // ✅ OBTENER HORARIOS SELECCIONADOS DEL FILTRO
@@ -2614,7 +2615,7 @@ function loadReservationsByDateWithFilters(page = 1) {
     formData.append('tipo_fecha', tipoFecha);
     formData.append('estado_filtro', estadoFiltro);
     formData.append('agency_filter', agencyFiltro);
-    formData.append('reserva_rapida_filter', reservaRapidaFiltro);
+formData.append('reserva_rapida_filter', reservaRapidaFiltro);
 
 
     // ✅ AÑADIR FILTRO DE HORARIOS SI HAY ALGUNO SELECCIONADO ESPECÍFICAMENTE
@@ -3184,7 +3185,7 @@ function initReportsEvents() {
         });
     }
 
-    document.getElementById('reserva-rapida-filtro').addEventListener('change', function() {
+document.getElementById('reserva-rapida-filtro').addEventListener('change', function() {
     if (document.getElementById('fecha-inicio').value && document.getElementById('fecha-fin').value) {
         loadReservationsByDateWithFilters();
     }

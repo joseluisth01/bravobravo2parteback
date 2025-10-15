@@ -317,7 +317,7 @@ class ReservasReportsAdmin
             $offset = ($page - 1) * $per_page;
 
             // ✅ FUNCIÓN PARA CONSTRUIR CONDICIONES WHERE REUTILIZABLE
-            function build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, &$query_params)
+            function build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $reserva_rapida_filter, &$query_params)
             {
                 $where_conditions = array();
                 $query_params = array();
@@ -421,33 +421,12 @@ class ReservasReportsAdmin
                 return $where_conditions;
             }
 
-            // Después de obtener otros filtros (línea ~60):
-            $reserva_rapida_filter = sanitize_text_field($_POST['reserva_rapida_filter'] ?? 'todas');
 
-            // En la construcción de WHERE conditions (antes del WHERE clause):
-            // Filtro de reservas rápidas
-            switch ($reserva_rapida_filter) {
-                case 'solo_rapidas':
-                    $quick_ids = $this->get_quick_reservation_ids();
-                    $ids_placeholder = implode(',', array_fill(0, count($quick_ids), '%d'));
-                    $where_conditions[] = "r.id IN ($ids_placeholder)";
-                    array_push($query_params, ...$quick_ids);
-                    break;
-                case 'sin_rapidas':
-                    $quick_ids = $this->get_quick_reservation_ids();
-                    $ids_placeholder = implode(',', array_fill(0, count($quick_ids), '%d'));
-                    $where_conditions[] = "r.id NOT IN ($ids_placeholder)";
-                    array_push($query_params, ...$quick_ids);
-                    break;
-                case 'todas':
-                default:
-                    // No añadir condición
-                    break;
-            }
+
 
             // ✅ CONSTRUIR CONDICIONES WHERE PARA LISTADO
             $listado_params = array();
-            $where_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $listado_params);
+$where_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $reserva_rapida_filter, $listado_params);
             $where_clause = '';
             if (!empty($where_conditions)) {
                 $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
@@ -482,13 +461,13 @@ class ReservasReportsAdmin
 
             // ✅ ESTADÍSTICAS GENERALES - USAR LA MISMA FUNCIÓN DE CONDICIONES
             $stats_params = array();
-            $stats_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $stats_params);
+$stats_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $reserva_rapida_filter, $stats_params);
 
             // ✅ ESTADÍSTICAS DE CONTEO (RESPETAN EL FILTRO DE ESTADO)
             $stats_count_where = 'WHERE ' . implode(' AND ', $stats_conditions);
 
             // ✅ ESTADÍSTICAS DE INGRESOS (SIEMPRE SOLO CONFIRMADAS)
-            $stats_revenue_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, 'confirmadas', $agency_filter, $selected_schedules, $revenue_params);
+$stats_revenue_conditions = build_where_conditions($fecha_inicio, $fecha_fin,$tipo_fecha,'confirmadas', $agency_filter, $selected_schedules, $reserva_rapida_filter, $revenue_params);
             $stats_revenue_where = 'WHERE ' . implode(' AND ', $stats_revenue_conditions);
 
             $stats_count = $wpdb->get_row($wpdb->prepare(
@@ -531,7 +510,7 @@ class ReservasReportsAdmin
             $stats_por_estado = null;
             if ($estado_filtro === 'todas') {
                 $estado_params = array();
-                $estado_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, 'todas', $agency_filter, $selected_schedules, $estado_params);
+$estado_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, 'todas', $agency_filter, $selected_schedules, $reserva_rapida_filter, $estado_params);
                 $estado_where = 'WHERE ' . implode(' AND ', $estado_conditions);
 
                 $stats_por_estado = $wpdb->get_results($wpdb->prepare(
@@ -555,7 +534,7 @@ class ReservasReportsAdmin
 
                 // ✅ USAR EXACTAMENTE LA MISMA FUNCIÓN PARA OBTENER CONDICIONES
                 $agencias_params = array();
-                $agencias_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, 'todas', $selected_schedules, $agencias_params);
+$agencias_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, 'todas', $selected_schedules, $reserva_rapida_filter, $agencias_params);
                 $agencias_where = 'WHERE ' . implode(' AND ', $agencias_conditions);
 
                 error_log('Condiciones para agencias: ' . $agencias_where);
@@ -646,7 +625,7 @@ class ReservasReportsAdmin
             die(json_encode(['success' => false, 'data' => 'Server error: ' . $e->getMessage()]));
         }
     }
-    
+
 
     /**
      * Obtener horarios disponibles para filtro de PDF
@@ -684,6 +663,10 @@ class ReservasReportsAdmin
         $tipo_fecha = sanitize_text_field($_POST['tipo_fecha'] ?? 'servicio');
         $estado_filtro = sanitize_text_field($_POST['estado_filtro'] ?? 'confirmadas');
         $agency_filter = sanitize_text_field($_POST['agency_filter'] ?? 'todas');
+        $reserva_rapida_filter = sanitize_text_field($_POST['reserva_rapida_filter'] ?? 'todas');
+        $selected_schedules = $_POST['selected_schedules'] ?? '';
+
+
 
         try {
             // Construir condiciones WHERE para obtener servicios únicos
@@ -775,8 +758,10 @@ class ReservasReportsAdmin
                     'fecha_fin' => $fecha_fin,
                     'tipo_fecha' => $tipo_fecha,
                     'estado_filtro' => $estado_filtro,
-                    'agency_filter' => $agency_filter
-                )
+                    'agency_filter' => $agency_filter,
+                    'selected_schedules' => $selected_schedules,
+                    'reserva_rapida_filter' => $reserva_rapida_filter // ✅ AÑADIR
+                ),
             );
 
             wp_send_json_success($response_data);
