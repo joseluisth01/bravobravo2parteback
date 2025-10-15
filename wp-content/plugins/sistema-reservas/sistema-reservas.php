@@ -134,37 +134,37 @@ class SistemaReservas
     private function load_dependencies()
     {
         $files = array(
-        'includes/class-database.php',
-        'includes/class-auth.php',
-        'includes/class-admin.php',
-        'includes/class-dashboard.php',
-        'includes/class-calendar-admin.php',
-        'includes/class-discounts-admin.php',
-        'includes/class-configuration-admin.php',
-        'includes/class-reports-admin.php',
-        'includes/class-visitas-reports-admin.php',  // ✅ AÑADIR ESTA LÍNEA
-        'includes/class-agencies-admin.php',
-        'includes/class-agency-profile-admin.php',
-        'includes/class-reservas-processor.php',
-        'includes/class-email-service.php',
-        'includes/class-frontend.php',
-        'includes/class-reserva-rapida-admin.php',
-        'includes/class-redsys-handler.php',
-        'includes/class-conductor-admin.php',
-        'includes/class-agency-services-admin.php',
-        'includes/class-agency-services-frontend.php',
-        'includes/class-visitas-report-pdf-generator.php',
-    );
+            'includes/class-database.php',
+            'includes/class-auth.php',
+            'includes/class-admin.php',
+            'includes/class-dashboard.php',
+            'includes/class-calendar-admin.php',
+            'includes/class-discounts-admin.php',
+            'includes/class-configuration-admin.php',
+            'includes/class-reports-admin.php',
+            'includes/class-visitas-reports-admin.php',  // ✅ AÑADIR ESTA LÍNEA
+            'includes/class-agencies-admin.php',
+            'includes/class-agency-profile-admin.php',
+            'includes/class-reservas-processor.php',
+            'includes/class-email-service.php',
+            'includes/class-frontend.php',
+            'includes/class-reserva-rapida-admin.php',
+            'includes/class-redsys-handler.php',
+            'includes/class-conductor-admin.php',
+            'includes/class-agency-services-admin.php',
+            'includes/class-agency-services-frontend.php',
+            'includes/class-visitas-report-pdf-generator.php',
+        );
 
         foreach ($files as $file) {
-        $path = RESERVAS_PLUGIN_PATH . $file;
-        if (file_exists($path)) {
-            require_once $path;
-            error_log("✅ Cargado: $file");
-        } else {
-            error_log("❌ RESERVAS ERROR: No se pudo cargar $file");
+            $path = RESERVAS_PLUGIN_PATH . $file;
+            if (file_exists($path)) {
+                require_once $path;
+                error_log("✅ Cargado: $file");
+            } else {
+                error_log("❌ RESERVAS ERROR: No se pudo cargar $file");
+            }
         }
-    }
     }
 
     private function initialize_classes()
@@ -244,8 +244,8 @@ class SistemaReservas
         }
 
         if (class_exists('ReservasVisitasReportsAdmin')) {
-    $this->visitas_reports_admin = new ReservasVisitasReportsAdmin();
-}
+            $this->visitas_reports_admin = new ReservasVisitasReportsAdmin();
+        }
     }
 
     public function add_rewrite_rules()
@@ -500,8 +500,8 @@ class SistemaReservas
         dbDelta($sql_servicios);
 
         // Tabla de reservas rápidas (tracking)
-$table_rapidas = $wpdb->prefix . 'reservas_rapidas';
-$sql_rapidas = "CREATE TABLE $table_rapidas (
+        $table_rapidas = $wpdb->prefix . 'reservas_rapidas';
+        $sql_rapidas = "CREATE TABLE $table_rapidas (
     id mediumint(9) NOT NULL AUTO_INCREMENT,
     reserva_id mediumint(9) NOT NULL,
     localizador varchar(20) NOT NULL,
@@ -516,8 +516,8 @@ $sql_rapidas = "CREATE TABLE $table_rapidas (
     KEY user_type (user_type)
 ) $charset_collate;";
 
-require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-dbDelta($sql_rapidas);
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql_rapidas);
 
 
         // Tabla de reservas de visitas guiadas
@@ -761,11 +761,11 @@ dbDelta($sql_rapidas);
 
         $es_reserva_rapida_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_reservas LIKE 'es_reserva_rapida'");
 
-if (empty($es_reserva_rapida_exists)) {
-    $wpdb->query("ALTER TABLE $table_reservas ADD COLUMN es_reserva_rapida TINYINT(1) DEFAULT 0 AFTER metodo_pago");
-    $wpdb->query("ALTER TABLE $table_reservas ADD INDEX es_reserva_rapida (es_reserva_rapida)");
-    error_log('✅ Campo es_reserva_rapida añadido a tabla de reservas');
-}
+        if (empty($es_reserva_rapida_exists)) {
+            $wpdb->query("ALTER TABLE $table_reservas ADD COLUMN es_reserva_rapida TINYINT(1) DEFAULT 0 AFTER metodo_pago");
+            $wpdb->query("ALTER TABLE $table_reservas ADD INDEX es_reserva_rapida (es_reserva_rapida)");
+            error_log('✅ Campo es_reserva_rapida añadido a tabla de reservas');
+        }
 
         // ✅ VERIFICAR Y AÑADIR CAMPO HORA_VUELTA A SERVICIOS
         $hora_vuelta_servicios_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_servicios LIKE 'hora_vuelta'");
@@ -3050,7 +3050,8 @@ function emergency_create_conductor()
 add_action('wp_ajax_force_create_visitas_table', 'force_create_visitas_table');
 add_action('wp_ajax_nopriv_force_create_visitas_table', 'force_create_visitas_table');
 
-function force_create_visitas_table() {
+function force_create_visitas_table()
+{
     global $wpdb;
     $table_visitas = $wpdb->prefix . 'reservas_visitas';
     $charset_collate = $wpdb->get_charset_collate();
@@ -3088,13 +3089,13 @@ function force_create_visitas_table() {
     dbDelta($sql);
 
     $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_visitas'") == $table_visitas;
-    
+
     if ($table_exists) {
         echo '✅ Tabla wp_reservas_visitas creada correctamente';
     } else {
         echo '❌ Error: La tabla no se pudo crear. Error: ' . $wpdb->last_error;
     }
-    
+
     exit;
 }
 

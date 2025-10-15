@@ -2573,7 +2573,7 @@ function loadReservationsByDateWithFilters(page = 1) {
     const tipoFecha = document.getElementById('tipo-fecha').value;
     const estadoFiltro = document.getElementById('estado-filtro').value;
     const agencyFiltro = document.getElementById('agency-filtro').value;
-const reservaRapidaFiltro = document.getElementById('reserva-rapida-filtro').value;
+    const reservaRapidaFiltro = document.getElementById('reserva-rapida-filtro').value;
 
 
     // ✅ OBTENER HORARIOS SELECCIONADOS DEL FILTRO
@@ -2615,7 +2615,7 @@ const reservaRapidaFiltro = document.getElementById('reserva-rapida-filtro').val
     formData.append('tipo_fecha', tipoFecha);
     formData.append('estado_filtro', estadoFiltro);
     formData.append('agency_filter', agencyFiltro);
-formData.append('reserva_rapida_filter', reservaRapidaFiltro);
+    formData.append('reserva_rapida_filter', reservaRapidaFiltro);
 
 
     // ✅ AÑADIR FILTRO DE HORARIOS SI HAY ALGUNO SELECCIONADO ESPECÍFICAMENTE
@@ -2813,16 +2813,16 @@ function renderReservationsReportWithFilters(data) {
     }
 
     let reservaRapidaText = '';
-if (data.filtros.reserva_rapida_filter) {
-    switch(data.filtros.reserva_rapida_filter) {
-        case 'solo_rapidas':
-            reservaRapidaText = ' - Solo reservas rápidas';
-            break;
-        case 'sin_rapidas':
-            reservaRapidaText = ' - Sin reservas rápidas';
-            break;
+    if (data.filtros.reserva_rapida_filter) {
+        switch (data.filtros.reserva_rapida_filter) {
+            case 'solo_rapidas':
+                reservaRapidaText = ' - Solo reservas rápidas';
+                break;
+            case 'sin_rapidas':
+                reservaRapidaText = ' - Sin reservas rápidas';
+                break;
+        }
     }
-}
 
     // Mostrar tabla de reservas
     let tableHtml = `
@@ -3185,11 +3185,11 @@ function initReportsEvents() {
         });
     }
 
-document.getElementById('reserva-rapida-filtro').addEventListener('change', function() {
-    if (document.getElementById('fecha-inicio').value && document.getElementById('fecha-fin').value) {
-        loadReservationsByDateWithFilters();
-    }
-});
+    document.getElementById('reserva-rapida-filtro').addEventListener('change', function () {
+        if (document.getElementById('fecha-inicio').value && document.getElementById('fecha-fin').value) {
+            loadReservationsByDateWithFilters();
+        }
+    });
 
     // ✅ VERIFICAR QUE EL ELEMENTO EXISTE ANTES DE AÑADIR EVENT LISTENER
     const agencySelect = document.getElementById('agency-filtro');
@@ -7893,12 +7893,12 @@ function initAdminReservaRapida() {
  * Función principal para procesar reserva rápida
  */
 function processReservaRapida(callbackOnError) {
-    console.log('=== INICIANDO PROCESS RESERVA RÁPIDA ===');
+    console.log('🎯🎯🎯 PROCESS RESERVA RÁPIDA EJECUTÁNDOSE');
 
     try {
         // Recopilar datos del formulario
         const formData = {
-            action: 'process_reserva_rapida',
+            action: 'process_reserva_rapida', // ✅ ACCIÓN CORRECTA PARA ADMIN
             nonce: reservasAjax.nonce,
             // Datos del cliente
             nombre: document.getElementById('nombre').value.trim(),
@@ -7914,49 +7914,51 @@ function processReservaRapida(callbackOnError) {
             ninos_menores: parseInt(document.getElementById('ninos_menores').value) || 0
         };
 
-        console.log('Datos a enviar:', formData);
+        console.log('📤 DATOS A ENVIAR (RESERVA RÁPIDA):', formData);
 
-        // Validaciones del lado cliente
-        const validation = validateReservaRapidaData(formData);
-        if (!validation.valid) {
-            showError(validation.error);
+        // Validaciones básicas
+        if (!formData.service_id) {
+            showError('Debe seleccionar un servicio');
             if (callbackOnError) callbackOnError();
             return;
         }
 
-        // Enviar solicitud AJAX
-        jQuery.ajax({
-            url: reservasAjax.ajax_url,
-            type: 'POST',
-            data: formData,
-            timeout: 30000, // 30 segundos timeout
-            success: function (response) {
-                console.log('Respuesta del servidor:', response);
+        const totalPersonas = formData.adultos + formData.residentes + formData.ninos_5_12;
+        if (totalPersonas === 0) {
+            showError('Debe haber al menos una persona');
+            if (callbackOnError) callbackOnError();
+            return;
+        }
 
-                if (response.success) {
-                    handleReservaRapidaSuccess(response.data);
+        // Enviar solicitud AJAX con FETCH (más confiable)
+        fetch(reservasAjax.ajax_url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(formData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📥 RESPUESTA DEL SERVIDOR:', data);
+
+                if (data.success) {
+                    console.log('✅ RESERVA RÁPIDA EXITOSA');
+                    handleReservaRapidaSuccess(data.data);
                 } else {
-                    showError('Error procesando reserva: ' + response.data);
+                    console.error('❌ ERROR DEL SERVIDOR:', data.data);
+                    showError('Error procesando reserva: ' + data.data);
                     if (callbackOnError) callbackOnError();
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error('Error AJAX:', status, error);
-
-                let errorMessage = 'Error de conexión';
-                if (status === 'timeout') {
-                    errorMessage = 'La solicitud tardó demasiado tiempo. Por favor, inténtalo de nuevo.';
-                } else if (xhr.responseJSON && xhr.responseJSON.data) {
-                    errorMessage = xhr.responseJSON.data;
-                }
-
-                showError(errorMessage);
+            })
+            .catch(error => {
+                console.error('❌ ERROR DE CONEXIÓN:', error);
+                showError('Error de conexión: ' + error.message);
                 if (callbackOnError) callbackOnError();
-            }
-        });
+            });
 
     } catch (error) {
-        console.error('Error en processReservaRapida:', error);
+        console.error('❌ EXCEPTION:', error);
         showError('Error interno: ' + error.message);
         if (callbackOnError) callbackOnError();
     }
@@ -8019,60 +8021,53 @@ function validateReservaRapidaData(data) {
  * Manejar respuesta exitosa de reserva rápida
  */
 function handleReservaRapidaSuccess(data) {
-    console.log('=== RESERVA RÁPIDA EXITOSA ===');
-    console.log('Datos de respuesta:', data);
+    console.log('✅ MANEJANDO ÉXITO DE RESERVA RÁPIDA:', data);
 
-    // Mostrar mensaje de éxito con detalles
-    const successMessage = `
-        <div style="text-align: center; padding: 30px; background: #d4edda; border: 2px solid #28a745; border-radius: 12px; margin: 20px 0;">
-            <h3 style="color: #155724; margin: 0 0 15px 0; font-size: 24px;">
-                ✅ ¡RESERVA RÁPIDA PROCESADA EXITOSAMENTE!
-            </h3>
+    const successHTML = `
+        <div style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
+            <h2 style="color: #28a745; margin-bottom: 20px;">¡Reserva Rápida Procesada!</h2>
             
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
-                <h4 style="color: #28a745; margin: 0 0 15px 0;">Detalles de la Reserva:</h4>
-                <div style="font-size: 16px; line-height: 1.6; color: #2d2d2d;">
-                    <strong>Localizador:</strong> <span style="font-family: monospace; background: #f8f9fa; padding: 4px 8px; border-radius: 4px; font-size: 18px; color: #28a745; font-weight: bold;">${data.localizador}</span><br>
-                    <strong>Cliente:</strong> ${document.getElementById('nombre').value} ${document.getElementById('apellidos').value}<br>
-                    <strong>Email:</strong> ${document.getElementById('email').value}<br>
-                    <strong>Fecha:</strong> ${formatDateForDisplay(data.detalles.fecha)}<br>
-                    <strong>Hora:</strong> ${data.detalles.hora}<br>
-                    <strong>Personas:</strong> ${data.detalles.personas}<br>
-                    <strong>Total:</strong> <span style="color: #28a745; font-weight: bold; font-size: 18px;">${data.detalles.precio_final}€</span><br>
-                    <strong>Procesado por:</strong> ${data.admin_user}
-                </div>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;">
+                <h3 style="margin-top: 0; color: #28a745;">Detalles de la Reserva:</h3>
+                <p><strong>Localizador:</strong> <span style="font-size: 24px; color: #28a745; font-family: monospace; font-weight: bold;">${data.localizador}</span></p>
+                <p><strong>Fecha:</strong> ${data.detalles.fecha}</p>
+                <p><strong>Hora:</strong> ${data.detalles.hora}</p>
+                <p><strong>Personas:</strong> ${data.detalles.personas}</p>
+                <p><strong>Total:</strong> <span style="color: #28a745; font-weight: bold; font-size: 20px;">${data.detalles.precio_final}€</span></p>
+                <p><strong>Procesado por:</strong> ${data.admin_user}</p>
             </div>
             
-            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
-                <p style="margin: 0; color: #1976d2; font-weight: 600;">
-                    📧 Emails enviados automáticamente:
+            <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745;">
+                <p style="margin: 0; color: #155724; font-weight: 600;">
+                    📧 Se han enviado emails de confirmación al cliente y al administrador
                 </p>
-                <ul style="margin: 10px 0 0 0; color: #1976d2; text-align: left; display: inline-block;">
-                    <li>Confirmación al cliente (con PDF adjunto)</li>
-                    <li>Notificación al super administrador</li>
-                </ul>
             </div>
             
-            <div style="margin-top: 25px;">
-                <button onclick="loadReportsSection()" style="background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 6px; margin-right: 10px; cursor: pointer; font-weight: 600;">
+            <div style="margin-top: 30px;">
+                <button onclick="loadReportsSection()" class="btn btn-primary" style="margin-right: 10px;">
                     📊 Ver en Informes
                 </button>
-                <button onclick="createNewReservaRapida()" style="background: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 6px; margin-right: 10px; cursor: pointer; font-weight: 600;">
+                <button onclick="loadReservaRapidaSection()" class="btn btn-secondary" style="margin-right: 10px;">
                     ➕ Nueva Reserva Rápida
                 </button>
-                <button onclick="loadDashboardSection('dashboard')" style="background: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <button onclick="loadDashboardSection('dashboard')" class="btn btn-secondary">
                     🏠 Volver al Dashboard
                 </button>
             </div>
         </div>
     `;
 
-    // Mostrar el mensaje de éxito
-    document.getElementById('dashboard-content').innerHTML = successMessage;
+    // Reemplazar contenido del dashboard
+    const dashboardContent = document.getElementById('dashboard-content');
+    if (dashboardContent) {
+        dashboardContent.innerHTML = successHTML;
+    } else {
+        document.body.innerHTML = successHTML;
+    }
 
-    // Hacer scroll hacia arriba para ver el mensaje
+    // Scroll al inicio
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
 }
 
 /**

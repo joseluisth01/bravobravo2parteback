@@ -315,292 +315,292 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    initializeReservaRapida();
-});
-
-function initializeReservaRapida() {
-    console.log('=== INICIALIZANDO RESERVA RÁPIDA ===');
-    
-    // Cargar servicios disponibles
-    loadAvailableServices();
-    
-    // Event listeners
-    document.getElementById('service_id').addEventListener('change', handleServiceChange);
-    
-    // Event listeners para cálculo de precios
-    const personInputs = ['adultos', 'residentes', 'ninos_5_12', 'ninos_menores'];
-    personInputs.forEach(inputId => {
-        document.getElementById(inputId).addEventListener('input', calculatePrice);
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeReservaRapida();
     });
-    
-    // Event listener para el formulario
-    document.getElementById('reserva-rapida-form').addEventListener('submit', handleFormSubmit);
-}
 
-function loadAvailableServices() {
-    const serviceSelect = document.getElementById('service_id');
-    serviceSelect.innerHTML = '<option value="">Cargando servicios...</option>';
-    
-    jQuery.ajax({
-        url: reservasAjax.ajax_url,
-        type: 'POST',
-        data: {
-            action: 'get_available_services_rapida',
-            nonce: reservasAjax.nonce
-        },
-        success: function(response) {
-            if (response.success) {
-                populateServiceSelect(response.data);
-            } else {
-                showError('Error cargando servicios: ' + response.data);
-            }
-        },
-        error: function() {
-            showError('Error de conexión cargando servicios');
-        }
-    });
-}
+    function initializeReservaRapida() {
+        console.log('=== INICIALIZANDO RESERVA RÁPIDA ===');
 
-function populateServiceSelect(serviciosData) {
-    const serviceSelect = document.getElementById('service_id');
-    serviceSelect.innerHTML = '<option value="">Selecciona un servicio</option>';
-    
-    if (Object.keys(serviciosData).length === 0) {
-        serviceSelect.innerHTML = '<option value="">No hay servicios disponibles</option>';
-        return;
+        // Cargar servicios disponibles
+        loadAvailableServices();
+
+        // Event listeners
+        document.getElementById('service_id').addEventListener('change', handleServiceChange);
+
+        // Event listeners para cálculo de precios
+        const personInputs = ['adultos', 'residentes', 'ninos_5_12', 'ninos_menores'];
+        personInputs.forEach(inputId => {
+            document.getElementById(inputId).addEventListener('input', calculatePrice);
+        });
+
+        // Event listener para el formulario
+        document.getElementById('reserva-rapida-form').addEventListener('submit', handleFormSubmit);
     }
-    
-    Object.keys(serviciosData).forEach(fecha => {
-        const fechaObj = new Date(fecha + 'T00:00:00');
-        const fechaFormateada = fechaObj.toLocaleDateString('es-ES', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        serviciosData[fecha].forEach(servicio => {
-            const option = document.createElement('option');
-            option.value = servicio.id;
-            option.textContent = `${fechaFormateada} - ${servicio.hora} (${servicio.plazas_disponibles} plazas)`;
-            option.dataset.fecha = fecha;
-            option.dataset.hora = servicio.hora;
-            option.dataset.plazas = servicio.plazas_disponibles;
-            option.dataset.precioAdulto = servicio.precio_adulto;
-            option.dataset.precioNino = servicio.precio_nino;
-            option.dataset.precioResidente = servicio.precio_residente;
-            
-            serviceSelect.appendChild(option);
-        });
-    });
-}
 
-function handleServiceChange() {
-    const serviceSelect = document.getElementById('service_id');
-    const serviceInfo = document.getElementById('service-info');
-    const serviceDetails = document.getElementById('service-details');
-    
-    if (serviceSelect.value) {
-        const option = serviceSelect.selectedOptions[0];
-        const fecha = option.dataset.fecha;
-        const hora = option.dataset.hora;
-        const plazas = option.dataset.plazas;
-        const precioAdulto = option.dataset.precioAdulto;
-        const precioNino = option.dataset.precioNino;
-        const precioResidente = option.dataset.precioResidente;
-        
-        serviceDetails.innerHTML = `
+    function loadAvailableServices() {
+        const serviceSelect = document.getElementById('service_id');
+        serviceSelect.innerHTML = '<option value="">Cargando servicios...</option>';
+
+        jQuery.ajax({
+            url: reservasAjax.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'get_available_services_rapida',
+                nonce: reservasAjax.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    populateServiceSelect(response.data);
+                } else {
+                    showError('Error cargando servicios: ' + response.data);
+                }
+            },
+            error: function() {
+                showError('Error de conexión cargando servicios');
+            }
+        });
+    }
+
+    function populateServiceSelect(serviciosData) {
+        const serviceSelect = document.getElementById('service_id');
+        serviceSelect.innerHTML = '<option value="">Selecciona un servicio</option>';
+
+        if (Object.keys(serviciosData).length === 0) {
+            serviceSelect.innerHTML = '<option value="">No hay servicios disponibles</option>';
+            return;
+        }
+
+        Object.keys(serviciosData).forEach(fecha => {
+            const fechaObj = new Date(fecha + 'T00:00:00');
+            const fechaFormateada = fechaObj.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            serviciosData[fecha].forEach(servicio => {
+                const option = document.createElement('option');
+                option.value = servicio.id;
+                option.textContent = `${fechaFormateada} - ${servicio.hora} (${servicio.plazas_disponibles} plazas)`;
+                option.dataset.fecha = fecha;
+                option.dataset.hora = servicio.hora;
+                option.dataset.plazas = servicio.plazas_disponibles;
+                option.dataset.precioAdulto = servicio.precio_adulto;
+                option.dataset.precioNino = servicio.precio_nino;
+                option.dataset.precioResidente = servicio.precio_residente;
+
+                serviceSelect.appendChild(option);
+            });
+        });
+    }
+
+    function handleServiceChange() {
+        const serviceSelect = document.getElementById('service_id');
+        const serviceInfo = document.getElementById('service-info');
+        const serviceDetails = document.getElementById('service-details');
+
+        if (serviceSelect.value) {
+            const option = serviceSelect.selectedOptions[0];
+            const fecha = option.dataset.fecha;
+            const hora = option.dataset.hora;
+            const plazas = option.dataset.plazas;
+            const precioAdulto = option.dataset.precioAdulto;
+            const precioNino = option.dataset.precioNino;
+            const precioResidente = option.dataset.precioResidente;
+
+            serviceDetails.innerHTML = `
             <strong>Fecha:</strong> ${fecha}<br>
             <strong>Hora:</strong> ${hora}<br>
             <strong>Plazas disponibles:</strong> ${plazas}<br>
             <strong>Precios:</strong> Adulto: ${precioAdulto}€ | Niño: ${precioNino}€ | Residente: ${precioResidente}€
         `;
-        serviceInfo.style.display = 'block';
-        
-        // Calcular precio si hay personas seleccionadas
-        calculatePrice();
-    } else {
-        serviceInfo.style.display = 'none';
-        document.getElementById('price-summary').style.display = 'none';
-    }
-    
-    updateSubmitButton();
-}
+            serviceInfo.style.display = 'block';
 
-function calculatePrice() {
-    const serviceSelect = document.getElementById('service_id');
-    if (!serviceSelect.value) return;
-    
-    const adultos = parseInt(document.getElementById('adultos').value) || 0;
-    const residentes = parseInt(document.getElementById('residentes').value) || 0;
-    const ninos_5_12 = parseInt(document.getElementById('ninos_5_12').value) || 0;
-    const ninos_menores = parseInt(document.getElementById('ninos_menores').value) || 0;
-    
-    const totalPersonas = adultos + residentes + ninos_5_12;
-    
-    if (totalPersonas === 0) {
-        document.getElementById('price-summary').style.display = 'none';
+            // Calcular precio si hay personas seleccionadas
+            calculatePrice();
+        } else {
+            serviceInfo.style.display = 'none';
+            document.getElementById('price-summary').style.display = 'none';
+        }
+
         updateSubmitButton();
-        return;
     }
-    
-    // Validar que hay al menos un adulto si hay niños
-    if (ninos_5_12 > 0 && (adultos + residentes) === 0) {
-        showError('Debe haber al menos un adulto si hay niños');
-        document.getElementById('price-summary').style.display = 'none';
-        updateSubmitButton();
-        return;
-    }
-    
-    // Verificar disponibilidad
-    const option = serviceSelect.selectedOptions[0];
-    const plazasDisponibles = parseInt(option.dataset.plazas);
-    
-    if (totalPersonas > plazasDisponibles) {
-        showError(`Solo quedan ${plazasDisponibles} plazas disponibles`);
-        document.getElementById('price-summary').style.display = 'none';
-        updateSubmitButton();
-        return;
-    }
-    
-    clearMessages();
-    
-    // Calcular precio vía AJAX
-    jQuery.ajax({
-        url: reservasAjax.ajax_url,
-        type: 'POST',
-        data: {
-            action: 'calculate_price_rapida',
-            service_id: serviceSelect.value,
-            adultos: adultos,
-            residentes: residentes,
-            ninos_5_12: ninos_5_12,
-            ninos_menores: ninos_menores,
-            nonce: reservasAjax.nonce
-        },
-        success: function(response) {
-            if (response.success) {
-                updatePriceSummary(response.data);
-            } else {
-                showError('Error calculando precio: ' + response.data);
+
+    function calculatePrice() {
+        const serviceSelect = document.getElementById('service_id');
+        if (!serviceSelect.value) return;
+
+        const adultos = parseInt(document.getElementById('adultos').value) || 0;
+        const residentes = parseInt(document.getElementById('residentes').value) || 0;
+        const ninos_5_12 = parseInt(document.getElementById('ninos_5_12').value) || 0;
+        const ninos_menores = parseInt(document.getElementById('ninos_menores').value) || 0;
+
+        const totalPersonas = adultos + residentes + ninos_5_12;
+
+        if (totalPersonas === 0) {
+            document.getElementById('price-summary').style.display = 'none';
+            updateSubmitButton();
+            return;
+        }
+
+        // Validar que hay al menos un adulto si hay niños
+        if (ninos_5_12 > 0 && (adultos + residentes) === 0) {
+            showError('Debe haber al menos un adulto si hay niños');
+            document.getElementById('price-summary').style.display = 'none';
+            updateSubmitButton();
+            return;
+        }
+
+        // Verificar disponibilidad
+        const option = serviceSelect.selectedOptions[0];
+        const plazasDisponibles = parseInt(option.dataset.plazas);
+
+        if (totalPersonas > plazasDisponibles) {
+            showError(`Solo quedan ${plazasDisponibles} plazas disponibles`);
+            document.getElementById('price-summary').style.display = 'none';
+            updateSubmitButton();
+            return;
+        }
+
+        clearMessages();
+
+        // Calcular precio vía AJAX
+        jQuery.ajax({
+            url: reservasAjax.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'calculate_price_rapida',
+                service_id: serviceSelect.value,
+                adultos: adultos,
+                residentes: residentes,
+                ninos_5_12: ninos_5_12,
+                ninos_menores: ninos_menores,
+                nonce: reservasAjax.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    updatePriceSummary(response.data);
+                } else {
+                    showError('Error calculando precio: ' + response.data);
+                }
+            },
+            error: function() {
+                showError('Error de conexión calculando precio');
             }
-        },
-        error: function() {
-            showError('Error de conexión calculando precio');
-        }
-    });
-}
-
-function updatePriceSummary(priceData) {
-    document.getElementById('precio-base').textContent = priceData.precio_base + '€';
-    document.getElementById('precio-total').textContent = priceData.precio_final + '€';
-    
-    // Mostrar descuentos si los hay
-    if (priceData.descuento_total > 0) {
-        document.getElementById('total-descuentos').textContent = '-' + priceData.descuento_total + '€';
-        document.getElementById('discount-row').style.display = 'flex';
-        
-        // Detalles de descuentos
-        let discountDetails = [];
-        if (priceData.descuento_residentes > 0) {
-            discountDetails.push(`Descuento residentes: -${priceData.descuento_residentes}€`);
-        }
-        if (priceData.descuento_ninos > 0) {
-            discountDetails.push(`Descuento niños: -${priceData.descuento_ninos}€`);
-        }
-        if (priceData.descuento_grupo > 0) {
-            discountDetails.push(`Descuento por grupo: -${priceData.descuento_grupo}€`);
-        }
-        
-        document.getElementById('discount-details').innerHTML = discountDetails.join('<br>');
-    } else {
-        document.getElementById('discount-row').style.display = 'none';
-        document.getElementById('discount-details').innerHTML = '';
+        });
     }
-    
-    document.getElementById('price-summary').style.display = 'block';
-    updateSubmitButton();
-}
 
-function updateSubmitButton() {
-    const serviceSelect = document.getElementById('service_id');
-    const adultos = parseInt(document.getElementById('adultos').value) || 0;
-    const residentes = parseInt(document.getElementById('residentes').value) || 0;
-    const ninos_5_12 = parseInt(document.getElementById('ninos_5_12').value) || 0;
-    const nombre = document.getElementById('nombre').value.trim();
-    const apellidos = document.getElementById('apellidos').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const telefono = document.getElementById('telefono').value.trim();
-    
-    const totalPersonas = adultos + residentes + ninos_5_12;
-    const submitBtn = document.getElementById('submit-btn');
-    
-    const isValid = serviceSelect.value && 
-                   totalPersonas > 0 && 
-                   nombre.length >= 2 && 
-                   apellidos.length >= 2 && 
-                   email && 
-                   telefono.length >= 9 &&
-                   (ninos_5_12 === 0 || (adultos + residentes) > 0);
-    
-    submitBtn.disabled = !isValid;
-    submitBtn.style.opacity = isValid ? '1' : '0.6';
-}
+    function updatePriceSummary(priceData) {
+        document.getElementById('precio-base').textContent = priceData.precio_base + '€';
+        document.getElementById('precio-total').textContent = priceData.precio_final + '€';
 
-function handleFormSubmit(e) {
-    e.preventDefault();
-    
-    if (document.getElementById('submit-btn').disabled) {
-        return;
-    }
-    
-    // Deshabilitar botón y mostrar loading
-    const submitBtn = document.getElementById('submit-btn');
-    const originalText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = '⏳ Procesando...';
-    
-    clearMessages();
-    
-    // Procesar reserva
-    processReservaRapida(function() {
-        // Restaurar botón en caso de error
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-    });
-}
+        // Mostrar descuentos si los hay
+        if (priceData.descuento_total > 0) {
+            document.getElementById('total-descuentos').textContent = '-' + priceData.descuento_total + '€';
+            document.getElementById('discount-row').style.display = 'flex';
 
-function cancelReservaRapida() {
-    if (confirm('¿Estás seguro de que quieres cancelar? Se perderán todos los datos introducidos.')) {
-        // Volver al dashboard
-        loadDashboardSection('dashboard');
-    }
-}
+            // Detalles de descuentos
+            let discountDetails = [];
+            if (priceData.descuento_residentes > 0) {
+                discountDetails.push(`Descuento residentes: -${priceData.descuento_residentes}€`);
+            }
+            if (priceData.descuento_ninos > 0) {
+                discountDetails.push(`Descuento niños: -${priceData.descuento_ninos}€`);
+            }
+            if (priceData.descuento_grupo > 0) {
+                discountDetails.push(`Descuento por grupo: -${priceData.descuento_grupo}€`);
+            }
 
-function showError(message) {
-    const messagesDiv = document.getElementById('form-messages');
-    messagesDiv.innerHTML = `<div class="error-message">${message}</div>`;
-}
-
-function showSuccess(message) {
-    const messagesDiv = document.getElementById('form-messages');
-    messagesDiv.innerHTML = `<div class="success-message">${message}</div>`;
-}
-
-function clearMessages() {
-    document.getElementById('form-messages').innerHTML = '';
-}
-
-// Event listeners para validación en tiempo real
-document.addEventListener('DOMContentLoaded', function() {
-    const inputs = ['nombre', 'apellidos', 'email', 'telefono', 'adultos', 'residentes', 'ninos_5_12', 'ninos_menores'];
-    inputs.forEach(inputId => {
-        const input = document.getElementById(inputId);
-        if (input) {
-            input.addEventListener('input', updateSubmitButton);
-            input.addEventListener('blur', updateSubmitButton);
+            document.getElementById('discount-details').innerHTML = discountDetails.join('<br>');
+        } else {
+            document.getElementById('discount-row').style.display = 'none';
+            document.getElementById('discount-details').innerHTML = '';
         }
+
+        document.getElementById('price-summary').style.display = 'block';
+        updateSubmitButton();
+    }
+
+    function updateSubmitButton() {
+        const serviceSelect = document.getElementById('service_id');
+        const adultos = parseInt(document.getElementById('adultos').value) || 0;
+        const residentes = parseInt(document.getElementById('residentes').value) || 0;
+        const ninos_5_12 = parseInt(document.getElementById('ninos_5_12').value) || 0;
+        const nombre = document.getElementById('nombre').value.trim();
+        const apellidos = document.getElementById('apellidos').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const telefono = document.getElementById('telefono').value.trim();
+
+        const totalPersonas = adultos + residentes + ninos_5_12;
+        const submitBtn = document.getElementById('submit-btn');
+
+        const isValid = serviceSelect.value &&
+            totalPersonas > 0 &&
+            nombre.length >= 2 &&
+            apellidos.length >= 2 &&
+            email &&
+            telefono.length >= 9 &&
+            (ninos_5_12 === 0 || (adultos + residentes) > 0);
+
+        submitBtn.disabled = !isValid;
+        submitBtn.style.opacity = isValid ? '1' : '0.6';
+    }
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+
+        if (document.getElementById('submit-btn').disabled) {
+            return;
+        }
+
+        // Deshabilitar botón y mostrar loading
+        const submitBtn = document.getElementById('submit-btn');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Procesando...';
+
+        clearMessages();
+
+        // Procesar reserva
+        processReservaRapida(function() {
+            // Restaurar botón en caso de error
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        });
+    }
+
+    function cancelReservaRapida() {
+        if (confirm('¿Estás seguro de que quieres cancelar? Se perderán todos los datos introducidos.')) {
+            // Volver al dashboard
+            loadDashboardSection('dashboard');
+        }
+    }
+
+    function showError(message) {
+        const messagesDiv = document.getElementById('form-messages');
+        messagesDiv.innerHTML = `<div class="error-message">${message}</div>`;
+    }
+
+    function showSuccess(message) {
+        const messagesDiv = document.getElementById('form-messages');
+        messagesDiv.innerHTML = `<div class="success-message">${message}</div>`;
+    }
+
+    function clearMessages() {
+        document.getElementById('form-messages').innerHTML = '';
+    }
+
+    // Event listeners para validación en tiempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = ['nombre', 'apellidos', 'email', 'telefono', 'adultos', 'residentes', 'ninos_5_12', 'ninos_menores'];
+        inputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('input', updateSubmitButton);
+                input.addEventListener('blur', updateSubmitButton);
+            }
+        });
     });
-});
 </script>

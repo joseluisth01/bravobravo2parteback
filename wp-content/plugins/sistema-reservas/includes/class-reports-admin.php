@@ -426,7 +426,7 @@ class ReservasReportsAdmin
 
             // ✅ CONSTRUIR CONDICIONES WHERE PARA LISTADO
             $listado_params = array();
-$where_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $reserva_rapida_filter, $listado_params);
+            $where_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $reserva_rapida_filter, $listado_params);
             $where_clause = '';
             if (!empty($where_conditions)) {
                 $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
@@ -461,13 +461,13 @@ $where_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fech
 
             // ✅ ESTADÍSTICAS GENERALES - USAR LA MISMA FUNCIÓN DE CONDICIONES
             $stats_params = array();
-$stats_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $reserva_rapida_filter, $stats_params);
+            $stats_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, $agency_filter, $selected_schedules, $reserva_rapida_filter, $stats_params);
 
             // ✅ ESTADÍSTICAS DE CONTEO (RESPETAN EL FILTRO DE ESTADO)
             $stats_count_where = 'WHERE ' . implode(' AND ', $stats_conditions);
 
             // ✅ ESTADÍSTICAS DE INGRESOS (SIEMPRE SOLO CONFIRMADAS)
-$stats_revenue_conditions = build_where_conditions($fecha_inicio, $fecha_fin,$tipo_fecha,'confirmadas', $agency_filter, $selected_schedules, $reserva_rapida_filter, $revenue_params);
+            $stats_revenue_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, 'confirmadas', $agency_filter, $selected_schedules, $reserva_rapida_filter, $revenue_params);
             $stats_revenue_where = 'WHERE ' . implode(' AND ', $stats_revenue_conditions);
 
             $stats_count = $wpdb->get_row($wpdb->prepare(
@@ -510,7 +510,7 @@ $stats_revenue_conditions = build_where_conditions($fecha_inicio, $fecha_fin,$ti
             $stats_por_estado = null;
             if ($estado_filtro === 'todas') {
                 $estado_params = array();
-$estado_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, 'todas', $agency_filter, $selected_schedules, $reserva_rapida_filter, $estado_params);
+                $estado_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, 'todas', $agency_filter, $selected_schedules, $reserva_rapida_filter, $estado_params);
                 $estado_where = 'WHERE ' . implode(' AND ', $estado_conditions);
 
                 $stats_por_estado = $wpdb->get_results($wpdb->prepare(
@@ -534,7 +534,7 @@ $estado_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fec
 
                 // ✅ USAR EXACTAMENTE LA MISMA FUNCIÓN PARA OBTENER CONDICIONES
                 $agencias_params = array();
-$agencias_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, 'todas', $selected_schedules, $reserva_rapida_filter, $agencias_params);
+                $agencias_conditions = build_where_conditions($fecha_inicio, $fecha_fin, $tipo_fecha, $estado_filtro, 'todas', $selected_schedules, $reserva_rapida_filter, $agencias_params);
                 $agencias_where = 'WHERE ' . implode(' AND ', $agencias_conditions);
 
                 error_log('Condiciones para agencias: ' . $agencias_where);
