@@ -405,10 +405,13 @@ class ReservasPDFGenerator
         }
 
         $pdf->SetFont('helvetica', 'B', 9);
-        $pdf->SetX(15);
-        $pdf->Cell(30, 5, 'Idioma:', 0, 0, 'L');
-        $pdf->SetFont('helvetica', '', 9);
-        $pdf->Cell(40, 5, 'Español', 0, 1, 'L');
+$pdf->SetX(15);
+$pdf->Cell(30, 5, 'Idioma:', 0, 0, 'L');
+$pdf->SetFont('helvetica', '', 9);
+
+// ✅ MOSTRAR IDIOMA DINÁMICO
+$idioma = isset($this->reserva_data['idioma']) ? ucfirst($this->reserva_data['idioma']) : 'Español';
+$pdf->Cell(40, 5, $idioma, 0, 1, 'L');
 
         $pdf->SetFont('helvetica', 'B', 9);
         $pdf->SetX(15);

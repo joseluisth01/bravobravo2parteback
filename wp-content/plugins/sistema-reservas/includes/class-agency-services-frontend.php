@@ -541,6 +541,7 @@ class ReservasAgencyServicesFrontend
             $apellidos = sanitize_text_field($_POST['apellidos']);
             $email = sanitize_email($_POST['email']);
             $telefono = sanitize_text_field($_POST['telefono']);
+            $idioma = sanitize_text_field($_POST['idioma'] ?? 'español');
 
             // Validar datos básicos
             if ($adultos < 1) {
@@ -589,6 +590,7 @@ class ReservasAgencyServicesFrontend
                 'ninos' => $ninos,
                 'ninos_menores' => $ninos_menores,
                 'total_personas' => $adultos + $ninos + $ninos_menores,
+                'idioma' => $idioma,
                 'precio_total' => $total,
                 'estado' => 'confirmada',
                 'metodo_pago' => 'pendiente_tpv',

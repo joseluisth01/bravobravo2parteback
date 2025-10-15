@@ -6348,6 +6348,24 @@ function renderEditAgencyModal() {
                                         </label>
                                         <div class="hours-container" id="edit-hours-lunes" style="display: none;">
                                             <div class="hours-list" data-day="lunes"></div>
+                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
+    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
+    <div class="idiomas-checkboxes" data-day="${day}">
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+            <span>Español</span>
+        </label>
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
+            <span>Inglés</span>
+        </label>
+        <label>
+            <input type="checkbox" name="idiomas[${day}][]" value="frances">
+            <span>Francés</span>
+        </label>
+    </div>
+    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
+</div>
                                             <button type="button" class="btn-add-hour" onclick="addHourSlot('lunes', true)">+ Añadir horario</button>
                                             
                                             <div class="excluded-dates-section">
@@ -6367,6 +6385,24 @@ function renderEditAgencyModal() {
                                         </label>
                                         <div class="hours-container" id="edit-hours-martes" style="display: none;">
                                             <div class="hours-list" data-day="martes"></div>
+                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
+    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
+    <div class="idiomas-checkboxes" data-day="${day}">
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+            <span>Español</span>
+        </label>
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
+            <span>Inglés</span>
+        </label>
+        <label>
+            <input type="checkbox" name="idiomas[${day}][]" value="frances">
+            <span>Francés</span>
+        </label>
+    </div>
+    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
+</div>
                                             <button type="button" class="btn-add-hour" onclick="addHourSlot('martes', true)">+ Añadir horario</button>
                                             
                                             <div class="excluded-dates-section">
@@ -6386,6 +6422,24 @@ function renderEditAgencyModal() {
                                         </label>
                                         <div class="hours-container" id="edit-hours-miercoles" style="display: none;">
                                             <div class="hours-list" data-day="miercoles"></div>
+                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
+    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
+    <div class="idiomas-checkboxes" data-day="${day}">
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+            <span>Español</span>
+        </label>
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
+            <span>Inglés</span>
+        </label>
+        <label>
+            <input type="checkbox" name="idiomas[${day}][]" value="frances">
+            <span>Francés</span>
+        </label>
+    </div>
+    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
+</div>
                                             <button type="button" class="btn-add-hour" onclick="addHourSlot('miercoles', true)">+ Añadir horario</button>
                                             
                                             <div class="excluded-dates-section">
@@ -6405,6 +6459,24 @@ function renderEditAgencyModal() {
                                         </label>
                                         <div class="hours-container" id="edit-hours-jueves" style="display: none;">
                                             <div class="hours-list" data-day="jueves"></div>
+                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
+    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
+    <div class="idiomas-checkboxes" data-day="${day}">
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+            <span>Español</span>
+        </label>
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
+            <span>Inglés</span>
+        </label>
+        <label>
+            <input type="checkbox" name="idiomas[${day}][]" value="frances">
+            <span>Francés</span>
+        </label>
+    </div>
+    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
+</div>
                                             <button type="button" class="btn-add-hour" onclick="addHourSlot('jueves', true)">+ Añadir horario</button>
                                             
                                             <div class="excluded-dates-section">
@@ -6424,6 +6496,24 @@ function renderEditAgencyModal() {
                                         </label>
                                         <div class="hours-container" id="edit-hours-viernes" style="display: none;">
                                             <div class="hours-list" data-day="viernes"></div>
+                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
+    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
+    <div class="idiomas-checkboxes" data-day="${day}">
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+            <span>Español</span>
+        </label>
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
+            <span>Inglés</span>
+        </label>
+        <label>
+            <input type="checkbox" name="idiomas[${day}][]" value="frances">
+            <span>Francés</span>
+        </label>
+    </div>
+    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
+</div>
                                             <button type="button" class="btn-add-hour" onclick="addHourSlot('viernes', true)">+ Añadir horario</button>
                                             
                                             <div class="excluded-dates-section">
@@ -6443,6 +6533,24 @@ function renderEditAgencyModal() {
                                         </label>
                                         <div class="hours-container" id="edit-hours-sabado" style="display: none;">
                                             <div class="hours-list" data-day="sabado"></div>
+                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
+    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
+    <div class="idiomas-checkboxes" data-day="${day}">
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+            <span>Español</span>
+        </label>
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
+            <span>Inglés</span>
+        </label>
+        <label>
+            <input type="checkbox" name="idiomas[${day}][]" value="frances">
+            <span>Francés</span>
+        </label>
+    </div>
+    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
+</div>
                                             <button type="button" class="btn-add-hour" onclick="addHourSlot('sabado', true)">+ Añadir horario</button>
                                             
                                             <div class="excluded-dates-section">
@@ -6462,6 +6570,24 @@ function renderEditAgencyModal() {
                                         </label>
                                         <div class="hours-container" id="edit-hours-domingo" style="display: none;">
                                             <div class="hours-list" data-day="domingo"></div>
+                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
+    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
+    <div class="idiomas-checkboxes" data-day="${day}">
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+            <span>Español</span>
+        </label>
+        <label style="margin-right: 15px;">
+            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
+            <span>Inglés</span>
+        </label>
+        <label>
+            <input type="checkbox" name="idiomas[${day}][]" value="frances">
+            <span>Francés</span>
+        </label>
+    </div>
+    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
+</div>
                                             <button type="button" class="btn-add-hour" onclick="addHourSlot('domingo', true)">+ Añadir horario</button>
                                             
                                             <div class="excluded-dates-section">
@@ -7179,10 +7305,10 @@ function saveAgencyServiceAfterCreate(agencyId) {
     }
 
     Object.keys(fechasExcluidas).forEach(day => {
-    fechasExcluidas[day].forEach((fecha, index) => {
-        serviceFormData.append(`fechas_excluidas[${day}][]`, fecha);
+        fechasExcluidas[day].forEach((fecha, index) => {
+            serviceFormData.append(`fechas_excluidas[${day}][]`, fecha);
+        });
     });
-});
 
     jQuery.ajax({
         url: reservasAjax.ajax_url,
@@ -7267,6 +7393,8 @@ function saveAgencyServiceOnEdit(agencyId) {
     const servicioActivo = jQuery('#edit_servicio_activo').is(':checked');
     const fechasExcluidas = collectFechasExcluidasData();
 
+
+
     // ✅ CREAR FormData CORRECTAMENTE
     const serviceFormData = new FormData();
     serviceFormData.append('action', 'save_agency_service');
@@ -7290,10 +7418,22 @@ function saveAgencyServiceOnEdit(agencyId) {
         });
 
         Object.keys(fechasExcluidas).forEach(day => {
-    fechasExcluidas[day].forEach((fecha, index) => {
-        serviceFormData.append(`fechas_excluidas[${day}][]`, fecha);
-    });
-});
+            fechasExcluidas[day].forEach((fecha, index) => {
+                serviceFormData.append(`fechas_excluidas[${day}][]`, fecha);
+            });
+        });
+
+        const idiomas = collectIdiomasData();
+
+        if (Object.keys(idiomas).length === 0) {
+            alert('Error: Debes seleccionar al menos un idioma para cada día activo');
+            return;
+        }
+        Object.keys(idiomas).forEach(day => {
+            idiomas[day].forEach((idioma, index) => {
+                serviceFormData.append(`idiomas[${day}][]`, idioma);
+            });
+        });
 
         // Validar y añadir precios
         const precioAdulto = parseFloat(jQuery('#edit_precio_adulto_servicio').val());
@@ -7394,6 +7534,35 @@ function collectHorariosData() {
     });
 
     return horarios;
+}
+
+/**
+ * Recopilar idiomas configurados por día
+ */
+function collectIdiomasData() {
+    const idiomas = {};
+
+    // Buscar checkboxes marcados de días
+    const checkboxes = document.querySelectorAll('.day-checkbox input:checked, .edit-day-checkbox:checked');
+
+    checkboxes.forEach(checkbox => {
+        const day = checkbox.value;
+        const isEdit = checkbox.classList.contains('edit-day-checkbox');
+        const prefix = isEdit ? 'edit-' : '';
+
+        // Buscar idiomas seleccionados para este día
+        const idiomasCheckboxes = document.querySelectorAll(`#${prefix}hours-${day} .idiomas-checkboxes input[type="checkbox"]:checked`);
+
+        if (idiomasCheckboxes.length > 0) {
+            idiomas[day] = [];
+            idiomasCheckboxes.forEach(input => {
+                idiomas[day].push(input.value);
+            });
+        }
+    });
+
+    console.log('Idiomas recopilados:', idiomas);
+    return idiomas;
 }
 
 /**

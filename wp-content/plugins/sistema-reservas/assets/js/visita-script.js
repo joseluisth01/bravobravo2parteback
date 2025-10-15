@@ -97,6 +97,49 @@ function populateServicePage() {
     jQuery('#fecha-fin').text(fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1));
     jQuery('#hora-fin').text(horaFin);
 
+    // Después de mostrar los precios y antes de autorrellenar personas:
+
+// ✅ SELECTOR DE IDIOMA
+let idiomasHTML = '';
+if (serviceData.idiomas_disponibles) {
+    let idiomas = [];
+    try {
+        idiomas = typeof serviceData.idiomas_disponibles === 'string' 
+            ? JSON.parse(serviceData.idiomas_disponibles) 
+            : serviceData.idiomas_disponibles;
+    } catch(e) {
+        console.error('Error parseando idiomas:', e);
+    }
+    
+    // Obtener día de la semana de la fecha de reserva
+    const fechaObj = new Date(serviceData.fecha + 'T00:00:00');
+    const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+    const diaNombre = diasSemana[fechaObj.getDay()];
+    
+    const idiomasDisponibles = idiomas[diaNombre] || ['español'];
+    
+    if (idiomasDisponibles.length > 1) {
+        idiomasHTML = `
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label>IDIOMA DE LA VISITA *</label>
+                <select id="idioma-visita" class="person-input" required>
+                    ${idiomasDisponibles.map(idioma => `
+                        <option value="${idioma}">${idioma.charAt(0).toUpperCase() + idioma.slice(1)}</option>
+                    `).join('')}
+                </select>
+            </div>
+        `;
+    } else {
+        // Solo un idioma disponible - campo oculto
+        idiomasHTML = `
+            <input type="hidden" id="idioma-visita" value="${idiomasDisponibles[0]}">
+        `;
+    }
+}
+
+// Insertar el selector después de los inputs de personas
+jQuery('.person-selector').last().after(idiomasHTML);
+
     // Precios dinámicos desde el servicio
     const precioAdulto = parseFloat(serviceData.precio_adulto) || 0;
     const precioNino = parseFloat(serviceData.precio_nino) || 0;
@@ -252,6 +295,8 @@ function processVisitaReservation() {
     const adultos = parseInt(jQuery('#adultos-visita').val()) || 0;
     const ninos = parseInt(jQuery('#ninos-visita').val()) || 0;
     const ninosMenores = parseInt(jQuery('#ninos-menores-visita').val()) || 0; // ✅ NUEVO
+    const idiomaSeleccionado = jQuery('#idioma-visita').val() || 'español';
+
 
     if (adultos < 1) {
         alert('Debe haber al menos un adulto en la reserva.');
@@ -278,7 +323,8 @@ function processVisitaReservation() {
         nombre: nombre,
         apellidos: apellidos,
         email: email,
-        telefono: telefono
+        telefono: telefono,
+        idioma: idiomaSeleccionado,
     };
 
     console.log('Datos a enviar:', reservationData);

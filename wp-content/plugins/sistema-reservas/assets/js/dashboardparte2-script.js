@@ -279,12 +279,16 @@ function removeHourSlot(button) {
  */
 function collectHorariosData() {
     const horarios = {};
-    
-    document.querySelectorAll('.day-checkbox input:checked').forEach(checkbox => {
+
+    // Buscar checkboxes marcados (tanto en crear como en editar)
+    const checkboxes = document.querySelectorAll('.day-checkbox input:checked, .edit-day-checkbox:checked');
+
+    checkboxes.forEach(checkbox => {
         const day = checkbox.value;
-        const prefix = checkbox.classList.contains('edit-day-checkbox') ? 'edit-' : '';
+        const isEdit = checkbox.classList.contains('edit-day-checkbox');
+        const prefix = isEdit ? 'edit-' : '';
         const hoursInputs = document.querySelectorAll(`#${prefix}hours-${day} input[type="time"]`);
-        
+
         horarios[day] = [];
         hoursInputs.forEach(input => {
             if (input.value) {
@@ -292,7 +296,7 @@ function collectHorariosData() {
             }
         });
     });
-    
+
     return horarios;
 }
 
@@ -452,6 +456,44 @@ function populateServiceForm(serviceData, isEdit) {
         console.error('❌ Error parseando fechas excluidas:', e);
         fechas_excluidas = {};
     }
+
+    // ✅ CARGAR IDIOMAS
+if (serviceData.idiomas_disponibles) {
+    let idiomas;
+    
+    try {
+        if (typeof serviceData.idiomas_disponibles === 'string') {
+            idiomas = JSON.parse(serviceData.idiomas_disponibles);
+        } else {
+            idiomas = serviceData.idiomas_disponibles;
+        }
+        
+        console.log('✅ Idiomas parseados:', idiomas);
+    } catch (e) {
+        console.error('❌ Error parseando idiomas:', e);
+        idiomas = {};
+    }
+    
+    if (idiomas && typeof idiomas === 'object') {
+        Object.keys(idiomas).forEach(day => {
+            const idiomasDelDia = Array.isArray(idiomas[day]) ? idiomas[day] : [];
+            const prefix2 = isEdit ? 'edit-' : '';
+            
+            // Desmarcar todos primero
+            const idiomasCheckboxes = document.querySelectorAll(`#${prefix2}hours-${day} .idiomas-checkboxes input[type="checkbox"]`);
+            idiomasCheckboxes.forEach(cb => cb.checked = false);
+            
+            // Marcar los configurados
+            idiomasDelDia.forEach(idioma => {
+                const checkbox = document.querySelector(`#${prefix2}hours-${day} .idiomas-checkboxes input[value="${idioma}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    console.log(`✅ Idioma ${idioma} marcado para ${day}`);
+                }
+            });
+        });
+    }
+}
     
     if (fechas_excluidas && typeof fechas_excluidas === 'object') {
         Object.keys(fechas_excluidas).forEach(day => {

@@ -240,6 +240,23 @@ class ReservasAgencyServicesAdmin
             $data['dias_disponibles'] = implode(',', $dias_disponibles);
             $data['horarios_disponibles'] = json_encode($horarios_json);
 
+            $idiomas_data = array();
+            if (isset($_POST['idiomas']) && is_array($_POST['idiomas'])) {
+                foreach ($_POST['idiomas'] as $dia => $idiomas) {
+                    if (!empty($idiomas) && is_array($idiomas)) {
+                        $idiomas_validos = array_filter($idiomas, function ($idioma) {
+                            return in_array($idioma, array('español', 'ingles', 'frances'));
+                        });
+
+                        if (!empty($idiomas_validos)) {
+                            $idiomas_data[$dia] = array_values($idiomas_validos);
+                        }
+                    }
+                }
+            }
+
+            $data['idiomas_disponibles'] = !empty($idiomas_data) ? json_encode($idiomas_data) : null;
+
             $fechas_excluidas = array();
             if (isset($_POST['fechas_excluidas']) && !empty($_POST['fechas_excluidas'])) {
                 $fechas_raw = $_POST['fechas_excluidas'];
