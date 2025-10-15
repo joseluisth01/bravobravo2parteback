@@ -40,6 +40,20 @@ jQuery(document).ready(function($) {
         previewImageFile(this, 'portada', true);
     });
 
+    $(document).on('click', '.btn-add-excluded-date', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const day = $(this).data('day');
+        console.log('Añadiendo fecha excluida para día:', day);
+        addExcludedDateSlot(day, false);
+    });
+    
+    $(document).on('click', '.btn-remove-excluded-date', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).closest('.excluded-date-slot').remove();
+    });
+
     $(document).on('click', '.btn-add-excluded-date', function() {
     const day = $(this).data('day');
     addExcludedDateSlot(day, false);
@@ -143,22 +157,32 @@ function loadAgencyServiceConfigForEdit(agencyId) {
  * Añadir slot de fecha excluida
  */
 function addExcludedDateSlot(day, isEdit) {
+    console.log('=== AÑADIENDO FECHA EXCLUIDA ===');
+    console.log('Día:', day);
+    console.log('Es edición:', isEdit);
+    
     const prefix = isEdit ? 'edit-' : '';
-    const excludedList = document.querySelector(`#${prefix}hours-${day} .excluded-dates-list`);
+    const containerSelector = `#${prefix}hours-${day} .excluded-dates-list`;
+    const excludedList = document.querySelector(containerSelector);
+    
+    console.log('Selector usado:', containerSelector);
+    console.log('Elemento encontrado:', excludedList);
     
     if (!excludedList) {
-        console.error('No se encontró excluded-dates-list para el día:', day);
+        console.error('❌ No se encontró excluded-dates-list para el día:', day);
+        console.error('Selector intentado:', containerSelector);
         return;
     }
     
     const dateSlot = document.createElement('div');
     dateSlot.className = 'excluded-date-slot';
     dateSlot.innerHTML = `
-        <input type="date" name="fechas_excluidas[${day}][]" required>
+        <input type="date" name="fechas_excluidas[${day}][]" required min="${new Date().toISOString().split('T')[0]}">
         <button type="button" class="btn-remove-excluded-date" title="Eliminar fecha">✕</button>
     `;
     
     excludedList.appendChild(dateSlot);
+    console.log('✅ Fecha excluida añadida para:', day);
 }
 
 
@@ -170,12 +194,14 @@ function toggleDayHours(checkbox, isEdit) {
     const prefix = isEdit ? 'edit-' : '';
     const hoursContainer = document.getElementById(prefix + 'hours-' + day);
     
+    console.log('Toggling hours para:', day, 'isEdit:', isEdit);
+    
     if (checkbox.checked) {
         hoursContainer.style.display = 'block';
         
         // Añadir al menos un horario por defecto
         const hoursList = hoursContainer.querySelector('.hours-list');
-        if (hoursList.children.length === 0) {
+        if (hoursList && hoursList.children.length === 0) {
             addHourSlot(day, isEdit);
         }
         
@@ -183,18 +209,24 @@ function toggleDayHours(checkbox, isEdit) {
         const excludedSection = hoursContainer.querySelector('.excluded-dates-section');
         if (excludedSection) {
             excludedSection.style.display = 'block';
+            console.log('✅ Sección de fechas excluidas visible');
+        } else {
+            console.warn('⚠️ No se encontró excluded-dates-section para:', day);
         }
     } else {
         hoursContainer.style.display = 'none';
         
-        // Limpiar horarios al desmarcar
+        // Limpiar horarios
         const hoursList = hoursContainer.querySelector('.hours-list');
-        hoursList.innerHTML = '';
+        if (hoursList) {
+            hoursList.innerHTML = '';
+        }
         
         // ✅ LIMPIAR FECHAS EXCLUIDAS
         const excludedList = hoursContainer.querySelector('.excluded-dates-list');
         if (excludedList) {
             excludedList.innerHTML = '';
+            console.log('✅ Fechas excluidas limpiadas');
         }
     }
 }

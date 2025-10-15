@@ -6350,12 +6350,11 @@ function renderEditAgencyModal() {
                                             <div class="hours-list" data-day="lunes"></div>
                                             <button type="button" class="btn-add-hour" onclick="addHourSlot('lunes', true)">+ Añadir horario</button>
                                             
-                                            <!-- ✅ FECHAS EXCLUIDAS -->
                                             <div class="excluded-dates-section">
                                                 <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
                                                 <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                                                <div class="excluded-dates-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
-                                                <button type="button" class="btn-add-excluded-date-edit" data-day="lunes">+ Añadir Fecha Excluida</button>
+                                                <div class="excluded-dates-list" data-day="lunes"></div>
+                                                <button type="button" class="btn-add-excluded-date" data-day="lunes">+ Añadir Fecha Excluida</button>
                                             </div>
                                         </div>
                                     </div>

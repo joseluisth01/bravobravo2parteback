@@ -1573,7 +1573,7 @@ function confirmacion_reserva_shortcode()
 
             let servicesHtml = `
         <div class="additional-services-section container">
-            <h2 class="horarios-titulo">¡Haz qué tu Visita Cobre Vida!</h2>
+            <h2 class="horarios-titulo">Reserva aquí tu visita guiada a Medina Azahara</h2>
             <p class="services-subtitle">
                 Completa la experiencia con un <strong>tour guiado por expertos</strong> y descubre cada secreto de Medina Azahara.
             </p>
