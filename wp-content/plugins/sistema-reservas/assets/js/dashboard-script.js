@@ -5476,37 +5476,25 @@ function adminConfirmReservation() {
     const ninos_5_12 = parseInt(document.getElementById('admin-ninos-5-12').value) || 0;
     const ninos_menores = parseInt(document.getElementById('admin-ninos-menores').value) || 0;
 
-    const totalPrice = document.getElementById('admin-total-price').textContent.replace('€', '').trim();
-    const descuentoTotal = document.getElementById('admin-total-discount').textContent.replace('€', '').replace('-', '').trim();
-
-    const reservationData = {
-        fecha: adminSelectedDate,
-        service_id: adminSelectedServiceId,
-        hora_ida: service.hora,
-        adultos: adultos,
-        residentes: residentes,
-        ninos_5_12: ninos_5_12,
-        ninos_menores: ninos_menores,
-        precio_adulto: service.precio_adulto,
-        precio_nino: service.precio_nino,
-        precio_residente: service.precio_residente,
-        total_price: totalPrice,
-        descuento_grupo: descuentoTotal ? parseFloat(descuentoTotal) : 0,
-        regla_descuento_aplicada: window.adminLastDiscountRule || null
-    };
-
-    // Enviar solicitud AJAX
+    // ✅ ENVIAR DIRECTAMENTE LOS DATOS, NO COMO JSON
     const ajaxData = {
-        action: 'process_reservation',
+        action: 'process_reserva_rapida', // ✅ CAMBIAR A LA FUNCIÓN CORRECTA
         nonce: reservasAjax.nonce,
+        // Datos del cliente
         nombre: formData.get('nombre'),
         apellidos: formData.get('apellidos'),
         email: formData.get('email'),
         telefono: formData.get('telefono'),
-        reservation_data: JSON.stringify(reservationData)
+        // Datos del servicio
+        service_id: adminSelectedServiceId,
+        // Datos de personas
+        adultos: adultos,
+        residentes: residentes,
+        ninos_5_12: ninos_5_12,
+        ninos_menores: ninos_menores
     };
 
-    console.log('Datos a enviar:', ajaxData);
+    console.log('✅ Datos a enviar (RESERVA RÁPIDA):', ajaxData);
 
     fetch(reservasAjax.ajax_url, {
         method: 'POST',
@@ -5524,19 +5512,19 @@ function adminConfirmReservation() {
             confirmBtn.textContent = originalText;
 
             if (data && data.success) {
-                console.log('Reserva procesada exitosamente:', data.data);
+                console.log('✅ Reserva rápida procesada exitosamente:', data.data);
 
-                // Mostrar mensaje de éxito
-                const detalles = data.data.detalles;
-                const mensaje = "🎉 ¡RESERVA CREADA EXITOSAMENTE! 🎉\n\n" +
+                // Mostrar mensaje de éxito mejorado
+                const mensaje = "🎉 ¡RESERVA RÁPIDA CREADA EXITOSAMENTE! 🎉\n\n" +
                     "📋 LOCALIZADOR: " + data.data.localizador + "\n\n" +
                     "📅 DETALLES:\n" +
-                    "• Fecha: " + detalles.fecha + "\n" +
-                    "• Hora: " + detalles.hora + "\n" +
-                    "• Personas: " + detalles.personas + "\n" +
-                    "• Precio: " + detalles.precio_final + "€\n\n" +
-                    "✅ La reserva ha sido procesada correctamente.\n" +
-                    "📧 El cliente recibirá la confirmación por email.\n\n" +
+                    "• Fecha: " + data.data.detalles.fecha + "\n" +
+                    "• Hora: " + data.data.detalles.hora + "\n" +
+                    "• Personas: " + data.data.detalles.personas + "\n" +
+                    "• Precio: " + data.data.detalles.precio_final + "€\n\n" +
+                    "✅ La reserva ha sido procesada como RESERVA RÁPIDA.\n" +
+                    "📧 El cliente recibirá la confirmación por email.\n" +
+                    "👤 Procesada por: " + data.data.admin_user + "\n\n" +
                     "¡Reserva administrativa completada!";
 
                 alert(mensaje);
@@ -5547,13 +5535,13 @@ function adminConfirmReservation() {
                 }, 2000);
 
             } else {
-                console.error('Error procesando reserva:', data);
+                console.error('❌ Error procesando reserva rápida:', data);
                 const errorMsg = data && data.data ? data.data : 'Error desconocido';
-                alert('❌ Error procesando la reserva: ' + errorMsg);
+                alert('❌ Error procesando la reserva rápida: ' + errorMsg);
             }
         })
         .catch(error => {
-            console.error('Error de conexión:', error);
+            console.error('❌ Error de conexión:', error);
 
             // Rehabilitar botón
             confirmBtn.disabled = false;
