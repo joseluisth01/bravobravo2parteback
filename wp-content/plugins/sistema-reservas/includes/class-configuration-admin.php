@@ -246,6 +246,12 @@ class ReservasConfigurationAdmin
                 'config_group' => 'notificaciones',
                 'description' => 'Email donde se recibirán las notificaciones de nuevas reservas'
             ),
+            array(
+                'config_key' => 'email_visitas',
+                'config_value' => get_option('admin_email'),
+                'config_group' => 'notificaciones',
+                'description' => 'Email donde se recibirán las notificaciones de reservas de visitas guiadas'
+            ),
 
             // General
             array(
@@ -453,6 +459,16 @@ class ReservasConfigurationAdmin
                 }
                 $configs_to_save['email_reservas'] = $email_reservas;
             }
+
+            // ✅ NUEVO CAMPO: Email de visitas guiadas
+if (isset($_POST['email_visitas'])) {
+    $email_visitas = sanitize_email($_POST['email_visitas']);
+    if (empty($email_visitas) || !is_email($email_visitas)) {
+        wp_send_json_error('El email de visitas no es válido');
+        return;
+    }
+    $configs_to_save['email_visitas'] = $email_visitas;
+}
 
             // General
             if (isset($_POST['zona_horaria'])) {

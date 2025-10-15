@@ -1818,18 +1818,26 @@ function renderConfigurationForm(configs) {
                                style="background-color: #e8f5e8; border: 2px solid #28a745;">
                         <small style="color: #155724; font-weight: bold;">📧 ${configs.notificaciones?.email_reservas?.description || 'Email donde llegarán las notificaciones de nuevas reservas de clientes'}</small>
                     </div>
+                    <div class="config-item">
+    <label for="email_visitas">Email de Visitas Guiadas</label>
+    <input type="email" id="email_visitas" name="email_visitas" 
+           value="${configs.notificaciones?.email_visitas?.value || ''}"
+           style="background-color: #e8f5e8; border: 2px solid #28a745;">
+    <small style="color: #155724; font-weight: bold;">📧 ${configs.notificaciones?.email_visitas?.description || 'Email donde llegarán las notificaciones de reservas de visitas guiadas'}</small>
+</div>
                 </div>
                 
-                <!-- ✅ INFORMACIÓN ADICIONAL SOBRE EMAILS -->
-                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #2196f3;">
-                    <h4 style="margin-top: 0; color: #1565c0;">ℹ️ Información sobre Emails</h4>
-                    <ul style="margin: 0; padding-left: 20px; color: #1565c0;">
-                        <li><strong>Confirmaciones:</strong> Se envían automáticamente SIEMPRE al cliente tras cada reserva</li>
-                        <li><strong>Recordatorios:</strong> Se envían automáticamente según las horas configuradas</li>
-                        <li><strong>Notificaciones de reservas:</strong> Llegan al "Email de Reservas" cada vez que un cliente hace una reserva</li>
-                        <li><strong>Email Remitente:</strong> Es el email técnico desde el que se envían todos los correos</li>
-                    </ul>
-                </div>
+                <!-- ✅ INFORMACIÓN ADICIONAL SOBRE EMAILS ACTUALIZADA -->
+<div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #2196f3;">
+    <h4 style="margin-top: 0; color: #1565c0;">ℹ️ Información sobre Emails</h4>
+    <ul style="margin: 0; padding-left: 20px; color: #1565c0;">
+        <li><strong>Confirmaciones:</strong> Se envían automáticamente SIEMPRE al cliente tras cada reserva</li>
+        <li><strong>Recordatorios:</strong> Se envían automáticamente según las horas configuradas</li>
+        <li><strong>Email de Reservas:</strong> Recibe notificaciones de reservas de AUTOBÚS</li>
+        <li><strong>Email de Visitas:</strong> Recibe notificaciones de reservas de VISITAS GUIADAS</li>
+        <li><strong>Email Remitente:</strong> Es el email técnico desde el que se envían todos los correos</li>
+    </ul>
+</div>
             </div>
 
             <!-- Sección: Configuración General -->

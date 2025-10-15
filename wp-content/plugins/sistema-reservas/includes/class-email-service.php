@@ -284,38 +284,56 @@ private static function generate_ticket_pdf($reserva_data)
     }
 }
 
-    /**
-     * Enviar email de notificación al administrador (SIN PDF)
-     */
-    public static function send_admin_notification($reserva_data)
-    {
-        $config = self::get_email_config();
-
-        if (empty($config['email_reservas'])) {
-            error_log("❌ No hay email de reservas configurado");
-            return array('success' => false, 'message' => 'Email de reservas no configurado');
-        }
-
-        $to = $config['email_reservas'];
-        $subject = "Nueva Reserva Recibida - " . $reserva_data['localizador'];
-
-        $message = self::build_admin_email_template($reserva_data);
-
-        $headers = array(
-            'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $config['nombre_remitente'] . ' <' . $config['email_remitente'] . '>'
-        );
-
-        $sent = wp_mail($to, $subject, $message, $headers);
-
-        if ($sent) {
-            error_log("✅ Email enviado al email de reservas: " . $to);
-            return array('success' => true, 'message' => 'Email enviado al administrador correctamente');
-        } else {
-            error_log("❌ Error enviando email al email de reservas: " . $to);
-            return array('success' => false, 'message' => 'Error enviando email al administrador');
-        }
+private static function get_admin_email_by_service($reserva_data)
+{
+    $is_visita = isset($reserva_data['is_visita']) && $reserva_data['is_visita'] === true;
+    
+    if ($is_visita) {
+        return ReservasConfigurationAdmin::get_config('email_visitas', get_option('admin_email'));
+    } else {
+        return ReservasConfigurationAdmin::get_config('email_reservas', get_option('admin_email'));
     }
+}
+
+/**
+ * Enviar email de notificación al administrador (SIN PDF)
+ * ✅ ACTUALIZADO: Detecta tipo de servicio y envía al email correcto
+ */
+public static function send_admin_notification($reserva_data)
+{
+    $config = self::get_email_config();
+
+    // ✅ OBTENER EMAIL CORRECTO SEGÚN TIPO DE SERVICIO
+    $admin_email = self::get_admin_email_by_service($reserva_data);
+
+    if (empty($admin_email)) {
+        error_log("❌ No hay email configurado para este tipo de servicio");
+        return array('success' => false, 'message' => 'Email de notificaciones no configurado');
+    }
+
+    $is_visita = isset($reserva_data['is_visita']) && $reserva_data['is_visita'] === true;
+    $tipo_servicio = $is_visita ? 'Visita Guiada' : 'Autobús';
+
+    $to = $admin_email;
+    $subject = "Nueva Reserva Recibida ({$tipo_servicio}) - " . $reserva_data['localizador'];
+
+    $message = self::build_admin_email_template($reserva_data);
+
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: ' . $config['nombre_remitente'] . ' <' . $config['email_remitente'] . '>'
+    );
+
+    $sent = wp_mail($to, $subject, $message, $headers);
+
+    if ($sent) {
+        error_log("✅ Email enviado al administrador ({$tipo_servicio}): " . $to);
+        return array('success' => true, 'message' => 'Email enviado al administrador correctamente');
+    } else {
+        error_log("❌ Error enviando email al administrador ({$tipo_servicio}): " . $to);
+        return array('success' => false, 'message' => 'Error enviando email al administrador');
+    }
+}
 
 public static function send_reminder_email($reserva_data)
 {
@@ -365,21 +383,19 @@ public static function send_reminder_email($reserva_data)
     }
 }
 
-    /**
-     * Obtener configuración de email desde la base de datos
-     */
-    private static function get_email_config()
-    {
-        if (!class_exists('ReservasConfigurationAdmin')) {
-            require_once RESERVAS_PLUGIN_PATH . 'includes/class-configuration-admin.php';
-        }
-
-        return array(
-            'email_remitente' => ReservasConfigurationAdmin::get_config('email_remitente', get_option('admin_email')),
-            'nombre_remitente' => ReservasConfigurationAdmin::get_config('nombre_remitente', get_bloginfo('name')),
-            'email_reservas' => ReservasConfigurationAdmin::get_config('email_reservas', get_option('admin_email')),
-        );
+private static function get_email_config()
+{
+    if (!class_exists('ReservasConfigurationAdmin')) {
+        require_once RESERVAS_PLUGIN_PATH . 'includes/class-configuration-admin.php';
     }
+
+    return array(
+        'email_remitente' => ReservasConfigurationAdmin::get_config('email_remitente', get_option('admin_email')),
+        'nombre_remitente' => ReservasConfigurationAdmin::get_config('nombre_remitente', get_bloginfo('name')),
+        'email_reservas' => ReservasConfigurationAdmin::get_config('email_reservas', get_option('admin_email')),
+        'email_visitas' => ReservasConfigurationAdmin::get_config('email_visitas', get_option('admin_email')),
+    );
+}
 
 private static function build_customer_email_template($reserva)
 {
@@ -1020,35 +1036,35 @@ private static function build_customer_email_template($reserva)
     }
 
 
-    /**
-     * Enviar email al super_admin cuando un administrador hace una reserva rápida
-     */
-    public static function send_admin_agency_reservation_notification($reserva_data, $admin_user)
-    {
-        $config = self::get_email_config();
+public static function send_admin_agency_reservation_notification($reserva_data, $admin_user)
+{
+    $config = self::get_email_config();
 
-        // Obtener email del super_admin desde configuración
-        $superadmin_email = ReservasConfigurationAdmin::get_config('email_reservas', get_option('admin_email'));
+    // ✅ OBTENER EMAIL CORRECTO SEGÚN TIPO DE SERVICIO
+    $superadmin_email = self::get_admin_email_by_service($reserva_data);
 
-        $subject = "Reserva Rápida realizada por Administrador - " . $reserva_data['localizador'];
+    $is_visita = isset($reserva_data['is_visita']) && $reserva_data['is_visita'] === true;
+    $tipo_servicio = $is_visita ? 'Visita Guiada' : 'Autobús';
 
-        $message = self::build_admin_agency_notification_template($reserva_data, $admin_user);
+    $subject = "Reserva Rápida realizada por Administrador ({$tipo_servicio}) - " . $reserva_data['localizador'];
 
-        $headers = array(
-            'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $config['nombre_remitente'] . ' <' . $config['email_remitente'] . '>'
-        );
+    $message = self::build_admin_agency_notification_template($reserva_data, $admin_user);
 
-        $sent = wp_mail($superadmin_email, $subject, $message, $headers);
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: ' . $config['nombre_remitente'] . ' <' . $config['email_remitente'] . '>'
+    );
 
-        if ($sent) {
-            error_log("✅ Email de notificación enviado al super_admin sobre reserva de administrador");
-            return array('success' => true, 'message' => 'Email enviado al super_admin');
-        } else {
-            error_log("❌ Error enviando email al super_admin sobre reserva de administrador");
-            return array('success' => false, 'message' => 'Error enviando email al super_admin');
-        }
+    $sent = wp_mail($superadmin_email, $subject, $message, $headers);
+
+    if ($sent) {
+        error_log("✅ Email de notificación enviado al super_admin sobre reserva de administrador ({$tipo_servicio})");
+        return array('success' => true, 'message' => 'Email enviado al super_admin');
+    } else {
+        error_log("❌ Error enviando email al super_admin sobre reserva de administrador ({$tipo_servicio})");
+        return array('success' => false, 'message' => 'Error enviando email al super_admin');
     }
+}
 
     /**
      * Template de email para notificar al super_admin sobre reserva hecha por administrador
@@ -1240,34 +1256,35 @@ private static function build_customer_email_template($reserva)
     }
 
 
-    /**
-     * Enviar email de notificación cuando una agencia hace una reserva rápida
-     */
-    public static function send_agency_reservation_notification($reserva_data, $agency_user)
-    {
-        $config = self::get_email_config();
+ public static function send_agency_reservation_notification($reserva_data, $agency_user)
+{
+    $config = self::get_email_config();
 
-        // Email al super_admin
-        $superadmin_email = ReservasConfigurationAdmin::get_config('email_reservas', get_option('admin_email'));
-        $subject = "Reserva Rápida realizada por Agencia - " . $reserva_data['localizador'];
+    // ✅ OBTENER EMAIL CORRECTO SEGÚN TIPO DE SERVICIO
+    $superadmin_email = self::get_admin_email_by_service($reserva_data);
 
-        $message = self::build_agency_reservation_notification_template($reserva_data, $agency_user);
+    $is_visita = isset($reserva_data['is_visita']) && $reserva_data['is_visita'] === true;
+    $tipo_servicio = $is_visita ? 'Visita Guiada' : 'Autobús';
 
-        $headers = array(
-            'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $config['nombre_remitente'] . ' <' . $config['email_remitente'] . '>'
-        );
+    $subject = "Reserva Rápida realizada por Agencia ({$tipo_servicio}) - " . $reserva_data['localizador'];
 
-        $sent = wp_mail($superadmin_email, $subject, $message, $headers);
+    $message = self::build_agency_reservation_notification_template($reserva_data, $agency_user);
 
-        if ($sent) {
-            error_log("✅ Email enviado al super_admin sobre reserva de agencia");
-            return array('success' => true, 'message' => 'Email enviado al super_admin');
-        } else {
-            error_log("❌ Error enviando email al super_admin sobre reserva de agencia");
-            return array('success' => false, 'message' => 'Error enviando email al super_admin');
-        }
+    $headers = array(
+        'Content-Type: text/html; charset=UTF-8',
+        'From: ' . $config['nombre_remitente'] . ' <' . $config['email_remitente'] . '>'
+    );
+
+    $sent = wp_mail($superadmin_email, $subject, $message, $headers);
+
+    if ($sent) {
+        error_log("✅ Email enviado al super_admin sobre reserva de agencia ({$tipo_servicio})");
+        return array('success' => true, 'message' => 'Email enviado al super_admin');
+    } else {
+        error_log("❌ Error enviando email al super_admin sobre reserva de agencia ({$tipo_servicio})");
+        return array('success' => false, 'message' => 'Error enviando email al super_admin');
     }
+}
 
     /**
      * Enviar email a la propia agencia sobre su reserva
