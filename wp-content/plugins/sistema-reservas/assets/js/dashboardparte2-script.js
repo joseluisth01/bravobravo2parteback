@@ -441,6 +441,44 @@ function populateServiceForm(serviceData, isEdit) {
         console.log('ℹ️ No hay horarios disponibles en los datos');
     }
 
+    // ✅ CARGAR IDIOMAS
+if (serviceData.idiomas_disponibles) {
+    let idiomas;
+    
+    try {
+        if (typeof serviceData.idiomas_disponibles === 'string') {
+            idiomas = JSON.parse(serviceData.idiomas_disponibles);
+        } else {
+            idiomas = serviceData.idiomas_disponibles;
+        }
+        
+        console.log('✅ Idiomas parseados:', idiomas);
+    } catch (e) {
+        console.error('❌ Error parseando idiomas:', e);
+        idiomas = {};
+    }
+    
+    if (idiomas && typeof idiomas === 'object') {
+        Object.keys(idiomas).forEach(day => {
+            const idiomasDelDia = Array.isArray(idiomas[day]) ? idiomas[day] : [];
+            const prefix2 = isEdit ? 'edit-' : '';
+            
+            // Desmarcar todos primero
+            const idiomasCheckboxes = document.querySelectorAll(`#${prefix2}hours-${day} .idiomas-checkboxes input[type="checkbox"]`);
+            idiomasCheckboxes.forEach(cb => cb.checked = false);
+            
+            // Marcar los configurados
+            idiomasDelDia.forEach(idioma => {
+                const checkbox = document.querySelector(`#${prefix2}hours-${day} .idiomas-checkboxes input[value="${idioma}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    console.log(`✅ Idioma ${idioma} marcado para ${day}`);
+                }
+            });
+        });
+    }
+}
+
     if (serviceData.fechas_excluidas) {
     let fechas_excluidas;
     

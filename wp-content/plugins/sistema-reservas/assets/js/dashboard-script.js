@@ -6245,7 +6245,7 @@ function renderEditAgencyModal() {
                 <form id="editAgencyForm" enctype="multipart/form-data">
                     <input type="hidden" name="agency_id" id="edit_agency_id">
                     
-                    <!-- ✅ ESTADO MOVIDO AL PRINCIPIO CON DISEÑO LLAMATIVO -->
+                    <!-- Estado -->
                     <div class="form-section status-section">
                         <div class="form-group status-group">
                             <select name="status" id="edit_status" class="status-select">
@@ -6319,7 +6319,7 @@ function renderEditAgencyModal() {
                         </div>
                     </div>
 
-                    <!-- ✅ NUEVA SECCIÓN: SERVICIOS ADICIONALES -->
+                    <!-- Servicios Adicionales -->
                     <div class="form-section service-section">
                         <h4>🎫 Servicios Adicionales de la Agencia</h4>
                         
@@ -6333,271 +6333,19 @@ function renderEditAgencyModal() {
                             </p>
                         </div>
 
-                        <!-- Campos que se muestran cuando el servicio está activo -->
                         <div id="edit-service-fields-container" style="display: none;">
                             
-                            <!-- Días y Horarios disponibles CON FECHAS EXCLUIDAS -->
+                            <!-- Días y Horarios -->
                             <div class="form-group form-group-full">
                                 <label>Días y Horarios Disponibles *</label>
                                 <div class="days-hours-selector">
-                                    <!-- LUNES -->
-                                    <div class="day-hours-item">
-                                        <label class="day-checkbox">
-                                            <input type="checkbox" class="edit-day-checkbox" value="lunes" onchange="toggleDayHours(this, true)">
-                                            <span>Lunes</span>
-                                        </label>
-                                        <div class="hours-container" id="edit-hours-lunes" style="display: none;">
-                                            <div class="hours-list" data-day="lunes"></div>
-                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
-    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
-    <div class="idiomas-checkboxes" data-day="${day}">
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
-            <span>Español</span>
-        </label>
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
-            <span>Inglés</span>
-        </label>
-        <label>
-            <input type="checkbox" name="idiomas[${day}][]" value="frances">
-            <span>Francés</span>
-        </label>
-    </div>
-    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
-</div>
-                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('lunes', true)">+ Añadir horario</button>
-                                            
-                                            <div class="excluded-dates-section">
-                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
-                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                                                <div class="excluded-dates-list" data-day="lunes"></div>
-                                                <button type="button" class="btn-add-excluded-date" data-day="lunes">+ Añadir Fecha Excluida</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- MARTES -->
-                                    <div class="day-hours-item">
-                                        <label class="day-checkbox">
-                                            <input type="checkbox" class="edit-day-checkbox" value="martes" onchange="toggleDayHours(this, true)">
-                                            <span>Martes</span>
-                                        </label>
-                                        <div class="hours-container" id="edit-hours-martes" style="display: none;">
-                                            <div class="hours-list" data-day="martes"></div>
-                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
-    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
-    <div class="idiomas-checkboxes" data-day="${day}">
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
-            <span>Español</span>
-        </label>
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
-            <span>Inglés</span>
-        </label>
-        <label>
-            <input type="checkbox" name="idiomas[${day}][]" value="frances">
-            <span>Francés</span>
-        </label>
-    </div>
-    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
-</div>
-                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('martes', true)">+ Añadir horario</button>
-                                            
-                                            <div class="excluded-dates-section">
-                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
-                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                                                <div class="excluded-dates-list"></div>
-                                                <button type="button" class="btn-add-excluded-date-edit" data-day="martes">+ Añadir Fecha Excluida</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- MIÉRCOLES -->
-                                    <div class="day-hours-item">
-                                        <label class="day-checkbox">
-                                            <input type="checkbox" class="edit-day-checkbox" value="miercoles" onchange="toggleDayHours(this, true)">
-                                            <span>Miércoles</span>
-                                        </label>
-                                        <div class="hours-container" id="edit-hours-miercoles" style="display: none;">
-                                            <div class="hours-list" data-day="miercoles"></div>
-                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
-    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
-    <div class="idiomas-checkboxes" data-day="${day}">
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
-            <span>Español</span>
-        </label>
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
-            <span>Inglés</span>
-        </label>
-        <label>
-            <input type="checkbox" name="idiomas[${day}][]" value="frances">
-            <span>Francés</span>
-        </label>
-    </div>
-    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
-</div>
-                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('miercoles', true)">+ Añadir horario</button>
-                                            
-                                            <div class="excluded-dates-section">
-                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
-                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                                                <div class="excluded-dates-list"></div>
-                                                <button type="button" class="btn-add-excluded-date-edit" data-day="miercoles">+ Añadir Fecha Excluida</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- JUEVES -->
-                                    <div class="day-hours-item">
-                                        <label class="day-checkbox">
-                                            <input type="checkbox" class="edit-day-checkbox" value="jueves" onchange="toggleDayHours(this, true)">
-                                            <span>Jueves</span>
-                                        </label>
-                                        <div class="hours-container" id="edit-hours-jueves" style="display: none;">
-                                            <div class="hours-list" data-day="jueves"></div>
-                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
-    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
-    <div class="idiomas-checkboxes" data-day="${day}">
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
-            <span>Español</span>
-        </label>
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
-            <span>Inglés</span>
-        </label>
-        <label>
-            <input type="checkbox" name="idiomas[${day}][]" value="frances">
-            <span>Francés</span>
-        </label>
-    </div>
-    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
-</div>
-                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('jueves', true)">+ Añadir horario</button>
-                                            
-                                            <div class="excluded-dates-section">
-                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
-                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                                                <div class="excluded-dates-list"></div>
-                                                <button type="button" class="btn-add-excluded-date-edit" data-day="jueves">+ Añadir Fecha Excluida</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- VIERNES -->
-                                    <div class="day-hours-item">
-                                        <label class="day-checkbox">
-                                            <input type="checkbox" class="edit-day-checkbox" value="viernes" onchange="toggleDayHours(this, true)">
-                                            <span>Viernes</span>
-                                        </label>
-                                        <div class="hours-container" id="edit-hours-viernes" style="display: none;">
-                                            <div class="hours-list" data-day="viernes"></div>
-                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
-    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
-    <div class="idiomas-checkboxes" data-day="${day}">
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
-            <span>Español</span>
-        </label>
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
-            <span>Inglés</span>
-        </label>
-        <label>
-            <input type="checkbox" name="idiomas[${day}][]" value="frances">
-            <span>Francés</span>
-        </label>
-    </div>
-    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
-</div>
-                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('viernes', true)">+ Añadir horario</button>
-                                            
-                                            <div class="excluded-dates-section">
-                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
-                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                                                <div class="excluded-dates-list"></div>
-                                                <button type="button" class="btn-add-excluded-date-edit" data-day="viernes">+ Añadir Fecha Excluida</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- SÁBADO -->
-                                    <div class="day-hours-item">
-                                        <label class="day-checkbox">
-                                            <input type="checkbox" class="edit-day-checkbox" value="sabado" onchange="toggleDayHours(this, true)">
-                                            <span>Sábado</span>
-                                        </label>
-                                        <div class="hours-container" id="edit-hours-sabado" style="display: none;">
-                                            <div class="hours-list" data-day="sabado"></div>
-                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
-    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
-    <div class="idiomas-checkboxes" data-day="${day}">
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
-            <span>Español</span>
-        </label>
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
-            <span>Inglés</span>
-        </label>
-        <label>
-            <input type="checkbox" name="idiomas[${day}][]" value="frances">
-            <span>Francés</span>
-        </label>
-    </div>
-    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
-</div>
-                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('sabado', true)">+ Añadir horario</button>
-                                            
-                                            <div class="excluded-dates-section">
-                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
-                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                                                <div class="excluded-dates-list"></div>
-                                                <button type="button" class="btn-add-excluded-date-edit" data-day="sabado">+ Añadir Fecha Excluida</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- DOMINGO -->
-                                    <div class="day-hours-item">
-                                        <label class="day-checkbox">
-                                            <input type="checkbox" class="edit-day-checkbox" value="domingo" onchange="toggleDayHours(this, true)">
-                                            <span>Domingo</span>
-                                        </label>
-                                        <div class="hours-container" id="edit-hours-domingo" style="display: none;">
-                                            <div class="hours-list" data-day="domingo"></div>
-                                            <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
-    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
-    <div class="idiomas-checkboxes" data-day="${day}">
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
-            <span>Español</span>
-        </label>
-        <label style="margin-right: 15px;">
-            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
-            <span>Inglés</span>
-        </label>
-        <label>
-            <input type="checkbox" name="idiomas[${day}][]" value="frances">
-            <span>Francés</span>
-        </label>
-    </div>
-    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
-</div>
-                                            <button type="button" class="btn-add-hour" onclick="addHourSlot('domingo', true)">+ Añadir horario</button>
-                                            
-                                            <div class="excluded-dates-section">
-                                                <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
-                                                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                                                <div class="excluded-dates-list"></div>
-                                                <button type="button" class="btn-add-excluded-date-edit" data-day="domingo">+ Añadir Fecha Excluida</button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    ${renderDayHoursEdit('lunes')}
+                                    ${renderDayHoursEdit('martes')}
+                                    ${renderDayHoursEdit('miercoles')}
+                                    ${renderDayHoursEdit('jueves')}
+                                    ${renderDayHoursEdit('viernes')}
+                                    ${renderDayHoursEdit('sabado')}
+                                    ${renderDayHoursEdit('domingo')}
                                 </div>
                                 <small>Selecciona los días y añade los horarios específicos para cada día</small>
                             </div>
@@ -7074,6 +6822,56 @@ function closeCreateAgencyModal() {
  */
 function closeEditAgencyModal() {
     jQuery('#editAgencyModal').hide();
+}
+
+function renderDayHoursEdit(day) {
+    const dayLabel = {
+        'lunes': 'Lunes',
+        'martes': 'Martes',
+        'miercoles': 'Miércoles',
+        'jueves': 'Jueves',
+        'viernes': 'Viernes',
+        'sabado': 'Sábado',
+        'domingo': 'Domingo'
+    }[day];
+
+    return `
+        <div class="day-hours-item">
+            <label class="day-checkbox">
+                <input type="checkbox" class="edit-day-checkbox" value="${day}" onchange="toggleDayHours(this, true)">
+                <span>${dayLabel}</span>
+            </label>
+            <div class="hours-container" id="edit-hours-${day}" style="display: none;">
+                <div class="hours-list" data-day="${day}"></div>
+                <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
+                    <div class="idiomas-checkboxes" data-day="${day}">
+                        <label style="margin-right: 15px;">
+                            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+                            <span>Español</span>
+                        </label>
+                        <label style="margin-right: 15px;">
+                            <input type="checkbox" name="idiomas[${day}][]" value="ingles">
+                            <span>Inglés</span>
+                        </label>
+                        <label>
+                            <input type="checkbox" name="idiomas[${day}][]" value="frances">
+                            <span>Francés</span>
+                        </label>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
+                </div>
+                <button type="button" class="btn-add-hour" onclick="addHourSlot('${day}', true)">+ Añadir horario</button>
+                
+                <div class="excluded-dates-section">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                    <div class="excluded-dates-list"></div>
+                    <button type="button" class="btn-add-excluded-date-edit" data-day="${day}">+ Añadir Fecha Excluida</button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 /**
