@@ -97,48 +97,57 @@ function populateServicePage() {
     jQuery('#fecha-fin').text(fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1));
     jQuery('#hora-fin').text(horaFin);
 
-    // Después de mostrar los precios y antes de autorrellenar personas:
-
-// ✅ SELECTOR DE IDIOMA
-let idiomasHTML = '';
-if (serviceData.idiomas_disponibles) {
-    let idiomas = [];
-    try {
-        idiomas = typeof serviceData.idiomas_disponibles === 'string' 
-            ? JSON.parse(serviceData.idiomas_disponibles) 
-            : serviceData.idiomas_disponibles;
-    } catch(e) {
-        console.error('Error parseando idiomas:', e);
-    }
-    
-    // Obtener día de la semana de la fecha de reserva
-    const fechaObj = new Date(serviceData.fecha + 'T00:00:00');
-    const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-    const diaNombre = diasSemana[fechaObj.getDay()];
-    
-    const idiomasDisponibles = idiomas[diaNombre] || ['español'];
-    
-    if (idiomasDisponibles.length > 1) {
-        idiomasHTML = `
-            <div class="form-group" style="grid-column: 1 / -1;">
-                <label>IDIOMA DE LA VISITA *</label>
-                <select id="idioma-visita" class="person-input" required>
-                    ${idiomasDisponibles.map(idioma => `
-                        <option value="${idioma}">${idioma.charAt(0).toUpperCase() + idioma.slice(1)}</option>
-                    `).join('')}
-                </select>
-            </div>
-        `;
+    let idiomasHTML = '';
+    if (serviceData.idiomas_disponibles) {
+        let idiomas = [];
+        try {
+            idiomas = typeof serviceData.idiomas_disponibles === 'string' 
+                ? JSON.parse(serviceData.idiomas_disponibles) 
+                : serviceData.idiomas_disponibles;
+        } catch(e) {
+            console.error('Error parseando idiomas:', e);
+            idiomas = {};
+        }
+        
+        // Obtener día de la semana de la fecha de reserva
+        const fechaObj = new Date(serviceData.fecha + 'T00:00:00');
+        const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        const diaNombre = diasSemana[fechaObj.getDay()];
+        
+        console.log('Día de la semana:', diaNombre);
+        console.log('Idiomas configurados:', idiomas);
+        
+        const idiomasDisponibles = idiomas[diaNombre] || ['español'];
+        
+        console.log('Idiomas disponibles para', diaNombre, ':', idiomasDisponibles);
+        
+        if (idiomasDisponibles.length > 1) {
+            // Hay múltiples idiomas, mostrar selector
+            idiomasHTML = `
+                <div class="person-selector" style="margin-top: 15px;">
+                    <label style="font-weight: 600;">IDIOMA DE LA VISITA *</label>
+                    <select id="idioma-visita" class="person-input" required>
+                        ${idiomasDisponibles.map(idioma => `
+                            <option value="${idioma}">${idioma.charAt(0).toUpperCase() + idioma.slice(1)}</option>
+                        `).join('')}
+                    </select>
+                </div>
+            `;
+        } else {
+            // Solo un idioma, campo oculto
+            idiomasHTML = `
+                <input type="hidden" id="idioma-visita" value="${idiomasDisponibles[0]}">
+            `;
+        }
+        
+        console.log('✅ HTML de idiomas generado');
     } else {
-        // Solo un idioma disponible - campo oculto
-        idiomasHTML = `
-            <input type="hidden" id="idioma-visita" value="${idiomasDisponibles[0]}">
-        `;
+        // Si no hay idiomas configurados, poner español por defecto
+        idiomasHTML = `<input type="hidden" id="idioma-visita" value="español">`;
+        console.log('⚠️ No hay idiomas configurados, usando español por defecto');
     }
-}
 
-// Insertar el selector después de los inputs de personas
-jQuery('.person-selector').last().after(idiomasHTML);
+    jQuery('#idioma-selector-container').html(idiomasHTML);
 
     // Precios dinámicos desde el servicio
     const precioAdulto = parseFloat(serviceData.precio_adulto) || 0;
@@ -506,14 +515,14 @@ function downloadVisitaTicket() {
  */
 function viewVisitaTicket() {
     console.log('🎫 Solicitando ver comprobante de visita');
-    
+
     const localizador = window.visitaLocalizador;
-    
+
     if (!localizador) {
         alert('No se encontró el localizador de la visita. Por favor, revisa tu email.');
         return;
     }
-    
+
     showLoadingModal('Generando comprobante de visita...');
     generateAndViewVisitaPDF(localizador);
 }
@@ -523,14 +532,14 @@ function viewVisitaTicket() {
  */
 function downloadVisitaTicket() {
     console.log('⬇️ Solicitando descargar comprobante de visita');
-    
+
     const localizador = window.visitaLocalizador;
-    
+
     if (!localizador) {
         alert('No se encontró el localizador de la visita. Por favor, revisa tu email.');
         return;
     }
-    
+
     showLoadingModal('Preparando descarga...');
     generateAndDownloadVisitaPDF(localizador);
 }
@@ -541,7 +550,7 @@ function downloadVisitaTicket() {
 function generateAndViewVisitaPDF(localizador) {
     console.log('📋 Generando PDF de visita para visualización...');
     console.log('🔍 Localizador:', localizador);
-    
+
     jQuery.ajax({
         url: reservasVisitaAjax.ajax_url,
         type: 'POST',
@@ -550,15 +559,15 @@ function generateAndViewVisitaPDF(localizador) {
             localizador: localizador,
             nonce: reservasVisitaAjax.nonce
         },
-        success: function(response) {
+        success: function (response) {
             console.log('📡 Respuesta:', response);
             hideLoadingModal();
-            
+
             if (response.success && response.data.pdf_url) {
                 console.log('✅ PDF URL recibida:', response.data.pdf_url);
                 console.log('📁 Archivo existe:', response.data.file_exists);
                 console.log('📏 Tamaño:', response.data.file_size);
-                
+
                 // Abrir PDF en nueva ventana
                 window.open(response.data.pdf_url, '_blank');
             } else {
@@ -566,7 +575,7 @@ function generateAndViewVisitaPDF(localizador) {
                 alert('Error generando el comprobante: ' + (response.data || 'Error desconocido'));
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             hideLoadingModal();
             console.error('❌ Error AJAX:', error);
             console.error('Response:', xhr.responseText);
@@ -581,7 +590,7 @@ function generateAndViewVisitaPDF(localizador) {
 function generateAndDownloadVisitaPDF(localizador) {
     console.log('⬇️ Generando PDF de visita para descarga...');
     console.log('🔍 Localizador:', localizador);
-    
+
     jQuery.ajax({
         url: reservasVisitaAjax.ajax_url,
         type: 'POST',
@@ -590,15 +599,15 @@ function generateAndDownloadVisitaPDF(localizador) {
             localizador: localizador,
             nonce: reservasVisitaAjax.nonce
         },
-        success: function(response) {
+        success: function (response) {
             console.log('📡 Respuesta:', response);
             hideLoadingModal();
-            
+
             if (response.success && response.data.pdf_url) {
                 console.log('✅ PDF URL recibida:', response.data.pdf_url);
                 console.log('📁 Archivo existe:', response.data.file_exists);
                 console.log('📏 Tamaño:', response.data.file_size);
-                
+
                 // Crear enlace de descarga
                 const link = document.createElement('a');
                 link.href = response.data.pdf_url;
@@ -607,14 +616,14 @@ function generateAndDownloadVisitaPDF(localizador) {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                
+
                 console.log('✅ Descarga iniciada');
             } else {
                 console.error('❌ Error en respuesta:', response);
                 alert('Error preparando la descarga: ' + (response.data || 'Error desconocido'));
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             hideLoadingModal();
             console.error('❌ Error AJAX:', error);
             console.error('Response:', xhr.responseText);
@@ -643,7 +652,7 @@ function showLoadingModal(message) {
             justify-content: center;
             z-index: 10000;
         `;
-        
+
         const content = document.createElement('div');
         content.style.cssText = `
             background: white;
@@ -652,12 +661,12 @@ function showLoadingModal(message) {
             text-align: center;
             max-width: 300px;
         `;
-        
+
         content.innerHTML = `
             <div style="font-size: 24px; margin-bottom: 15px;">⏳</div>
             <div id="loading-message-visita" style="font-size: 16px; color: #333;">${message}</div>
         `;
-        
+
         modal.appendChild(content);
         document.body.appendChild(modal);
     } else {
