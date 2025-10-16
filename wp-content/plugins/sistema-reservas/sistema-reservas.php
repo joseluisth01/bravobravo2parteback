@@ -1304,6 +1304,29 @@ function confirmacion_reserva_shortcode()
             .service-image {
                 height: 200px;
             }
+
+                .confirmacion-container .action-buttons{
+        flex-direction: column;
+    }
+
+    .service-content{
+        padding: 20px !important;
+    }
+
+    .success-banner h1{
+        font-size: 30px !important;
+        margin:0px !important;
+    }
+
+    .horarios-boton23{
+        width: 100% !important;
+        padding: 20px !important;
+    }
+
+    .horarios-boton2{
+        width: 100% !important;
+        padding: 20px !important;
+    }
         }
 
         .success-banner {

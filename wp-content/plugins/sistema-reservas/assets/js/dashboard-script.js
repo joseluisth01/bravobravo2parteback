@@ -6847,7 +6847,7 @@ function renderDayHoursEdit(day) {
                     <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
                     <div class="idiomas-checkboxes" data-day="${day}">
                         <label style="margin-right: 15px;">
-                            <input type="checkbox" name="idiomas[${day}][]" value="español" checked>
+                            <input type="checkbox" name="idiomas[${day}][]" value="espanol" checked>
                             <span>Español</span>
                         </label>
                         <label style="margin-right: 15px;">
@@ -7354,12 +7354,17 @@ function collectIdiomasData() {
         if (idiomasCheckboxes.length > 0) {
             idiomas[day] = [];
             idiomasCheckboxes.forEach(input => {
-                idiomas[day].push(input.value);
+                // ✅ NORMALIZAR: Reemplazar español con espanol
+                let idioma = input.value;
+                if (idioma === 'español') {
+                    idioma = 'espanol';
+                }
+                idiomas[day].push(idioma);
             });
         }
     });
 
-    console.log('Idiomas recopilados:', idiomas);
+    console.log('Idiomas recopilados (normalizados):', idiomas);
     return idiomas;
 }
 

@@ -414,7 +414,7 @@ color: black;
 }
 
 /* === RESPONSIVE === */
-@media (max-width: 768px) {
+@media (max-width: 790px) {
     .reservas-booking-container {
         padding: 10px;
     }
@@ -441,6 +441,8 @@ color: black;
     .booking-navigation {
         padding: 0;
     }
+
+    
 }
 
 .details-summary{
@@ -635,6 +637,25 @@ color: black;
     
     .detail-row .value {
         text-align: left;
+    }
+
+        .confirmacion-container .action-buttons{
+        flex-direction: column !important;
+    }
+
+    .success-banner h1{
+        font-size: 30px !important;
+        margin:0px !important;
+    }
+
+    .horarios-boton23{
+        width: 100% !important;
+        padding: 20px !important;
+    }
+
+    .horarios-boton2{
+        width: 100% !important;
+        padding: 20px !important;
     }
 }
 

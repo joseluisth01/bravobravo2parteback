@@ -409,8 +409,22 @@ class ReservasPDFGenerator
         $pdf->Cell(30, 5, 'Idioma:', 0, 0, 'L');
         $pdf->SetFont('helvetica', '', 9);
 
+        // ✅ OBTENER IDIOMA REAL DE LOS DATOS DE RESERVA
         $idioma = isset($this->reserva_data['idioma']) ? ucfirst($this->reserva_data['idioma']) : 'Español';
-$pdf->Cell(40, 5, $idioma, 0, 1, 'L');
+
+        // ✅ MAPEAR VALORES DE BD A TEXTO LEGIBLE
+        $idiomas_map = array(
+            'espanol' => 'Español',
+            'ingles' => 'Inglés',
+            'frances' => 'Francés'
+        );
+
+        // Aplicar mapeo si existe
+        if (isset($idiomas_map[strtolower($idioma)])) {
+            $idioma = $idiomas_map[strtolower($idioma)];
+        }
+
+        $pdf->Cell(40, 5, $idioma, 0, 1, 'L');
 
         $pdf->SetFont('helvetica', 'B', 9);
         $pdf->SetX(15);
@@ -573,7 +587,23 @@ $pdf->Cell(40, 5, $idioma, 0, 1, 'L');
         $pdf->SetX(127);
         $pdf->Cell(25, 4, 'Idioma:', 0, 0, 'L');
         $pdf->SetFont('helvetica', '', 8);
-        $pdf->Cell(40, 4, 'Español', 0, 1, 'L');
+
+        // ✅ OBTENER IDIOMA REAL DE LOS DATOS DE RESERVA
+        $idioma = isset($this->reserva_data['idioma']) ? ucfirst($this->reserva_data['idioma']) : 'Español';
+
+        // ✅ MAPEAR VALORES DE BD A TEXTO LEGIBLE
+        $idiomas_map = array(
+            'espanol' => 'Español',
+            'ingles' => 'Inglés',
+            'frances' => 'Francés'
+        );
+
+        // Aplicar mapeo si existe
+        if (isset($idiomas_map[strtolower($idioma)])) {
+            $idioma = $idiomas_map[strtolower($idioma)];
+        }
+
+        $pdf->Cell(40, 4, $idioma, 0, 1, 'L');
 
         // ✅ TOTAL EN EL TALÓN - SOLO SI NO ES AGENCIA
         if (!$hide_prices) {

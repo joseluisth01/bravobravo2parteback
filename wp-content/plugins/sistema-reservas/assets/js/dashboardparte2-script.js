@@ -466,12 +466,19 @@ function populateServiceForm(serviceData, isEdit) {
                 const idiomasCheckboxes = document.querySelectorAll(`#${prefix2}hours-${day} .idiomas-checkboxes input[type="checkbox"]`);
                 idiomasCheckboxes.forEach(cb => cb.checked = false);
 
-                // Marcar los configurados
                 idiomasDelDia.forEach(idioma => {
-                    const checkbox = document.querySelector(`#${prefix2}hours-${day} .idiomas-checkboxes input[value="${idioma}"]`);
+                    // ✅ NORMALIZAR al buscar checkbox
+                    let idiomaValue = idioma;
+                    if (idioma === 'español') {
+                        idiomaValue = 'espanol';
+                    }
+
+                    const checkbox = document.querySelector(`#${prefix2}hours-${day} .idiomas-checkboxes input[value="${idiomaValue}"]`);
                     if (checkbox) {
                         checkbox.checked = true;
                         console.log(`✅ Idioma ${idioma} marcado para ${day}`);
+                    } else {
+                        console.warn(`⚠️ No se encontró checkbox para idioma ${idioma}`);
                     }
                 });
             });

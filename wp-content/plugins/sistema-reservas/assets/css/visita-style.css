@@ -20,7 +20,33 @@
     padding: 10px;
 }
 
-
+.idiomas-selector-visual {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .idioma-option {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border: 3px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .idioma-option:hover {
+        border-color: #EFCF4B;
+        background: #f0f8ff;
+        transform: translateY(-2px);
+    }
+    
+    .idioma-option.selected {
+        border-color: #DB7461;
+        background: #b7b7b752;
+    }
 
 .service-hero .back-btn{
     position: absolute;
@@ -354,4 +380,29 @@ display: flex
         width: 100%;
         padding: 15px 40px;
     }
+.containerdetalles{
+    padding: 20px !important;
+}
+
+.info-notes{
+    padding: 20px !important;
+    flex-direction: column;
+    gap: 20px !important;
+}
+
+.details-column-left{
+    flex-direction: column;
+    gap: 20px !important;
+}
+
+.details-column-left div{
+    width: 100% !important;
+}
+
+.person-selector{
+    justify-content: space-between !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+}
+
 }

@@ -85,10 +85,10 @@ public function render_detalles_visita()
         <!-- Detalles de compra (precios dinámicos) -->
         <div class="visita-details-section">
             <h2>DETALLES DE COMPRA DE VISITA GUIADA</h2>
-            <div style="padding:30px 60px;">
+            <div class="containerdetalles" style="padding:30px 60px;">
 
                 <div class="details-info-box">
-                    <div style="background-color:#DB7461; display:flex; align-items:center; justify-content: space-around">
+                    <div style="background-color:#DB7461; display:flex; align-items:center; justify-content: space-around; flex-wrap:wrap">
                         <div class="info-row adultos">
                             <span class="label">ADULTOS (MAYORES DE 12 AÑOS):</span>
                             <span class="price" id="precio-adulto-info">-€</span>

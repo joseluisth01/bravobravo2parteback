@@ -44,7 +44,7 @@ function loadServiceData() {
         if (serviceData.idiomas_disponibles) {
             console.log('🔍 idiomas_disponibles (tipo):', typeof serviceData.idiomas_disponibles);
             console.log('🔍 idiomas_disponibles (valor):', serviceData.idiomas_disponibles);
-            
+
             // Si es string, parsearlo
             if (typeof serviceData.idiomas_disponibles === 'string') {
                 try {
@@ -114,98 +114,133 @@ function populateServicePage() {
     jQuery('#fecha-fin').text(fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1));
     jQuery('#hora-fin').text(horaFin);
 
+    // ✅ NUEVA LÓGICA PARA IDIOMAS (CORREGIDA)
     let idiomasHTML = '';
-let idiomasDisponibles = ['español']; // ✅ ESPAÑOL SIEMPRE POR DEFECTO
+    let idiomasDisponibles = []; // ✅ CAMBIO: Empezar vacío, NO con español por defecto
 
-if (serviceData.idiomas_disponibles) {
-    let idiomas = {};
-    try {
-        idiomas = typeof serviceData.idiomas_disponibles === 'string' 
-            ? JSON.parse(serviceData.idiomas_disponibles) 
-            : serviceData.idiomas_disponibles;
-        
-        console.log('✅ Idiomas parseados:', idiomas);
-    } catch(e) {
-        console.error('❌ Error parseando idiomas:', e);
-        console.error('Dato recibido:', serviceData.idiomas_disponibles);
-        idiomas = {};
-    }
-    
-    // Obtener día de la semana de la fecha de reserva
-    const fechaObj = new Date(serviceData.fecha + 'T00:00:00');
-    const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-    const diaNombre = diasSemana[fechaObj.getDay()];
-    
-    console.log('📅 Día de la semana:', diaNombre);
-    console.log('🌍 Idiomas configurados completos:', idiomas);
-    
-    // ✅ VERIFICAR SI HAY IDIOMAS PARA ESTE DÍA
-    if (idiomas && typeof idiomas === 'object' && Object.keys(idiomas).length > 0) {
-        // Si hay idiomas configurados para este día específico
-        if (idiomas[diaNombre] && Array.isArray(idiomas[diaNombre]) && idiomas[diaNombre].length > 0) {
-            idiomasDisponibles = idiomas[diaNombre];
-            console.log('✅ Idiomas encontrados para', diaNombre, ':', idiomasDisponibles);
-        } else {
-            console.log('⚠️ No hay idiomas configurados para', diaNombre, ', usando español por defecto');
+    if (serviceData.idiomas_disponibles) {
+        let idiomas = {};
+        try {
+            idiomas = typeof serviceData.idiomas_disponibles === 'string'
+                ? JSON.parse(serviceData.idiomas_disponibles)
+                : serviceData.idiomas_disponibles;
+
+            console.log('✅ Idiomas parseados:', idiomas);
+        } catch (e) {
+            console.error('❌ Error parseando idiomas:', e);
+            idiomas = {};
         }
-    } else {
-        console.log('⚠️ No hay idiomas configurados en el servicio, usando español por defecto');
+
+        // Obtener día de la semana de la fecha de reserva
+        const diasSemana = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        const diaNombre = diasSemana[fechaObj.getDay()];
+
+        console.log('📅 Día de la semana:', diaNombre);
+        console.log('🌍 Idiomas configurados:', idiomas);
+
+        // ✅ OBTENER IDIOMAS SOLO DEL DÍA ESPECÍFICO
+        if (idiomas && typeof idiomas === 'object' && idiomas[diaNombre]) {
+            if (Array.isArray(idiomas[diaNombre]) && idiomas[diaNombre].length > 0) {
+                idiomasDisponibles = idiomas[diaNombre];
+                console.log('✅ Idiomas encontrados para', diaNombre, ':', idiomasDisponibles);
+            }
+        }
     }
-} else {
-    console.log('ℹ️ serviceData.idiomas_disponibles no existe, usando español por defecto');
-}
 
-// ✅ ASEGURAR QUE ESPAÑOL ESTÉ SIEMPRE INCLUIDO
-if (!idiomasDisponibles.includes('español')) {
-    idiomasDisponibles.unshift('español');
-    console.log('✅ Español añadido por defecto a la lista');
-}
+    // ✅ SI NO HAY IDIOMAS CONFIGURADOS, USAR ESPAÑOL POR DEFECTO
+    if (idiomasDisponibles.length === 0) {
+        idiomasDisponibles = ['espanol'];
+        console.log('⚠️ No hay idiomas configurados, usando español por defecto');
+    }
 
-console.log('🎯 Idiomas finales a mostrar:', idiomasDisponibles);
+    console.log('🎯 Idiomas finales a mostrar:', idiomasDisponibles);
 
-// ✅ GENERAR HTML DEL SELECTOR
-if (idiomasDisponibles.length > 1) {
-    // Hay múltiples idiomas, mostrar selector
-    idiomasHTML = `
+    const idiomasConfig = {
+        'espanol': {
+            label: 'Español',
+            flag: 'https://flagcdn.com/h20/es.png'
+        },
+        'ingles': {
+            label: 'Inglés',
+            flag: 'https://flagcdn.com/h20/gb.png'
+        },
+        'frances': {
+            label: 'Francés',
+            flag: 'https://flagcdn.com/h20/fr.png'
+        }
+    };
+
+    // ✅ GENERAR HTML DEL SELECTOR CON BANDERAS
+    if (idiomasDisponibles.length === 1) {
+        // Solo hay un idioma: mostrar solo la bandera (sin selector)
+        const idioma = idiomasDisponibles[0];
+        const config = idiomasConfig[idioma] || { label: idioma, flag: '🏳️' };
+
+        idiomasHTML = `
         <div class="person-selector" style="margin-top: 15px;">
-            <label style="font-weight: 600;">IDIOMA DE LA VISITA *</label>
-            <select id="idioma-visita" class="person-input" required>
-                ${idiomasDisponibles.map(idioma => `
-                    <option value="${idioma}">${idioma.charAt(0).toUpperCase() + idioma.slice(1)}</option>
-                `).join('')}
-            </select>
+        <label style="font-weight: 600;">IDIOMA DE LA VISITA *</label>
+        <div class="idiomas-selector-visual">
+            ${idiomasDisponibles.map((idioma, index) => {
+            const config = idiomasConfig[idioma] || { label: idioma, flag: '' };
+            return `
+                    <label class="idioma-option ${index === 0 ? 'selected' : ''}" data-idioma="${idioma}">
+                        <input type="radio" name="idioma-visita" value="${idioma}" ${index === 0 ? 'checked' : ''} required style="display:none;">
+                        <img src="${config.flag}" alt="${config.label}" style="width: 32px; height: 20px; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        <span style="font-size: 14px; font-weight: 600; margin-left: 8px;">${config.label}</span>
+                    </label>
+                `;
+        }).join('')}
         </div>
+        <input type="hidden" id="idioma-visita" value="${idiomasDisponibles[0]}">
+    </div>
     `;
-    console.log('✅ Selector de idiomas generado con', idiomasDisponibles.length, 'opciones');
-} else {
-    // Solo español disponible, campo oculto
-    idiomasHTML = `
-        <input type="hidden" id="idioma-visita" value="español">
+        console.log('✅ Idioma único mostrado:', idioma);
+    } else {
+        // Múltiples idiomas: selector con banderas
+        idiomasHTML = `
+        <div class="person-selector" style="margin-top: 15px;">
+        <label style="font-weight: 600;">IDIOMA DE LA VISITA *</label>
+        <div class="idiomas-selector-visual">
+            ${idiomasDisponibles.map((idioma, index) => {
+            const config = idiomasConfig[idioma] || { label: idioma, flag: '' };
+            return `
+                    <label class="idioma-option ${index === 0 ? 'selected' : ''}" data-idioma="${idioma}">
+                        <input type="radio" name="idioma-visita" value="${idioma}" ${index === 0 ? 'checked' : ''} required style="display:none;">
+                        <img src="${config.flag}" alt="${config.label}" style="width: 32px; height: 20px; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                        <span style="font-size: 14px; font-weight: 600; margin-left: 8px;">${config.label}</span>
+                    </label>
+                `;
+        }).join('')}
+        </div>
+        <input type="hidden" id="idioma-visita" value="${idiomasDisponibles[0]}">
+    </div>
     `;
-    console.log('✅ Solo español disponible, campo oculto creado');
-}
+        console.log('✅ Selector de idiomas generado con', idiomasDisponibles.length, 'opciones');
+    }
 
-jQuery('#idioma-selector-container').html(idiomasHTML);
-console.log('✅ HTML de idiomas insertado en el DOM');
+    jQuery('#idioma-selector-container').html(idiomasHTML);
+
+    // Event listener para el selector visual
+    jQuery('.idioma-option').on('click', function () {
+        jQuery('.idioma-option').removeClass('selected');
+        jQuery(this).addClass('selected');
+        jQuery(this).find('input[type="radio"]').prop('checked', true);
+        jQuery('#idioma-visita').val(jQuery(this).data('idioma'));
+    });
+    console.log('✅ HTML de idiomas insertado en el DOM');
 
     // Precios dinámicos desde el servicio
     const precioAdulto = parseFloat(serviceData.precio_adulto) || 0;
     const precioNino = parseFloat(serviceData.precio_nino) || 0;
     const precioNinoMenor = parseFloat(serviceData.precio_nino_menor) || 0;
 
-    console.log('Precios cargados del servicio:');
-    console.log('- Precio adulto:', precioAdulto);
-    console.log('- Precio niño (5-12):', precioNino);
-    console.log('- Precio niño menor (<5):', precioNinoMenor);
-
-    // Mostrar precios en la sección de información
     jQuery('#precio-adulto-info').text(precioAdulto.toFixed(0) + '€');
     jQuery('#precio-nino-info').text(precioNino.toFixed(0) + '€');
     jQuery('#precio-nino-menor-info').text(precioNinoMenor.toFixed(0) + '€');
 
     console.log('✅ Página rellenada correctamente');
 
-    // ✅ LLAMAR AL AUTORELLENO DE PERSONAS
+    // ✅ LLAMAR AL AUTORELLENO
     autoFillPersonasFromBusReservation();
 }
 
@@ -725,7 +760,7 @@ function hideLoadingModal() {
 }
 
 // ✅ FUNCIÓN DE DEBUG - ELIMINAR DESPUÉS DE RESOLVER
-window.debugServiceData = function() {
+window.debugServiceData = function () {
     console.log('=== DEBUG COMPLETO ===');
     console.log('serviceData completo:', JSON.stringify(serviceData, null, 2));
     console.log('idiomas_disponibles raw:', serviceData.idiomas_disponibles);
@@ -733,7 +768,7 @@ window.debugServiceData = function() {
     console.log('Es NULL?:', serviceData.idiomas_disponibles === null);
     console.log('Es undefined?:', serviceData.idiomas_disponibles === undefined);
     console.log('Es string vacío?:', serviceData.idiomas_disponibles === '');
-    
+
     const container = jQuery('#idioma-selector-container');
     console.log('Contenedor existe?:', container.length > 0);
     console.log('HTML del contenedor:', container.html());
