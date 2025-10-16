@@ -518,26 +518,29 @@ class ReservasAgencyServicesAdmin
         }
 
         if ($service) {
-            $response_data = array(
-                'id' => $service->id,
-                'agency_id' => $service->agency_id,
-                'servicio_activo' => intval($service->servicio_activo),
-                'horarios_disponibles' => $service->horarios_disponibles ?? '{}',
-                'precio_adulto' => floatval($service->precio_adulto ?? 0),
-                'precio_nino' => floatval($service->precio_nino ?? 0),
-                'precio_nino_menor' => floatval($service->precio_nino_menor ?? 0),
-                'logo_url' => $service->logo_url ?? '',
-                'portada_url' => $service->portada_url ?? '',
-                'descripcion' => $service->descripcion ?? '',
-                'titulo' => $service->titulo ?? '',
-                'orden_prioridad' => intval($service->orden_prioridad ?? 999),
-                'created_at' => $service->created_at,
-                'updated_at' => $service->updated_at
-            );
+        $response_data = array(
+            'id' => $service->id,
+            'agency_id' => $service->agency_id,
+            'servicio_activo' => intval($service->servicio_activo),
+            'horarios_disponibles' => $service->horarios_disponibles ?? '{}',
+            'idiomas_disponibles' => $service->idiomas_disponibles ?? '{}',  // ✅ AÑADIR
+            'fechas_excluidas' => $service->fechas_excluidas ?? '{}',      // ✅ AÑADIR
+            'precio_adulto' => floatval($service->precio_adulto ?? 0),
+            'precio_nino' => floatval($service->precio_nino ?? 0),
+            'precio_nino_menor' => floatval($service->precio_nino_menor ?? 0),
+            'logo_url' => $service->logo_url ?? '',
+            'portada_url' => $service->portada_url ?? '',
+            'descripcion' => $service->descripcion ?? '',
+            'titulo' => $service->titulo ?? '',
+            'orden_prioridad' => intval($service->orden_prioridad ?? 999),
+            'created_at' => $service->created_at,
+            'updated_at' => $service->updated_at
+        );
 
-            error_log('✅ Servicio encontrado para agency_id ' . $agency_id);
-            wp_send_json_success($response_data);
-        } else {
+        error_log('✅ Servicio encontrado para agency_id ' . $agency_id);
+        error_log('Datos enviados: ' . print_r($response_data, true)); // ✅ Debug
+        wp_send_json_success($response_data);
+    } else {
             error_log('ℹ️ No hay servicio configurado para agency_id ' . $agency_id);
 
             wp_send_json_success(array(
