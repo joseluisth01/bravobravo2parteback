@@ -1562,16 +1562,29 @@ function confirmacion_reserva_shortcode()
         }
 
         function renderAvailableServices(services) {
-            if (!services || services.length === 0) {
-                console.log('No hay servicios para mostrar');
-                return;
-            }
+    if (!services || services.length === 0) {
+        console.log('No hay servicios para mostrar');
+        return;
+    }
 
-            // Separar servicio destacado (prioridad 1) del resto
-            const destacado = services.find(s => parseInt(s.orden_prioridad) === 1);
-            const otros = services.filter(s => parseInt(s.orden_prioridad) !== 1);
+    // ✅ GUARDAR SERVICIOS GLOBALMENTE
+    window.availableServices = services;
+    console.log('✅ Servicios guardados globalmente:', window.availableServices.length);
 
-            let servicesHtml = `
+    // ✅ DEBUG: Ver idiomas de cada servicio
+    services.forEach((s, i) => {
+        console.log(`Servicio ${i+1} ID ${s.id}:`, {
+            nombre: s.agency_name,
+            idiomas_disponibles: s.idiomas_disponibles,
+            tipo: typeof s.idiomas_disponibles
+        });
+    });
+
+    // Separar servicio destacado (prioridad 1) del resto
+    const destacado = services.find(s => parseInt(s.orden_prioridad) === 1);
+    const otros = services.filter(s => parseInt(s.orden_prioridad) !== 1);
+
+    let servicesHtml = `
         <div class="additional-services-section container">
             <h2 class="horarios-titulo">Reserva aquí tu visita guiada a Medina Azahara</h2>
             <p class="services-subtitle">
@@ -1583,9 +1596,9 @@ function confirmacion_reserva_shortcode()
             </p>
     `;
 
-            // Si hay servicio destacado (prioridad 1) - GRANDE ARRIBA
-            if (destacado) {
-                servicesHtml += `
+    // Si hay servicio destacado (prioridad 1)
+    if (destacado) {
+        servicesHtml += `
             <div class="service-card service-card-destacado" style="grid-column: 1 / -1; margin-bottom: 30px;" data-service-id="${destacado.id}">
                 ${destacado.portada_url ? `
                     <div class="service-image" style="height: 250px;">
@@ -1606,14 +1619,14 @@ function confirmacion_reserva_shortcode()
                 </div>
             </div>
         `;
-            }
+    }
 
-            // Otros servicios (grid de 3 columnas)
-            if (otros.length > 0) {
-                servicesHtml += `<div class="services-grid">`;
+    // Otros servicios (grid)
+    if (otros.length > 0) {
+        servicesHtml += `<div class="services-grid">`;
 
-                otros.forEach(service => {
-                    servicesHtml += `
+        otros.forEach(service => {
+            servicesHtml += `
                 <div class="service-card" data-service-id="${service.id}">
                     ${service.portada_url ? `
                         <div class="service-image">
@@ -1634,81 +1647,128 @@ function confirmacion_reserva_shortcode()
                     </div>
                 </div>
             `;
-                });
+        });
 
-                servicesHtml += `</div>`;
-            }
+        servicesHtml += `</div>`;
+    }
 
-            servicesHtml += `</div>`;
+    servicesHtml += `</div>`;
 
-            // Guardar los servicios en una variable global para acceder después
-            window.availableServices = services;
-
-            // Insertar después del contenedor principal
-            const mainContainer = document.querySelector('.confirmacion-container.container');
-            if (mainContainer) {
-                mainContainer.insertAdjacentHTML('afterend', servicesHtml);
-            }
-        }
+    // Insertar HTML
+    const mainContainer = document.querySelector('.confirmacion-container.container');
+    if (mainContainer) {
+        mainContainer.insertAdjacentHTML('afterend', servicesHtml);
+        console.log('✅ HTML de servicios insertado');
+    } else {
+        console.error('❌ No se encontró .confirmacion-container');
+    }
+}
 
         function selectService(serviceId) {
-            console.log('Servicio seleccionado ID:', serviceId);
+    console.log('=== SELECT SERVICE ===');
+    console.log('ID recibido:', serviceId);
+    console.log('window.availableServices existe?:', typeof window.availableServices !== 'undefined');
+    console.log('Total servicios disponibles:', window.availableServices ? window.availableServices.length : 0);
 
-            const service = window.availableServices.find(s => parseInt(s.id) === parseInt(serviceId));
+    if (!window.availableServices || window.availableServices.length === 0) {
+        console.error('❌ No hay servicios disponibles');
+        alert('Error: No se encontraron servicios disponibles');
+        return;
+    }
 
-            if (!service) {
-                alert('Error: No se encontraron datos del servicio');
-                return;
-            }
+    const service = window.availableServices.find(s => parseInt(s.id) === parseInt(serviceId));
 
-            console.log('Datos del servicio completos:', service);
+    if (!service) {
+        console.error('❌ No se encontró el servicio con ID:', serviceId);
+        alert('Error: No se encontraron datos del servicio');
+        return;
+    }
 
-            const serviceData = {
-                id: service.id,
-                agency_id: service.agency_id,
-                agency_name: service.agency_name,
-                titulo: service.titulo || service.agency_name,
-                descripcion: service.descripcion || '',
-                portada_url: service.portada_url || '',
-                logo_url: service.logo_url || '',
-                precio_adulto: parseFloat(service.precio_adulto),
-                precio_nino: parseFloat(service.precio_nino),
-                precio_nino_menor: parseFloat(service.precio_nino_menor), // ✅ AÑADIR ESTA LÍNEA
-                fecha: reservationData.detalles.fecha,
-                hora: reservationData.detalles.hora,
-                email: service.email,
-                phone: service.phone
-            };
+    console.log('✅ Servicio encontrado:', service);
+    console.log('✅ Idiomas del servicio:', service.idiomas_disponibles);
+    console.log('✅ Tipo de idiomas:', typeof service.idiomas_disponibles);
 
-            console.log('Guardando datos en sessionStorage:', serviceData);
-            sessionStorage.setItem('selectedServiceData', JSON.stringify(serviceData));
+    // ✅ PREPARAR idiomas_disponibles CORRECTAMENTE
+    let idiomasDisponibles = service.idiomas_disponibles;
 
-            // ✅ CONSTRUIR URL RELATIVA CORRECTAMENTE
-            const currentPath = window.location.pathname;
-            let targetUrl;
-
-            // Si estamos en un subdirectorio (como /bravobravo2parte/)
-            if (currentPath.includes('/')) {
-                const pathParts = currentPath.split('/').filter(part => part !== '');
-
-                // Si hay al menos una parte en la ruta (subdirectorio)
-                if (pathParts.length > 0 && pathParts[0] !== 'detalles-reserva-visita') {
-                    // Usar el primer segmento como base
-                    targetUrl = window.location.origin + '/' + pathParts[0] + '/detalles-reserva-visita/';
-                } else {
-                    // Estamos en la raíz
-                    targetUrl = window.location.origin + '/detalles-reserva-visita/';
-                }
-            } else {
-                // Estamos en la raíz
-                targetUrl = window.location.origin + '/detalles-reserva-visita/';
-            }
-
-            console.log('Redirigiendo a:', targetUrl);
-
-            // Redirigir a la página de detalles
-            window.location.href = targetUrl;
+    // Si es NULL, undefined o vacío, usar objeto vacío
+    if (!idiomasDisponibles || idiomasDisponibles === 'null' || idiomasDisponibles === '') {
+        console.log('⚠️ Idiomas NULL/undefined/vacío, usando objeto vacío');
+        idiomasDisponibles = '{}';
+    } 
+    // Si es string, mantenerlo así (ya viene como JSON string de la BD)
+    else if (typeof idiomasDisponibles === 'string') {
+        console.log('✅ Idiomas ya es string JSON:', idiomasDisponibles);
+        // Intentar parsearlo para validar que es JSON válido
+        try {
+            JSON.parse(idiomasDisponibles);
+            console.log('✅ String JSON válido');
+        } catch(e) {
+            console.error('❌ String JSON inválido, usando objeto vacío');
+            idiomasDisponibles = '{}';
         }
+    }
+    // Si es objeto, convertirlo a string
+    else if (typeof idiomasDisponibles === 'object') {
+        console.log('✅ Idiomas es objeto, convirtiendo a string');
+        idiomasDisponibles = JSON.stringify(idiomasDisponibles);
+    }
+
+    console.log('💾 Idiomas final a guardar:', idiomasDisponibles);
+
+    const serviceData = {
+        id: service.id,
+        agency_id: service.agency_id,
+        agency_name: service.agency_name,
+        titulo: service.titulo || service.agency_name,
+        descripcion: service.descripcion || '',
+        portada_url: service.portada_url || '',
+        logo_url: service.logo_url || '',
+        precio_adulto: parseFloat(service.precio_adulto),
+        precio_nino: parseFloat(service.precio_nino),
+        precio_nino_menor: parseFloat(service.precio_nino_menor),
+        idiomas_disponibles: idiomasDisponibles, // ✅ AHORA SIEMPRE TIENE VALOR
+        fecha: reservationData.detalles.fecha,
+        hora: reservationData.detalles.hora,
+        email: service.email,
+        phone: service.phone
+    };
+
+    console.log('💾 Objeto serviceData completo:', serviceData);
+    console.log('💾 Stringify del objeto:', JSON.stringify(serviceData));
+
+    // Guardar en sessionStorage
+    sessionStorage.setItem('selectedServiceData', JSON.stringify(serviceData));
+    console.log('✅ Datos guardados en sessionStorage');
+
+    // ✅ VERIFICAR inmediatamente que se guardó
+    const verificacion = sessionStorage.getItem('selectedServiceData');
+    console.log('✅ Verificación inmediata:', verificacion);
+    
+    if (verificacion) {
+        const parsed = JSON.parse(verificacion);
+        console.log('✅ Verificación parseada:', parsed);
+        console.log('✅ Idiomas en verificación:', parsed.idiomas_disponibles);
+    }
+
+    // ✅ CONSTRUIR URL
+    const currentPath = window.location.pathname;
+    let targetUrl;
+
+    if (currentPath.includes('/')) {
+        const pathParts = currentPath.split('/').filter(part => part !== '');
+        if (pathParts.length > 0 && pathParts[0] !== 'detalles-reserva-visita') {
+            targetUrl = window.location.origin + '/' + pathParts[0] + '/detalles-reserva-visita/';
+        } else {
+            targetUrl = window.location.origin + '/detalles-reserva-visita/';
+        }
+    } else {
+        targetUrl = window.location.origin + '/detalles-reserva-visita/';
+    }
+
+    console.log('🔄 Redirigiendo a:', targetUrl);
+    window.location.href = targetUrl;
+}
 
         function contactService(email, phone, agencyName) {
             // En lugar de alert, redirigir a la página de detalles

@@ -240,8 +240,11 @@ class ReservasAgencyServicesAdmin
             $data['dias_disponibles'] = implode(',', $dias_disponibles);
             $data['horarios_disponibles'] = json_encode($horarios_json);
 
+            // ✅ PROCESAR IDIOMAS
             $idiomas_data = array();
             if (isset($_POST['idiomas']) && is_array($_POST['idiomas'])) {
+                error_log('📝 Procesando idiomas recibidos: ' . print_r($_POST['idiomas'], true));
+
                 foreach ($_POST['idiomas'] as $dia => $idiomas) {
                     if (!empty($idiomas) && is_array($idiomas)) {
                         $idiomas_validos = array_filter($idiomas, function ($idioma) {
@@ -250,12 +253,17 @@ class ReservasAgencyServicesAdmin
 
                         if (!empty($idiomas_validos)) {
                             $idiomas_data[$dia] = array_values($idiomas_validos);
+                            error_log("✅ Idiomas válidos para $dia: " . implode(', ', $idiomas_validos));
                         }
                     }
                 }
+
+                error_log('📋 Idiomas finales procesados: ' . print_r($idiomas_data, true));
             }
 
+            // ✅ SIEMPRE GUARDAR, INCLUSO SI ESTÁ VACÍO (NULL)
             $data['idiomas_disponibles'] = !empty($idiomas_data) ? json_encode($idiomas_data) : null;
+            error_log('💾 Guardando en BD - idiomas_disponibles: ' . ($data['idiomas_disponibles'] ?? 'NULL'));
 
             $fechas_excluidas = array();
             if (isset($_POST['fechas_excluidas']) && !empty($_POST['fechas_excluidas'])) {
@@ -346,38 +354,35 @@ class ReservasAgencyServicesAdmin
         }
     }
 
-    /**
-     * Obtener servicios disponibles para una fecha y hora específica
-     */
     public static function get_available_services($fecha, $hora)
-    {
-        error_log('=== GET AVAILABLE SERVICES ===');
-        error_log('Fecha: ' . $fecha);
-        error_log('Hora: ' . $hora);
+{
+    error_log('=== GET AVAILABLE SERVICES ===');
+    error_log('Fecha: ' . $fecha);
+    error_log('Hora: ' . $hora);
 
-        global $wpdb;
-        $table_services = $wpdb->prefix . 'reservas_agency_services';
-        $table_agencies = $wpdb->prefix . 'reservas_agencies';
+    global $wpdb;
+    $table_services = $wpdb->prefix . 'reservas_agency_services';
+    $table_agencies = $wpdb->prefix . 'reservas_agencies';
 
-        // Obtener día de la semana en español
-        $fecha_obj = new DateTime($fecha);
-        $dia_numero = $fecha_obj->format('N'); // 1 (lunes) a 7 (domingo)
+    // Obtener día de la semana en español
+    $fecha_obj = new DateTime($fecha);
+    $dia_numero = $fecha_obj->format('N'); // 1 (lunes) a 7 (domingo)
 
-        $dias_semana = [
-            1 => 'lunes',
-            2 => 'martes',
-            3 => 'miercoles',
-            4 => 'jueves',
-            5 => 'viernes',
-            6 => 'sabado',
-            7 => 'domingo'
-        ];
+    $dias_semana = [
+        1 => 'lunes',
+        2 => 'martes',
+        3 => 'miercoles',
+        4 => 'jueves',
+        5 => 'viernes',
+        6 => 'sabado',
+        7 => 'domingo'
+    ];
 
-        $dia_nombre = $dias_semana[$dia_numero];
-        error_log('Día de la semana: ' . $dia_nombre);
+    $dia_nombre = $dias_semana[$dia_numero];
+    error_log('Día de la semana: ' . $dia_nombre);
 
-        // Obtener todos los servicios activos
-        $services = $wpdb->get_results("
+    // Obtener todos los servicios activos
+    $services = $wpdb->get_results("
         SELECT s.*, a.agency_name, a.contact_person, a.email, a.phone
         FROM $table_services s
         INNER JOIN $table_agencies a ON s.agency_id = a.id
@@ -386,145 +391,143 @@ class ReservasAgencyServicesAdmin
         ORDER BY s.orden_prioridad ASC, s.created_at ASC
     ");
 
-        error_log('Total servicios activos: ' . count($services));
+    error_log('Total servicios activos: ' . count($services));
 
-        $available_services = array();
+    $available_services = array();
 
-        foreach ($services as $service) {
-            // Verificar si el servicio está disponible este día
-            $dias_disponibles = explode(',', $service->dias_disponibles);
+    foreach ($services as $service) {
+        // ✅ DEBUG DE IDIOMAS
+        error_log('🔍 Servicio ID ' . $service->id . ' - Idiomas en BD: ' . ($service->idiomas_disponibles ?? 'NULL'));
+        
+        // Verificar si el servicio está disponible este día
+        $dias_disponibles = explode(',', $service->dias_disponibles);
 
-            if (!in_array($dia_nombre, $dias_disponibles)) {
-                continue;
-            }
+        if (!in_array($dia_nombre, $dias_disponibles)) {
+            continue;
+        }
 
-            // ✅ VERIFICAR FECHAS EXCLUIDAS
-            if (!empty($service->fechas_excluidas)) {
-                $fechas_excluidas = json_decode($service->fechas_excluidas, true);
+        // Verificar fechas excluidas
+        if (!empty($service->fechas_excluidas)) {
+            $fechas_excluidas = json_decode($service->fechas_excluidas, true);
 
-                if (isset($fechas_excluidas[$dia_nombre]) && is_array($fechas_excluidas[$dia_nombre])) {
-                    // Verificar si la fecha actual está en las fechas excluidas para este día
-                    if (in_array($fecha, $fechas_excluidas[$dia_nombre])) {
-                        error_log('❌ Servicio excluido para esta fecha: ' . $service->agency_name . ' - ' . $fecha);
-                        continue; // Saltar este servicio para esta fecha específica
-                    }
+            if (isset($fechas_excluidas[$dia_nombre]) && is_array($fechas_excluidas[$dia_nombre])) {
+                if (in_array($fecha, $fechas_excluidas[$dia_nombre])) {
+                    error_log('❌ Servicio excluido para esta fecha: ' . $service->agency_name . ' - ' . $fecha);
+                    continue;
                 }
-            }
-
-            // Verificar horarios
-            $horarios = json_decode($service->horarios_disponibles, true);
-
-            if (!isset($horarios[$dia_nombre])) {
-                continue;
-            }
-
-            // Verificar si la hora coincide con algún horario disponible
-            $hora_coincide = false;
-            foreach ($horarios[$dia_nombre] as $horario_disponible) {
-                // Comparar solo HH:MM (ignorar segundos)
-                $hora_reserva = substr($hora, 0, 5);
-                $hora_servicio = substr($horario_disponible, 0, 5);
-
-                if ($hora_reserva === $hora_servicio) {
-                    $hora_coincide = true;
-                    break;
-                }
-            }
-
-            if ($hora_coincide) {
-                $available_services[] = $service;
-                error_log('✅ Servicio disponible: ' . $service->agency_name);
             }
         }
 
-        error_log('Total servicios disponibles: ' . count($available_services));
+        // Verificar horarios
+        $horarios = json_decode($service->horarios_disponibles, true);
 
-        return $available_services;
+        if (!isset($horarios[$dia_nombre])) {
+            continue;
+        }
+
+        // Verificar si la hora coincide
+        $hora_coincide = false;
+        foreach ($horarios[$dia_nombre] as $horario_disponible) {
+            $hora_reserva = substr($hora, 0, 5);
+            $hora_servicio = substr($horario_disponible, 0, 5);
+
+            if ($hora_reserva === $hora_servicio) {
+                $hora_coincide = true;
+                break;
+            }
+        }
+
+        if ($hora_coincide) {
+            // ✅ ASEGURAR QUE idiomas_disponibles NO ES NULL
+            if ($service->idiomas_disponibles === null || empty($service->idiomas_disponibles)) {
+                error_log('⚠️ Idiomas NULL para servicio ID ' . $service->id . ', estableciendo objeto vacío');
+                $service->idiomas_disponibles = '{}';
+            }
+            
+            error_log('✅ Servicio disponible: ' . $service->agency_name . ' (Idiomas: ' . $service->idiomas_disponibles . ')');
+            $available_services[] = $service;
+        }
     }
 
-    /**
-     * Obtener servicio de una agencia (SIN DEPENDENCIA DE WP ADMIN)
-     */
+    error_log('Total servicios disponibles: ' . count($available_services));
+
+    return $available_services;
+}
+
     public function get_agency_service()
-    {
-        error_log('=== GET AGENCY SERVICE START ===');
+{
+    error_log('=== GET AGENCY SERVICE START ===');
 
-        // ✅ INICIAR SESIÓN SI NO ESTÁ ACTIVA
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+    // ✅ INICIAR SESIÓN SI NO ESTÁ ACTIVA
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-        // ✅ VERIFICAR NONCE
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
-            error_log('❌ Nonce inválido');
-            wp_send_json_error('Error de seguridad');
-            return;
-        }
+    // ✅ VERIFICAR NONCE
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+        error_log('❌ Nonce inválido');
+        wp_send_json_error('Error de seguridad');
+        return;
+    }
 
-        // ✅ VERIFICAR SESIÓN DE RESERVAS (NO DE WORDPRESS)
-        if (!isset($_SESSION['reservas_user'])) {
-            error_log('❌ No hay sesión de reservas activa');
-            error_log('Session ID: ' . session_id());
-            error_log('Session data: ' . print_r($_SESSION, true));
-            wp_send_json_error('Sesión expirada. Por favor, recarga la página.');
-            return;
-        }
+    // ✅ VERIFICAR SESIÓN DE RESERVAS (NO DE WORDPRESS)
+    if (!isset($_SESSION['reservas_user'])) {
+        error_log('❌ No hay sesión de reservas activa');
+        wp_send_json_error('Sesión expirada. Por favor, recarga la página.');
+        return;
+    }
 
-        $user = $_SESSION['reservas_user'];
+    $user = $_SESSION['reservas_user'];
 
-        // ✅ VERIFICAR PERMISOS DEL SISTEMA DE RESERVAS (NO DE WP)
-        if (!isset($user['role']) || $user['role'] !== 'super_admin') {
-            error_log('❌ Usuario sin permisos en sistema de reservas');
-            error_log('Role actual: ' . ($user['role'] ?? 'sin rol'));
-            wp_send_json_error('Sin permisos para gestionar servicios');
-            return;
-        }
+    // ✅ VERIFICAR PERMISOS DEL SISTEMA DE RESERVAS (NO DE WP)
+    if (!isset($user['role']) || $user['role'] !== 'super_admin') {
+        error_log('❌ Usuario sin permisos en sistema de reservas');
+        wp_send_json_error('Sin permisos para gestionar servicios');
+        return;
+    }
 
-        error_log('✅ Usuario verificado: ' . $user['username'] . ' (Role: ' . $user['role'] . ')');
+    if (!isset($_POST['agency_id'])) {
+        wp_send_json_error('ID de agencia no proporcionado');
+        return;
+    }
 
-        if (!isset($_POST['agency_id'])) {
-            wp_send_json_error('ID de agencia no proporcionado');
-            return;
-        }
+    $agency_id = intval($_POST['agency_id']);
 
-        $agency_id = intval($_POST['agency_id']);
+    if ($agency_id <= 0) {
+        wp_send_json_error('ID de agencia inválido');
+        return;
+    }
 
-        if ($agency_id <= 0) {
-            wp_send_json_error('ID de agencia inválido');
-            return;
-        }
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'reservas_agency_services';
 
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'reservas_agency_services';
+    $service = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $table_name WHERE agency_id = %d",
+        $agency_id
+    ));
 
-        // Verificar que la tabla existe
-        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
+    if ($wpdb->last_error) {
+        error_log('❌ Error en query: ' . $wpdb->last_error);
+        wp_send_json_error('Error de base de datos');
+        return;
+    }
 
-        if (!$table_exists) {
-            error_log('❌ Tabla no existe: ' . $table_name);
-            wp_send_json_error('Error de configuración de base de datos');
-            return;
-        }
-
-        $service = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM $table_name WHERE agency_id = %d",
-            $agency_id
-        ));
-
-        if ($wpdb->last_error) {
-            error_log('❌ Error en query: ' . $wpdb->last_error);
-            wp_send_json_error('Error de base de datos');
-            return;
-        }
-
-        if ($service) {
+    if ($service) {
+        // ✅ LOGGING PARA DEBUG
+        error_log('📋 Servicio encontrado en BD:');
+        error_log('- ID: ' . $service->id);
+        error_log('- Agency ID: ' . $service->agency_id);
+        error_log('- Horarios (raw): ' . $service->horarios_disponibles);
+        error_log('- Idiomas (raw): ' . ($service->idiomas_disponibles ?? 'NULL'));
+        error_log('- Fechas excluidas (raw): ' . ($service->fechas_excluidas ?? 'NULL'));
+        
         $response_data = array(
             'id' => $service->id,
             'agency_id' => $service->agency_id,
             'servicio_activo' => intval($service->servicio_activo),
             'horarios_disponibles' => $service->horarios_disponibles ?? '{}',
-            'idiomas_disponibles' => $service->idiomas_disponibles ?? '{}',  // ✅ AÑADIR
-            'fechas_excluidas' => $service->fechas_excluidas ?? '{}',      // ✅ AÑADIR
+            'idiomas_disponibles' => $service->idiomas_disponibles ?? '{}', // ✅ CRÍTICO: No debe ser NULL
+            'fechas_excluidas' => $service->fechas_excluidas ?? '{}',
             'precio_adulto' => floatval($service->precio_adulto ?? 0),
             'precio_nino' => floatval($service->precio_nino ?? 0),
             'precio_nino_menor' => floatval($service->precio_nino_menor ?? 0),
@@ -537,26 +540,31 @@ class ReservasAgencyServicesAdmin
             'updated_at' => $service->updated_at
         );
 
+        // ✅ LOGGING DE LO QUE SE ENVÍA
+        error_log('📤 Datos que se envían al frontend:');
+        error_log('- Idiomas enviados: ' . $response_data['idiomas_disponibles']);
         error_log('✅ Servicio encontrado para agency_id ' . $agency_id);
-        error_log('Datos enviados: ' . print_r($response_data, true)); // ✅ Debug
+        
         wp_send_json_success($response_data);
     } else {
-            error_log('ℹ️ No hay servicio configurado para agency_id ' . $agency_id);
+        error_log('ℹ️ No hay servicio configurado para agency_id ' . $agency_id);
 
-            wp_send_json_success(array(
-                'servicio_activo' => 0,
-                'horarios_disponibles' => '{}',
-                'precio_adulto' => 0,
-                'precio_nino' => 0,
-                'precio_nino_menor' => 0,
-                'logo_url' => '',
-                'portada_url' => '',
-                'descripcion' => '',
-                'titulo' => '',
-                'orden_prioridad' => 999
-            ));
-        }
+        wp_send_json_success(array(
+            'servicio_activo' => 0,
+            'horarios_disponibles' => '{}',
+            'idiomas_disponibles' => '{}', // ✅ NO NULL
+            'fechas_excluidas' => '{}',
+            'precio_adulto' => 0,
+            'precio_nino' => 0,
+            'precio_nino_menor' => 0,
+            'logo_url' => '',
+            'portada_url' => '',
+            'descripcion' => '',
+            'titulo' => '',
+            'orden_prioridad' => 999
+        ));
     }
+}
 
     /**
      * Manejar subida de imágenes
