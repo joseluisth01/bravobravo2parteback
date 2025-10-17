@@ -27,6 +27,26 @@ jQuery(document).ready(function ($) {
 function loadServiceData() {
     console.log('=== CARGANDO DATOS DEL SERVICIO ===');
 
+    // ✅ GUARDAR LOCALIZADOR EN sessionStorage SI VIENE DE confirmacion-reserva
+    const urlParams = new URLSearchParams(window.location.search);
+    const localizadorFromReferrer = urlParams.get('localizador');
+
+    if (localizadorFromReferrer) {
+        sessionStorage.setItem('current_localizador', localizadorFromReferrer);
+        console.log('✅ Localizador guardado:', localizadorFromReferrer);
+    } else {
+        // Intentar obtener de document.referrer si viene de confirmacion-reserva
+        const referrer = document.referrer;
+        if (referrer.includes('confirmacion-reserva')) {
+            const referrerUrl = new URL(referrer);
+            const locFromReferrer = referrerUrl.searchParams.get('localizador');
+            if (locFromReferrer) {
+                sessionStorage.setItem('current_localizador', locFromReferrer);
+                console.log('✅ Localizador guardado desde referrer:', locFromReferrer);
+            }
+        }
+    }
+
     try {
         const dataString = sessionStorage.getItem('selectedServiceData');
 
@@ -178,7 +198,7 @@ function populateServicePage() {
 
         idiomasHTML = `
         <div class="person-selector" style="margin-top: 15px;">
-        <label style="font-weight: 600;">IDIOMA DE LA VISITA *</label>
+        <label style="font-weight: 600;">IDIOMA DE LA VISITA</label>
         <div class="idiomas-selector-visual">
             ${idiomasDisponibles.map((idioma, index) => {
             const config = idiomasConfig[idioma] || { label: idioma, flag: '' };
@@ -199,7 +219,7 @@ function populateServicePage() {
         // Múltiples idiomas: selector con banderas
         idiomasHTML = `
         <div class="person-selector" style="margin-top: 15px;">
-        <label style="font-weight: 600;">IDIOMA DE LA VISITA *</label>
+        <label style="font-weight: 600;">IDIOMA DE LA VISITA</label>
         <div class="idiomas-selector-visual">
             ${idiomasDisponibles.map((idioma, index) => {
             const config = idiomasConfig[idioma] || { label: idioma, flag: '' };
@@ -511,30 +531,63 @@ function loadConfirmationData() {
  * Volver a servicios
  */
 function goBackToServices() {
-    sessionStorage.removeItem('selectedServiceData');
+    console.log('=== VOLVIENDO A SERVICIOS ===');
+    
+    // ✅ OBTENER LOCALIZADOR DE MÚLTIPLES FUENTES
+    let localizador = null;
+    
+    // Primero intentar desde URL
+    const urlParams = new URLSearchParams(window.location.search);
+    localizador = urlParams.get('localizador');
+    
+    if (!localizador) {
+        // Intentar desde sessionStorage
+        localizador = sessionStorage.getItem('current_localizador');
+    }
+    
+    if (!localizador) {
+        // Intentar desde datos del servicio
+        try {
+            const serviceDataString = sessionStorage.getItem('selectedServiceData');
+            if (serviceDataString) {
+                const serviceData = JSON.parse(serviceDataString);
+                // Puede que esté guardado ahí
+                localizador = serviceData.localizador;
+            }
+        } catch (error) {
+            console.error('Error obteniendo localizador:', error);
+        }
+    }
 
-    // ✅ CONSTRUIR URL RELATIVA CORRECTAMENTE
+    console.log('Localizador encontrado:', localizador);
+
+    // ✅ CONSTRUIR URL CON LOCALIZADOR
     const currentPath = window.location.pathname;
     let targetUrl;
 
-    // Si estamos en un subdirectorio
     if (currentPath.includes('/')) {
         const pathParts = currentPath.split('/').filter(part => part !== '');
-
-        // Si hay al menos una parte en la ruta (subdirectorio)
+        
         if (pathParts.length > 0 && pathParts[0] !== 'confirmacion-reserva') {
-            // Usar el primer segmento como base
             targetUrl = window.location.origin + '/' + pathParts[0] + '/confirmacion-reserva/';
         } else {
-            // Estamos en la raíz
             targetUrl = window.location.origin + '/confirmacion-reserva/';
         }
     } else {
-        // Estamos en la raíz
         targetUrl = window.location.origin + '/confirmacion-reserva/';
     }
+    
+    // ✅ AÑADIR LOCALIZADOR A LA URL
+    if (localizador) {
+        targetUrl += '?localizador=' + localizador;
+        console.log('✅ Redirigiendo con localizador:', targetUrl);
+    } else {
+        console.warn('⚠️ No se encontró localizador');
+        alert('No se pudo encontrar los datos de tu reserva. Por favor, revisa tu email.');
+        return;
+    }
 
-    console.log('Volviendo a:', targetUrl);
+    // ✅ IMPORTANTE: Forzar recarga completa de la página
     window.location.href = targetUrl;
 }
 

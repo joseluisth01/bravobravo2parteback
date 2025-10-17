@@ -527,96 +527,95 @@ class ReservasPDFGenerator
         }
     }
 
-    /**
-     * Sección del talón (parte desprendible) - sin cambios
-     */
     private function generate_stub_section($pdf, $hide_prices = false)
-    {
-        $y_start = 95;
+{
+    $y_start = 95;
 
-        // ✅ DETECTAR SI ES VISITA GUIADA
-        $is_visita = isset($this->reserva_data['is_visita']) && $this->reserva_data['is_visita'] === true;
+    // ✅ DETECTAR SI ES VISITA GUIADA
+    $is_visita = isset($this->reserva_data['is_visita']) && $this->reserva_data['is_visita'] === true;
 
-        // MARCO DEL TALÓN (lado derecho)
-        $pdf->Rect(125, $y_start, 70, 55);
+    // MARCO DEL TALÓN (lado derecho)
+    $pdf->Rect(125, $y_start, 70, 55);
 
-        // LOCALIZADOR GRANDE EN EL TALÓN
-        $pdf->SetFont('helvetica', 'B', 10);
-        $pdf->SetXY(127, $y_start + 5);
-        $pdf->Cell(66, 6, 'Localizador/Localizer:', 0, 1, 'C');
+    // LOCALIZADOR GRANDE EN EL TALÓN
+    $pdf->SetFont('helvetica', 'B', 10);
+    $pdf->SetXY(127, $y_start + 5);
+    $pdf->Cell(66, 6, 'Localizador/Localizer:', 0, 1, 'C');
 
-        $pdf->SetFont('helvetica', 'B', 16);
-        $pdf->SetX(127);
-        $pdf->Cell(66, 8, $this->reserva_data['localizador'], 0, 1, 'C');
+    $pdf->SetFont('helvetica', 'B', 16);
+    $pdf->SetX(127);
+    $pdf->Cell(66, 8, $this->reserva_data['localizador'], 0, 1, 'C');
 
-        // INFORMACIÓN DEL TALÓN
-        $pdf->SetFont('helvetica', 'B', 8);
-        $pdf->SetXY(127, $y_start + 20);
-        $pdf->Cell(25, 4, 'Fecha Compra:', 0, 0, 'L');
-        $pdf->SetFont('helvetica', '', 8);
-        $pdf->Cell(40, 4, $this->format_date($this->reserva_data['created_at'] ?? date('Y-m-d')), 0, 1, 'L');
+    // INFORMACIÓN DEL TALÓN
+    $pdf->SetFont('helvetica', 'B', 8);
+    $pdf->SetXY(127, $y_start + 20);
+    $pdf->Cell(25, 4, 'Fecha Compra:', 0, 0, 'L');
+    $pdf->SetFont('helvetica', '', 8);
+    $pdf->Cell(40, 4, $this->format_date($this->reserva_data['created_at'] ?? date('Y-m-d')), 0, 1, 'L');
 
-        $pdf->SetFont('helvetica', 'B', 8);
-        $pdf->SetX(127);
-        $pdf->Cell(25, 4, 'Producto:', 0, 0, 'L');
-        $pdf->SetFont('helvetica', '', 7);
-        $pdf->SetX(152);
+    $pdf->SetFont('helvetica', 'B', 8);
+    $pdf->SetX(127);
+    $pdf->Cell(25, 4, 'Producto:', 0, 0, 'L');
+    $pdf->SetFont('helvetica', '', 7);
+    $pdf->SetX(152);
 
-        // ✅ PRODUCTO EN TALÓN - CAMBIAR SEGÚN TIPO
-        if ($is_visita) {
-            // Para visitas: solo hora de inicio
-            $pdf->MultiCell(40, 3, 'Visita Guiada Medina Azahara (' . substr($this->reserva_data['hora'], 0, 5) . ' hrs)', 0, 'L');
-        } else {
-            // Para autobús: hora de ida y vuelta
-            $pdf->MultiCell(40, 3, 'TAQ BUS Madinat Al-Zahra + Lanzadera (' . substr($this->reserva_data['hora'], 0, 5) . ' / ' . substr($this->reserva_data['hora_vuelta'] ?? '', 0, 5) . ' hrs)', 0, 'L');
-        }
-
-        $pdf->SetFont('helvetica', 'B', 8);
-        $pdf->SetXY(127, $y_start + 30);
-        $pdf->Cell(25, 4, 'Fecha Visita:', 0, 0, 'L');
-        $pdf->SetFont('helvetica', '', 8);
-        $pdf->Cell(40, 4, $this->format_date($this->reserva_data['fecha']), 0, 1, 'L');
-
-        $pdf->SetFont('helvetica', 'B', 8);
-        $pdf->SetX(127);
-        $pdf->Cell(25, 4, 'Hora de Salida:', 0, 0, 'L');
-        $pdf->SetFont('helvetica', '', 8);
-        $pdf->Cell(40, 4, substr($this->reserva_data['hora'], 0, 5) . ' hrs', 0, 1, 'L');
-
-        $pdf->SetFont('helvetica', 'B', 8);
-        $pdf->SetX(127);
-        $pdf->Cell(25, 4, 'Idioma:', 0, 0, 'L');
-        $pdf->SetFont('helvetica', '', 8);
-
-        // ✅ OBTENER IDIOMA REAL DE LOS DATOS DE RESERVA
-        $idioma = isset($this->reserva_data['idioma']) ? ucfirst($this->reserva_data['idioma']) : 'Español';
-
-        // ✅ MAPEAR VALORES DE BD A TEXTO LEGIBLE
-        $idiomas_map = array(
-            'espanol' => 'Español',
-            'ingles' => 'Inglés',
-            'frances' => 'Francés'
-        );
-
-        // Aplicar mapeo si existe
-        if (isset($idiomas_map[strtolower($idioma)])) {
-            $idioma = $idiomas_map[strtolower($idioma)];
-        }
-
-        $pdf->Cell(40, 4, $idioma, 0, 1, 'L');
-
-        // ✅ TOTAL EN EL TALÓN - SOLO SI NO ES AGENCIA
-        if (!$hide_prices) {
-            $pdf->SetFont('helvetica', 'B', 11);
-            $pdf->SetXY(127, $y_start + 48);
-            $pdf->Cell(66, 6, 'Total: ' . number_format($this->reserva_data['precio_final'], 2) . ' €', 0, 0, 'C');
-        } else {
-            // ✅ PARA AGENCIAS: MOSTRAR "RESERVA CONFIRMADA"
-            $pdf->SetFont('helvetica', 'B', 10);
-            $pdf->SetXY(127, $y_start + 48);
-            $pdf->Cell(66, 6, 'RESERVA CONFIRMADA', 0, 0, 'C');
-        }
+    // ✅ PRODUCTO EN TALÓN - CAMBIAR SEGÚN TIPO
+    if ($is_visita) {
+        $pdf->MultiCell(40, 3, 'Visita Guiada Medina Azahara (' . substr($this->reserva_data['hora'], 0, 5) . ' hrs)', 0, 'L');
+    } else {
+        $pdf->MultiCell(40, 3, 'TAQ BUS Madinat Al-Zahra + Lanzadera (' . substr($this->reserva_data['hora'], 0, 5) . ' / ' . substr($this->reserva_data['hora_vuelta'] ?? '', 0, 5) . ' hrs)', 0, 'L');
     }
+
+    $pdf->SetFont('helvetica', 'B', 8);
+    $pdf->SetXY(127, $y_start + 30);
+    $pdf->Cell(25, 4, 'Fecha Visita:', 0, 0, 'L');
+    $pdf->SetFont('helvetica', '', 8);
+    $pdf->Cell(40, 4, $this->format_date($this->reserva_data['fecha']), 0, 1, 'L');
+
+    $pdf->SetFont('helvetica', 'B', 8);
+    $pdf->SetX(127);
+    $pdf->Cell(25, 4, 'Hora de Salida:', 0, 0, 'L');
+    $pdf->SetFont('helvetica', '', 8);
+    $pdf->Cell(40, 4, substr($this->reserva_data['hora'], 0, 5) . ' hrs', 0, 1, 'L');
+
+    $pdf->SetFont('helvetica', 'B', 8);
+    $pdf->SetX(127);
+    $pdf->Cell(25, 4, 'Idioma:', 0, 0, 'L');
+    $pdf->SetFont('helvetica', '', 8);
+
+    // ✅ OBTENER IDIOMA REAL DE LOS DATOS DE RESERVA
+    $idioma = isset($this->reserva_data['idioma']) && !empty($this->reserva_data['idioma']) 
+        ? $this->reserva_data['idioma'] 
+        : 'espanol';
+
+    // ✅ MAPEAR VALORES DE BD A TEXTO LEGIBLE
+    $idiomas_map = array(
+        'espanol' => 'Español',
+        'ingles' => 'Inglés',
+        'frances' => 'Francés'
+    );
+
+    // Aplicar mapeo
+    $idioma_display = isset($idiomas_map[strtolower($idioma)]) 
+        ? $idiomas_map[strtolower($idioma)] 
+        : ucfirst($idioma);
+
+    error_log('🌍 PDF - Idioma en datos: ' . ($this->reserva_data['idioma'] ?? 'NULL'));
+    error_log('🌍 PDF - Idioma a mostrar: ' . $idioma_display);
+
+    $pdf->Cell(40, 4, $idioma_display, 0, 1, 'L');
+
+    // ✅ TOTAL EN EL TALÓN - SOLO SI NO ES AGENCIA
+    if (!$hide_prices) {
+        $pdf->SetFont('helvetica', 'B', 11);
+        $pdf->SetXY(127, $y_start + 48);
+        $pdf->Cell(66, 6, 'Total: ' . number_format($this->reserva_data['precio_final'], 2) . ' €', 0, 0, 'C');
+    } else {
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->SetXY(127, $y_start + 48);
+        $pdf->Cell(66, 6, 'RESERVA CONFIRMADA', 0, 0, 'C');
+    }
+}
 
     /**
      * Sección de condiciones de compra - CORREGIDO PARA VISITAS

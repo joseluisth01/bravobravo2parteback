@@ -742,6 +742,14 @@ class SistemaReservas
             error_log('✅ Columna enabled añadida a tabla de servicios');
         }
 
+        $table_visitas = $wpdb->prefix . 'reservas_visitas';
+        $idioma_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_visitas LIKE 'idioma'");
+
+        if (empty($idioma_exists)) {
+            $wpdb->query("ALTER TABLE $table_visitas ADD COLUMN idioma VARCHAR(50) DEFAULT 'espanol' AFTER total_personas");
+            error_log('✅ Columna idioma añadida a tabla de visitas');
+        }
+
         // ✅ VERIFICAR Y AÑADIR CAMPOS DE DESCUENTO ESPECÍFICO POR SERVICIO
         $descuento_tipo_exists = $wpdb->get_results("SHOW COLUMNS FROM $table_servicios LIKE 'descuento_tipo'");
 
@@ -1305,28 +1313,28 @@ function confirmacion_reserva_shortcode()
                 height: 200px;
             }
 
-                .confirmacion-container .action-buttons{
-        flex-direction: column;
-    }
+            .confirmacion-container .action-buttons {
+                flex-direction: column;
+            }
 
-    .service-content{
-        padding: 20px !important;
-    }
+            .service-content {
+                padding: 20px !important;
+            }
 
-    .success-banner h1{
-        font-size: 30px !important;
-        margin:0px !important;
-    }
+            .success-banner h1 {
+                font-size: 30px !important;
+                margin: 0px !important;
+            }
 
-    .horarios-boton23{
-        width: 100% !important;
-        padding: 20px !important;
-    }
+            .horarios-boton23 {
+                width: 100% !important;
+                padding: 20px !important;
+            }
 
-    .horarios-boton2{
-        width: 100% !important;
-        padding: 20px !important;
-    }
+            .horarios-boton2 {
+                width: 100% !important;
+                padding: 20px !important;
+            }
         }
 
         .success-banner {
@@ -1537,24 +1545,54 @@ function confirmacion_reserva_shortcode()
         let reservationData = null;
         const ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
-        // ✅ CARGAR DATOS AL INICIAR LA PÁGINA - VERSIÓN CORREGIDA
+        // ✅ MEJORAR LA CARGA INICIAL
         window.addEventListener('DOMContentLoaded', function() {
             console.log('=== PÁGINA DE CONFIRMACIÓN CARGADA ===');
+
+            // Primero cargar los datos de la reserva
             loadReservationData();
+
+            // ✅ ESPERAR A QUE SE CARGUEN LOS DATOS ANTES DE CARGAR SERVICIOS
+            const checkReservationData = setInterval(function() {
+                if (reservationData && reservationData.detalles) {
+                    console.log('✅ Datos de reserva disponibles, cargando servicios...');
+                    clearInterval(checkReservationData);
+                    loadAvailableServices();
+                }
+            }, 100); // Revisar cada 100ms
+
+            // ✅ TIMEOUT DE SEGURIDAD: Si después de 5 segundos no hay datos, intentar cargar servicios igual
+            setTimeout(function() {
+                if (!reservationData || !reservationData.detalles) {
+                    console.warn('⚠️ Timeout esperando datos de reserva, intentando cargar servicios de todas formas');
+                    clearInterval(checkReservationData);
+
+                    // Intentar obtener datos de la URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const localizador = urlParams.get('localizador');
+
+                    if (localizador) {
+                        console.log('🔄 Reintentando carga de datos con localizador:', localizador);
+                        loadReservationData();
+                    }
+                }
+            }, 5000);
         });
 
         function goBackInicio() {
             window.location.href = '<?php echo home_url('/'); ?>';
         }
 
-        // Dentro del <script> del shortcode, después de loadReservationData()
         function loadAvailableServices() {
+            console.log('=== INTENTANDO CARGAR SERVICIOS DISPONIBLES ===');
+
             if (!reservationData || !reservationData.detalles) {
-                console.log('No hay datos de reserva para cargar servicios');
+                console.log('❌ No hay datos de reserva para cargar servicios');
+                console.log('reservationData:', reservationData);
                 return;
             }
 
-            console.log('=== CARGANDO SERVICIOS DISPONIBLES ===');
+            console.log('✅ Datos de reserva encontrados');
             console.log('Fecha:', reservationData.detalles.fecha);
             console.log('Hora:', reservationData.detalles.hora);
 
@@ -1571,23 +1609,72 @@ function confirmacion_reserva_shortcode()
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Servicios disponibles:', data);
+                    console.log('📡 Respuesta de servicios:', data);
 
                     if (data.success && data.data && data.data.length > 0) {
+                        console.log('✅ Servicios encontrados:', data.data.length);
                         renderAvailableServices(data.data);
                     } else {
-                        console.log('No hay servicios disponibles para esta fecha/hora');
+                        console.log('⚠️ No hay servicios disponibles para esta fecha/hora');
+                        // Mostrar mensaje al usuario
+                        showNoServicesMessage();
                     }
                 })
                 .catch(error => {
-                    console.error('Error cargando servicios:', error);
+                    console.error('❌ Error cargando servicios:', error);
+                    showServicesError();
                 });
+        }
+
+        // ✅ NUEVA FUNCIÓN: Mostrar mensaje cuando no hay servicios
+        function showNoServicesMessage() {
+            const mainContainer = document.querySelector('.confirmacion-container.container');
+            if (mainContainer) {
+                const messageHtml = `
+            <div class="additional-services-section container" style="padding: 40px; text-align: center;">
+                <h2 class="horarios-titulo">No hay servicios de visitas guiadas disponibles</h2>
+                <p style="font-size: 16px; color: #666; margin-top: 15px;">
+                    Lo sentimos, no hay visitas guiadas disponibles para la fecha y hora de tu reserva de autobús.
+                </p>
+            </div>
+        `;
+                mainContainer.insertAdjacentHTML('afterend', messageHtml);
+            }
+        }
+
+        // ✅ NUEVA FUNCIÓN: Mostrar error al cargar servicios
+        function showServicesError() {
+            const mainContainer = document.querySelector('.confirmacion-container.container');
+            if (mainContainer) {
+                const errorHtml = `
+            <div class="additional-services-section container" style="padding: 40px; text-align: center;">
+                <h2 class="horarios-titulo" style="color: #E74C3C;">Error cargando servicios</h2>
+                <p style="font-size: 16px; color: #666; margin-top: 15px;">
+                    Hubo un problema al cargar los servicios de visitas guiadas. Por favor, recarga la página.
+                </p>
+                <button class="complete-btn" onclick="window.location.reload()" style="margin-top: 20px;">
+                    RECARGAR PÁGINA
+                </button>
+            </div>
+        `;
+                mainContainer.insertAdjacentHTML('afterend', messageHtml);
+            }
         }
 
         function renderAvailableServices(services) {
     if (!services || services.length === 0) {
-        console.log('No hay servicios para mostrar');
+        console.log('❌ No hay servicios para mostrar');
         return;
+    }
+
+    console.log('=== RENDERIZANDO SERVICIOS ===');
+    console.log('Total servicios:', services.length);
+
+    // ✅ LIMPIAR SERVICIOS EXISTENTES PRIMERO
+    const existingServicesSection = document.querySelector('.additional-services-section');
+    if (existingServicesSection) {
+        console.log('🧹 Limpiando servicios anteriores');
+        existingServicesSection.remove();
     }
 
     // ✅ GUARDAR SERVICIOS GLOBALMENTE
@@ -1681,117 +1768,107 @@ function confirmacion_reserva_shortcode()
     const mainContainer = document.querySelector('.confirmacion-container.container');
     if (mainContainer) {
         mainContainer.insertAdjacentHTML('afterend', servicesHtml);
-        console.log('✅ HTML de servicios insertado');
+        console.log('✅ HTML de servicios insertado en el DOM');
     } else {
         console.error('❌ No se encontró .confirmacion-container');
     }
 }
 
         function selectService(serviceId) {
-    console.log('=== SELECT SERVICE ===');
-    console.log('ID recibido:', serviceId);
-    console.log('window.availableServices existe?:', typeof window.availableServices !== 'undefined');
-    console.log('Total servicios disponibles:', window.availableServices ? window.availableServices.length : 0);
+            console.log('=== SELECT SERVICE ===');
+            console.log('ID recibido:', serviceId);
 
-    if (!window.availableServices || window.availableServices.length === 0) {
-        console.error('❌ No hay servicios disponibles');
-        alert('Error: No se encontraron servicios disponibles');
-        return;
-    }
+            if (!window.availableServices || window.availableServices.length === 0) {
+                console.error('❌ No hay servicios disponibles');
+                alert('Error: No se encontraron servicios disponibles');
+                return;
+            }
 
-    const service = window.availableServices.find(s => parseInt(s.id) === parseInt(serviceId));
+            const service = window.availableServices.find(s => parseInt(s.id) === parseInt(serviceId));
 
-    if (!service) {
-        console.error('❌ No se encontró el servicio con ID:', serviceId);
-        alert('Error: No se encontraron datos del servicio');
-        return;
-    }
+            if (!service) {
+                console.error('❌ No se encontró el servicio con ID:', serviceId);
+                alert('Error: No se encontraron datos del servicio');
+                return;
+            }
 
-    console.log('✅ Servicio encontrado:', service);
-    console.log('✅ Idiomas del servicio:', service.idiomas_disponibles);
-    console.log('✅ Tipo de idiomas:', typeof service.idiomas_disponibles);
+            console.log('✅ Servicio encontrado:', service);
 
-    // ✅ PREPARAR idiomas_disponibles CORRECTAMENTE
-    let idiomasDisponibles = service.idiomas_disponibles;
+            // ✅ PREPARAR idiomas_disponibles CORRECTAMENTE
+            let idiomasDisponibles = service.idiomas_disponibles;
 
-    // Si es NULL, undefined o vacío, usar objeto vacío
-    if (!idiomasDisponibles || idiomasDisponibles === 'null' || idiomasDisponibles === '') {
-        console.log('⚠️ Idiomas NULL/undefined/vacío, usando objeto vacío');
-        idiomasDisponibles = '{}';
-    } 
-    // Si es string, mantenerlo así (ya viene como JSON string de la BD)
-    else if (typeof idiomasDisponibles === 'string') {
-        console.log('✅ Idiomas ya es string JSON:', idiomasDisponibles);
-        // Intentar parsearlo para validar que es JSON válido
-        try {
-            JSON.parse(idiomasDisponibles);
-            console.log('✅ String JSON válido');
-        } catch(e) {
-            console.error('❌ String JSON inválido, usando objeto vacío');
-            idiomasDisponibles = '{}';
+            if (!idiomasDisponibles || idiomasDisponibles === 'null' || idiomasDisponibles === '') {
+                console.log('⚠️ Idiomas NULL/undefined/vacío, usando objeto vacío');
+                idiomasDisponibles = '{}';
+            } else if (typeof idiomasDisponibles === 'string') {
+                console.log('✅ Idiomas ya es string JSON:', idiomasDisponibles);
+                try {
+                    JSON.parse(idiomasDisponibles);
+                    console.log('✅ String JSON válido');
+                } catch (e) {
+                    console.error('❌ String JSON inválido, usando objeto vacío');
+                    idiomasDisponibles = '{}';
+                }
+            } else if (typeof idiomasDisponibles === 'object') {
+                console.log('✅ Idiomas es objeto, convirtiendo a string');
+                idiomasDisponibles = JSON.stringify(idiomasDisponibles);
+            }
+
+            console.log('💾 Idiomas final a guardar:', idiomasDisponibles);
+
+            const serviceData = {
+                id: service.id,
+                agency_id: service.agency_id,
+                agency_name: service.agency_name,
+                titulo: service.titulo || service.agency_name,
+                descripcion: service.descripcion || '',
+                portada_url: service.portada_url || '',
+                logo_url: service.logo_url || '',
+                precio_adulto: parseFloat(service.precio_adulto),
+                precio_nino: parseFloat(service.precio_nino),
+                precio_nino_menor: parseFloat(service.precio_nino_menor),
+                idiomas_disponibles: idiomasDisponibles,
+                fecha: reservationData.detalles.fecha,
+                hora: reservationData.detalles.hora,
+                email: service.email,
+                phone: service.phone
+            };
+
+            console.log('💾 Objeto serviceData completo:', serviceData);
+
+            // Guardar en sessionStorage
+            sessionStorage.setItem('selectedServiceData', JSON.stringify(serviceData));
+            console.log('✅ Datos guardados en sessionStorage');
+
+            // ✅ GUARDAR TAMBIÉN EL LOCALIZADOR ACTUAL
+            if (reservationData && reservationData.localizador) {
+                sessionStorage.setItem('current_localizador', reservationData.localizador);
+                console.log('✅ Localizador guardado:', reservationData.localizador);
+            }
+
+            // ✅ CONSTRUIR URL INCLUYENDO LOCALIZADOR
+            const currentPath = window.location.pathname;
+            let targetUrl;
+
+            if (currentPath.includes('/')) {
+                const pathParts = currentPath.split('/').filter(part => part !== '');
+                if (pathParts.length > 0 && pathParts[0] !== 'detalles-reserva-visita') {
+                    targetUrl = window.location.origin + '/' + pathParts[0] + '/detalles-reserva-visita/';
+                } else {
+                    targetUrl = window.location.origin + '/detalles-reserva-visita/';
+                }
+            } else {
+                targetUrl = window.location.origin + '/detalles-reserva-visita/';
+            }
+
+            // ✅ AÑADIR LOCALIZADOR A LA URL
+            if (reservationData && reservationData.localizador) {
+                targetUrl += '?localizador=' + reservationData.localizador;
+            }
+
+            console.log('🔄 Redirigiendo a:', targetUrl);
+            window.location.href = targetUrl;
         }
-    }
-    // Si es objeto, convertirlo a string
-    else if (typeof idiomasDisponibles === 'object') {
-        console.log('✅ Idiomas es objeto, convirtiendo a string');
-        idiomasDisponibles = JSON.stringify(idiomasDisponibles);
-    }
-
-    console.log('💾 Idiomas final a guardar:', idiomasDisponibles);
-
-    const serviceData = {
-        id: service.id,
-        agency_id: service.agency_id,
-        agency_name: service.agency_name,
-        titulo: service.titulo || service.agency_name,
-        descripcion: service.descripcion || '',
-        portada_url: service.portada_url || '',
-        logo_url: service.logo_url || '',
-        precio_adulto: parseFloat(service.precio_adulto),
-        precio_nino: parseFloat(service.precio_nino),
-        precio_nino_menor: parseFloat(service.precio_nino_menor),
-        idiomas_disponibles: idiomasDisponibles, // ✅ AHORA SIEMPRE TIENE VALOR
-        fecha: reservationData.detalles.fecha,
-        hora: reservationData.detalles.hora,
-        email: service.email,
-        phone: service.phone
-    };
-
-    console.log('💾 Objeto serviceData completo:', serviceData);
-    console.log('💾 Stringify del objeto:', JSON.stringify(serviceData));
-
-    // Guardar en sessionStorage
-    sessionStorage.setItem('selectedServiceData', JSON.stringify(serviceData));
-    console.log('✅ Datos guardados en sessionStorage');
-
-    // ✅ VERIFICAR inmediatamente que se guardó
-    const verificacion = sessionStorage.getItem('selectedServiceData');
-    console.log('✅ Verificación inmediata:', verificacion);
-    
-    if (verificacion) {
-        const parsed = JSON.parse(verificacion);
-        console.log('✅ Verificación parseada:', parsed);
-        console.log('✅ Idiomas en verificación:', parsed.idiomas_disponibles);
-    }
-
-    // ✅ CONSTRUIR URL
-    const currentPath = window.location.pathname;
-    let targetUrl;
-
-    if (currentPath.includes('/')) {
-        const pathParts = currentPath.split('/').filter(part => part !== '');
-        if (pathParts.length > 0 && pathParts[0] !== 'detalles-reserva-visita') {
-            targetUrl = window.location.origin + '/' + pathParts[0] + '/detalles-reserva-visita/';
-        } else {
-            targetUrl = window.location.origin + '/detalles-reserva-visita/';
-        }
-    } else {
-        targetUrl = window.location.origin + '/detalles-reserva-visita/';
-    }
-
-    console.log('🔄 Redirigiendo a:', targetUrl);
-    window.location.href = targetUrl;
-}
 
         function contactService(email, phone, agencyName) {
             // En lugar de alert, redirigir a la página de detalles
@@ -1860,7 +1937,6 @@ function confirmacion_reserva_shortcode()
         function loadReservationData() {
             console.log('=== INTENTANDO CARGAR DATOS DE RESERVA ===');
 
-            // ✅ OBTENER PARÁMETROS DE LA URL
             const urlParams = new URLSearchParams(window.location.search);
             const localizador = urlParams.get('localizador');
             const order_id = urlParams.get('order');
@@ -1868,7 +1944,13 @@ function confirmacion_reserva_shortcode()
             console.log('Localizador desde URL:', localizador);
             console.log('Order ID desde URL:', order_id);
 
-            // ✅ BUSCAR POR LOCALIZADOR O POR ORDER_ID
+            // ✅ GUARDAR LOCALIZADOR INMEDIATAMENTE
+            if (localizador) {
+                sessionStorage.setItem('current_localizador', localizador);
+                window.currentLocalizador = localizador; // ✅ TAMBIÉN COMO VARIABLE GLOBAL
+                console.log('✅ Localizador guardado:', localizador);
+            }
+
             if (!localizador && !order_id) {
                 console.error('❌ No se encontró localizador ni order_id en la URL');
                 showErrorInfo();
@@ -1965,30 +2047,73 @@ function confirmacion_reserva_shortcode()
         function viewTicket() {
             console.log('🎫 Solicitando ver comprobante');
 
-            if (!reservationData || !reservationData.localizador) {
+            // ✅ INTENTAR OBTENER LOCALIZADOR DE MÚLTIPLES FUENTES
+            let localizador = null;
+
+            if (reservationData && reservationData.localizador) {
+                localizador = reservationData.localizador;
+            } else {
+                // Intentar desde sessionStorage
+                localizador = sessionStorage.getItem('current_localizador');
+
+                if (!localizador) {
+                    // Intentar desde variable global
+                    localizador = window.currentLocalizador;
+                }
+
+                if (!localizador) {
+                    // Último intento: desde URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    localizador = urlParams.get('localizador');
+                }
+            }
+
+            if (!localizador) {
                 alert('No se encontraron datos de la reserva. Por favor, revisa tu email para ver el comprobante.');
                 return;
             }
 
+            console.log('✅ Localizador encontrado:', localizador);
+
             showLoadingModal('Generando comprobante...');
-            generateAndViewPDF();
+            generateAndViewPDF(localizador); // ✅ PASAR LOCALIZADOR COMO PARÁMETRO
         }
 
         function downloadTicket() {
             console.log('⬇️ Solicitando descargar comprobante');
 
-            if (!reservationData || !reservationData.localizador) {
+            // ✅ INTENTAR OBTENER LOCALIZADOR DE MÚLTIPLES FUENTES
+            let localizador = null;
+
+            if (reservationData && reservationData.localizador) {
+                localizador = reservationData.localizador;
+            } else {
+                localizador = sessionStorage.getItem('current_localizador');
+
+                if (!localizador) {
+                    localizador = window.currentLocalizador;
+                }
+
+                if (!localizador) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    localizador = urlParams.get('localizador');
+                }
+            }
+
+            if (!localizador) {
                 alert('No se encontraron datos de la reserva. Por favor, revisa tu email para descargar el comprobante.');
                 return;
             }
 
+            console.log('✅ Localizador encontrado:', localizador);
+
             showLoadingModal('Preparando descarga...');
-            generateAndDownloadPDF();
+            generateAndDownloadPDF(localizador); // ✅ PASAR LOCALIZADOR COMO PARÁMETRO
         }
 
-        function generateAndViewPDF() {
+        function generateAndViewPDF(localizadorParam) { // ✅ CAMBIAR NOMBRE DEL PARÁMETRO
             console.log('📋 Requesting PDF generation for view...');
-            console.log('🔍 Using localizador:', reservationData.localizador);
+            console.log('🔍 Using localizador:', localizadorParam);
 
             fetch(ajaxurl, {
                     method: 'POST',
@@ -1997,7 +2122,7 @@ function confirmacion_reserva_shortcode()
                     },
                     body: new URLSearchParams({
                         action: 'generate_ticket_pdf_view',
-                        localizador: reservationData.localizador,
+                        localizador: localizadorParam, // ✅ USAR EL PARÁMETRO
                         nonce: '<?php echo wp_create_nonce('reservas_nonce'); ?>'
                     })
                 })
@@ -2028,9 +2153,9 @@ function confirmacion_reserva_shortcode()
                 });
         }
 
-        function generateAndDownloadPDF() {
+        function generateAndDownloadPDF(localizadorParam) { // ✅ CAMBIAR NOMBRE DEL PARÁMETRO
             console.log('⬇️ Requesting PDF generation for download...');
-            console.log('🔍 Using localizador:', reservationData.localizador);
+            console.log('🔍 Using localizador:', localizadorParam);
 
             fetch(ajaxurl, {
                     method: 'POST',
@@ -2039,7 +2164,7 @@ function confirmacion_reserva_shortcode()
                     },
                     body: new URLSearchParams({
                         action: 'generate_ticket_pdf_download',
-                        localizador: reservationData.localizador,
+                        localizador: localizadorParam, // ✅ USAR EL PARÁMETRO
                         nonce: '<?php echo wp_create_nonce('reservas_nonce'); ?>'
                     })
                 })
@@ -2059,8 +2184,8 @@ function confirmacion_reserva_shortcode()
                         // Crear enlace de descarga
                         const link = document.createElement('a');
                         link.href = data.data.pdf_url;
-                        link.download = `billete_${reservationData.localizador}.pdf`;
-                        link.target = '_blank'; // Por si el download falla, al menos se abre
+                        link.download = `billete_${localizadorParam}.pdf`; // ✅ USAR EL PARÁMETRO
+                        link.target = '_blank';
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
