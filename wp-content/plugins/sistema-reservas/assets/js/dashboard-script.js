@@ -14631,16 +14631,16 @@ function loadVisitasReportsSection() {
 
             /* ===== MODAL DE DETALLES MEJORADO ===== */
             #visitaDetailsModal {
-                display: none;
-                position: fixed;
-                z-index: 10000;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                animation: fadeIn 0.2s ease;
-            }
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
 
             @keyframes fadeIn {
                 from { opacity: 0; }
@@ -14648,16 +14648,16 @@ function loadVisitasReportsSection() {
             }
 
             #visitaDetailsModal .modal-content {
-                background: white;
-                margin: 3% auto;
-                padding: 0;
-                border-radius: 12px;
-                max-width: 1000px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-                animation: slideDown 0.3s ease;
-                overflow: hidden;
-            }
-
+    background: white;
+    margin: 3% auto;
+    padding: 0;
+    border-radius: 12px;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    animation: slideDown 0.3s ease;
+}
             @keyframes slideDown {
                 from {
                     transform: translateY(-30px);
@@ -14670,142 +14670,197 @@ function loadVisitasReportsSection() {
             }
 
             .modal-header-visita {
-                background: #f8f9fa;
-                padding: 20px 30px;
-                border-bottom: 1px solid #e2e8f0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
+    background: #f8f9fa;
+    padding: 20px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
+}
 
             .modal-header-visita h3 {
-                color: #2d3748;
-                font-size: 20px;
-                font-weight: 600;
-                margin: 0;
-            }
-
-            .modal-header-visita .close {
-                color: #64748b;
-                font-size: 28px;
-                font-weight: 300;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                width: 32px;
-                height: 32px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 6px;
-            }
-
+    color: #2d3748;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+.modal-header-visita .close {
+    color: #64748b;
+    font-size: 28px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: transparent;
+}
             .modal-header-visita .close:hover {
-                background: #e2e8f0;
-                color: #1e293b;
-            }
+    background: #e2e8f0;
+    color: #1e293b;
+}
 
-            .modal-body-visita {
-                padding: 30px;
-            }
+.modal-body-visita {
+    padding: 30px;
+}
 
-            .visita-details-sections {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 20px;
-                margin-bottom: 20px;
-            }
+.visita-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
 
-            .detail-section {
-                background: #f8f9fa;
-                padding: 20px;
-                border-radius: 8px;
-                border-left: 3px solid #3b82f6;
-            }
+.detail-card {
+    background: #f8f9fa;
+    padding: 18px;
+    border-radius: 8px;
+    border-left: 3px solid #3b82f6;
+    transition: all 0.2s ease;
+}
 
-            .detail-section-title {
-                font-size: 12px;
-                color: #64748b;
-                text-transform: uppercase;
-                font-weight: 600;
-                letter-spacing: 0.5px;
-                margin-bottom: 15px;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            }
+.detail-card:hover {
+    transform: translateX(3px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 
-            .detail-row {
-                margin-bottom: 12px;
-            }
+.detail-card-label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
 
-            .detail-row:last-child {
-                margin-bottom: 0;
-            }
+.detail-card-value {
+    font-size: 16px;
+    color: #2d3748;
+    font-weight: 600;
+}
 
-            .detail-label {
-                font-size: 11px;
-                color: #64748b;
-                margin-bottom: 4px;
-                font-weight: 500;
-            }
+.detail-card-highlight {
+    background: #3b82f6;
+    color: white;
+    border-left: none;
+}
 
-            .detail-value {
-                font-size: 14px;
-                color: #2d3748;
-                font-weight: 600;
-            }
+.detail-card-highlight .detail-card-label {
+    color: rgba(255, 255, 255, 0.9);
+}
 
-            .detail-value-large {
-                font-size: 18px;
-                color: #10b981;
-            }
+.detail-card-highlight .detail-card-value {
+    color: white;
+    font-size: 20px;
+}
 
-            .status-badge-modal {
-                display: inline-block;
-                padding: 4px 12px;
-                border-radius: 4px;
-                font-size: 12px;
-                font-weight: 600;
-                text-transform: uppercase;
-            }
+.status-badge-modal {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
 
-            .status-confirmada {
-                background: #d1fae5;
-                color: #065f46;
-            }
+.status-confirmada {
+    background: #d1fae5;
+    color: #065f46;
+}
 
-            .status-cancelada {
-                background: #fee2e2;
-                color: #991b1b;
-            }
+.status-cancelada {
+    background: #fee2e2;
+    color: #991b1b;
+}
 
-            /* ===== RESPONSIVE ===== */
-            @media (max-width: 768px) {
-                .filters-grid {
-                    grid-template-columns: 1fr;
-                }
+/* ===== ESTILOS PARA FILTROS MINIMALISTAS ===== */
+.visitas-filters-container {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+    border: 1px solid #e2e8f0;
+}
 
-                .visita-details-sections {
-                    grid-template-columns: 1fr;
-                }
+.visitas-filters-header {
+    text-align: left;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
 
-                .filters-actions {
-                    flex-direction: column;
-                }
+.visitas-filters-header h3 {
+    color: #2d3748;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+}
 
-                .filters-actions button {
-                    width: 100%;
-                }
+.visitas-filters-header p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+}
 
-                .search-input-group {
-                    flex-direction: column;
-                }
+.filters-actions button {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
 
-                .search-input-group select,
-                .search-input-group input {
-                    width: 100%;
-                }
-            }
+.btn-apply-filters {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-apply-filters:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.btn-reset-filters {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.btn-reset-filters:hover {
+    background: #e2e8f0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    #visitaDetailsModal .modal-content {
+        margin: 5% 10px;
+        max-width: calc(100% - 20px);
+    }
+
+    .modal-header-visita {
+        padding: 15px 20px;
+    }
+
+    .modal-header-visita h3 {
+        font-size: 18px;
+    }
+
+    .modal-body-visita {
+        padding: 20px;
+    }
+
+    .visita-details-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
         </style>
 
         <div class="reports-management">
@@ -15129,12 +15184,10 @@ function renderVisitasReport(data) {
                     <td>
                         <button class="btn-small btn-info" onclick="showVisitaDetails(${visita.id})" title="Ver detalles">👁️</button>
                         <button class="btn-small btn-success" onclick="downloadVisitaPDF(${visita.id}, '${visita.localizador}')" title="Descargar PDF">📄</button>
-                        <button class="btn-small btn-warning" onclick="showEditVisitaModal(${visita.id})" title="Editar datos">✏️</button>
-                        <button class="btn-small btn-primary" onclick="resendVisitaConfirmationEmail(${visita.id}, '${visita.localizador}')" title="Reenviar email">📧</button>
                         ${visita.estado === 'confirmada' ?
-                    `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
-                    '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
-                }
+                            `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
+                            '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
+                        }
                     </td>
                 </tr>
             `;
