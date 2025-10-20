@@ -13987,9 +13987,366 @@ function get_agencies_for_reservation() {
 function loadVisitasReportsSection() {
     console.log('=== CARGANDO SECCIÓN DE INFORMES DE VISITAS GUIADAS ===');
 
+    // ✅ VERIFICAR SI ES AGENCIA
+    const isAgency = window.reservasUser && window.reservasUser.role === 'agencia';
+    const agencySelectorDisplay = isAgency ? 'style="display: none;"' : '';
+    
+    // ✅ NUEVO: Mostrar botón PDF solo para super_admin
+    const isSuperAdmin = window.reservasUser && window.reservasUser.role === 'super_admin';
+    const pdfButtonHtml = isSuperAdmin ? `
+        <button class="btn-apply-filters" onclick="getAvailableSchedulesForVisitasPDF()" style="background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);">
+            📄 Descargar PDF
+        </button>
+    ` : '';
+
     document.body.innerHTML = `
         <style>
         /* ===== DESGLOSE POR AGENCIAS - ESTILO MEJORADO ===== */
+        #visitaDetailsModal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        #visitaDetailsModal .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 20px;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        .modal-header-visita {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            position: relative;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-header-visita h3 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-header-visita .close {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 32px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header-visita .close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .modal-body-visita {
+            padding: 40px;
+        }
+
+        .visita-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-card-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .detail-card-value {
+            font-size: 18px;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .detail-card-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left: none;
+        }
+
+        .detail-card-highlight .detail-card-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .detail-card-highlight .detail-card-value {
+            color: white;
+            font-size: 24px;
+        }
+
+        .status-badge-modal {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-confirmada {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .status-cancelada {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+        }
+
+        /* ===== ESTILOS PARA MODAL DE EDICIÓN ===== */
+        #editVisitaModal {
+            display: none;
+            position: fixed;
+            z-index: 10001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        #editVisitaModal .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 20px;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        #editVisitaModal .modal-header-visita {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #f1f5f9;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            #visitaDetailsModal .modal-content,
+            #editVisitaModal .modal-content {
+                margin: 5% 10px;
+                max-width: calc(100% - 20px);
+            }
+
+            .modal-header-visita {
+                padding: 20px;
+            }
+
+            .modal-header-visita h3 {
+                font-size: 20px;
+                padding-right: 40px;
+            }
+
+            .modal-body-visita {
+                padding: 20px;
+            }
+
+            .visita-details-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .detail-card-value {
+                font-size: 16px;
+            }
+
+            .detail-card-highlight .detail-card-value {
+                font-size: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        /* ===== SCROLLBAR PERSONALIZADO PARA MODALES ===== */
+        #visitaDetailsModal .modal-content::-webkit-scrollbar,
+        #editVisitaModal .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #visitaDetailsModal .modal-content::-webkit-scrollbar-track,
+        #editVisitaModal .modal-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        #visitaDetailsModal .modal-content::-webkit-scrollbar-thumb,
+        #editVisitaModal .modal-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        #visitaDetailsModal .modal-content::-webkit-scrollbar-thumb:hover,
+        #editVisitaModal .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
             .agencies-breakdown-section {
                 background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
                 padding: 30px;
@@ -14453,7 +14810,7 @@ function loadVisitasReportsSection() {
 
         <div class="reports-management">
             <div class="reports-header">
-                <h1>📊 Informes de Visitas Guiadas</h1>
+                <h1>📊 Informes de Visitas Guiadas${isAgency ? ' - ' + (window.reservasUser.agency_name || 'Mi Agencia') : ''}</h1>
                 <div class="reports-actions">
                     <button class="btn-secondary" onclick="goBackToDashboard()">← Volver al Dashboard</button>
                 </div>
@@ -14490,7 +14847,7 @@ function loadVisitasReportsSection() {
                             <option value="todas">Todas</option>
                         </select>
                     </div>
-                    <div class="filter-item">
+                    <div class="filter-item" ${agencySelectorDisplay}>
                         <label for="visitas-agency-filter">Agencia:</label>
                         <select id="visitas-agency-filter">
                             <option value="todas">🔄 Cargando agencias...</option>
@@ -14505,10 +14862,7 @@ function loadVisitasReportsSection() {
                     <button class="btn-reset-filters" onclick="resetVisitasFilters()">
                         ↺ Restablecer
                     </button>
-                    <!-- ✅ NUEVO BOTÓN -->
-                    <button class="btn-apply-filters" onclick="getAvailableSchedulesForVisitasPDF()" style="background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);">
-                        📄 Descargar PDF
-                    </button>
+                    ${pdfButtonHtml}
                 </div>
             </div>
 
@@ -14554,9 +14908,14 @@ function loadVisitasReportsSection() {
         </div>
     `;
 
-    loadAgenciesForVisitasFilter().then(() => {
+    if (!isAgency) {
+        loadAgenciesForVisitasFilter().then(() => {
+            loadVisitasReportData();
+        });
+    } else {
+        // Para agencias, cargar directamente los datos
         loadVisitasReportData();
-    });
+    }
 
     initVisitasReportsEvents();
 }
@@ -14614,7 +14973,15 @@ function loadVisitasReportData(page = 1) {
     const fechaFin = document.getElementById('visitas-fecha-fin').value;
     const tipoFecha = document.getElementById('visitas-tipo-fecha').value;
     const estadoFiltro = document.getElementById('visitas-estado-filtro').value;
-    const agencyFilter = document.getElementById('visitas-agency-filter').value;
+    let agencyFilter = document.getElementById('visitas-agency-filter').value;
+
+    // ✅ NUEVO: Si es agencia, forzar su propio ID
+    if (window.reservasUser && window.reservasUser.role === 'agencia') {
+        if (window.reservasUser.id) {
+            agencyFilter = window.reservasUser.id;
+            console.log('🔒 Filtro forzado a agencia actual:', agencyFilter);
+        }
+    }
 
     if (!fechaInicio || !fechaFin) {
         alert('Por favor, selecciona ambas fechas');
@@ -14688,8 +15055,10 @@ function renderVisitasReport(data) {
     `;
 
     // Estadísticas por agencia con diseño mejorado
+    const isAgency = window.reservasUser && window.reservasUser.role === 'agencia';
+    
     let agencyStatsHtml = '';
-    if (data.stats_por_agencias && data.stats_por_agencias.length > 0) {
+    if (data.stats_por_agencias && data.stats_por_agencias.length > 0 && !isAgency) {
         agencyStatsHtml = `
             <div class="agencies-breakdown-section">
                 <h3 class="agencies-breakdown-title">
@@ -14853,6 +15222,9 @@ function searchVisitasData() {
 }
 
 function showVisitaDetails(visitaId) {
+    console.log('=== MOSTRANDO DETALLES DE VISITA ===');
+    console.log('ID:', visitaId);
+
     const formData = new FormData();
     formData.append('action', 'get_visita_details');
     formData.append('visita_id', visitaId);
@@ -14864,9 +15236,11 @@ function showVisitaDetails(visitaId) {
     })
         .then(response => response.json())
         .then(data => {
+            console.log('Respuesta del servidor:', data);
+
             if (data.success) {
                 const visita = data.data;
-
+                
                 const fechaFormateada = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
                     weekday: 'long',
                     year: 'numeric',
@@ -14875,89 +15249,84 @@ function showVisitaDetails(visitaId) {
                 });
 
                 const estadoClass = visita.estado === 'confirmada' ? 'status-confirmada' : 'status-cancelada';
-                const estadoTexto = visita.estado === 'confirmada' ? 'CONFIRMADA' : 'CANCELADA';
+                const estadoTexto = visita.estado === 'confirmada' ? '✓ Confirmada' : '✕ Cancelada';
 
                 const detailsHtml = `
-                    <div class="visita-details-sections">
-                        <!-- Información General -->
-                        <div class="detail-section">
-                            <div class="detail-section-title">📋 Información General</div>
-                            <div class="detail-row">
-                                <div class="detail-label">Localizador:</div>
-                                <div class="detail-value">${visita.localizador}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Estado:</div>
-                                <div class="detail-value">
-                                    <span class="status-badge-modal ${estadoClass}">${estadoTexto}</span>
-                                </div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Fecha de servicio:</div>
-                                <div class="detail-value" style="font-size: 12px;">${fechaFormateada}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Hora:</div>
-                                <div class="detail-value">${visita.hora}</div>
+                    <div class="visita-details-grid">
+                        <div class="detail-card detail-card-highlight">
+                            <div class="detail-card-label">Localizador</div>
+                            <div class="detail-card-value">${visita.localizador}</div>
+                        </div>
+
+                        <div class="detail-card detail-card-highlight">
+                            <div class="detail-card-label">Estado</div>
+                            <div class="detail-card-value">
+                                <span class="status-badge-modal ${estadoClass}">${estadoTexto}</span>
                             </div>
                         </div>
 
-                        <!-- Datos del Cliente -->
-                        <div class="detail-section">
-                            <div class="detail-section-title">👤 Datos del Cliente</div>
-                            <div class="detail-row">
-                                <div class="detail-label">Nombre:</div>
-                                <div class="detail-value">${visita.nombre} ${visita.apellidos}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Email:</div>
-                                <div class="detail-value" style="font-size: 12px;">${visita.email}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Teléfono:</div>
-                                <div class="detail-value">${visita.telefono}</div>
-                            </div>
+                        <div class="detail-card">
+                            <div class="detail-card-label">📅 Fecha del Servicio</div>
+                            <div class="detail-card-value">${fechaFormateada}</div>
                         </div>
 
-                        <!-- Distribución de Personas -->
-                        <div class="detail-section">
-                            <div class="detail-section-title">👨‍👩‍👧‍👦 Distribución de Personas</div>
-                            <div class="detail-row">
-                                <div class="detail-label">Adultos:</div>
-                                <div class="detail-value">${visita.adultos}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Niños (5-12 años):</div>
-                                <div class="detail-value">${visita.ninos}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Niños menores (-5):</div>
-                                <div class="detail-value">${visita.ninos_menores}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Total personas:</div>
-                                <div class="detail-value">${visita.adultos + visita.ninos + visita.ninos_menores}</div>
-                            </div>
+                        <div class="detail-card">
+                            <div class="detail-card-label">🕐 Hora</div>
+                            <div class="detail-card-value">${visita.hora}</div>
                         </div>
 
-                        <!-- Información de Precios -->
-                        <div class="detail-section">
-                            <div class="detail-section-title">💰 Información de Precios</div>
-                            <div class="detail-row">
-                                <div class="detail-label">Agencia:</div>
-                                <div class="detail-value" style="font-size: 12px;">${visita.agency_name || 'Sin agencia'}</div>
-                            </div>
-                            <div class="detail-row">
-                                <div class="detail-label">Total:</div>
-                                <div class="detail-value detail-value-large">${parseFloat(visita.precio_total).toFixed(2)}€</div>
-                            </div>
+                        <div class="detail-card">
+                            <div class="detail-card-label">👤 Cliente</div>
+                            <div class="detail-card-value">${visita.nombre} ${visita.apellidos}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">📧 Email</div>
+                            <div class="detail-card-value" style="font-size: 14px;">${visita.email}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">📱 Teléfono</div>
+                            <div class="detail-card-value">${visita.telefono}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">🏢 Agencia</div>
+                            <div class="detail-card-value">${visita.agency_name || 'Sin agencia'}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">👨‍👩‍👧‍👦 Adultos</div>
+                            <div class="detail-card-value">${visita.adultos}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">👶 Niños (5-12 años)</div>
+                            <div class="detail-card-value">${visita.ninos}</div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-card-label">🍼 Niños menores (-5 años)</div>
+                            <div class="detail-card-value">${visita.ninos_menores}</div>
+                        </div>
+
+                        <div class="detail-card detail-card-highlight">
+                            <div class="detail-card-label">💰 Total</div>
+                            <div class="detail-card-value">${parseFloat(visita.precio_total).toFixed(2)}€</div>
                         </div>
                     </div>
                 `;
 
                 document.getElementById('visita-details-content').innerHTML = detailsHtml;
                 document.getElementById('visitaDetailsModal').style.display = 'block';
+            } else {
+                console.error('❌ Error:', data);
+                alert('❌ Error obteniendo datos de la visita: ' + (data.data || 'Error desconocido'));
             }
+        })
+        .catch(error => {
+            console.error('❌ Error de conexión:', error);
+            alert('❌ Error de conexión al obtener detalles');
         });
 }
 
@@ -15027,6 +15396,30 @@ function initVisitasReportsEvents() {
     };
 }
 
+/**
+ * ✅ CARGAR INFORMES DE VISITAS GUIADAS PARA AGENCIAS
+ */
+function loadAgencyVisitasReports() {
+    console.log('=== CARGANDO INFORMES DE VISITAS GUIADAS PARA AGENCIA ===');
+
+    if (!window.reservasUser || window.reservasUser.role !== 'agencia') {
+        alert('Esta función solo está disponible para agencias');
+        return;
+    }
+
+    // Verificar que la función de visitas reports existe
+    if (typeof loadVisitasReportsSection !== 'function') {
+        console.error('❌ La función loadVisitasReportsSection no está disponible');
+        alert('Error: Módulo de informes no disponible. Recarga la página.');
+        return;
+    }
+
+    // Llamar a la función de reports de visitas (ya existente)
+    loadVisitasReportsSection();
+
+    console.log('✅ Sección de informes de visitas guiadas cargada para agencia');
+}
+
 
 /**
  * ✅ DESCARGAR PDF DE VISITA
@@ -15072,13 +15465,11 @@ function downloadVisitaPDF(visitaId, localizador) {
         });
 }
 
-/**
- * ✅ MOSTRAR MODAL PARA EDITAR VISITA
- */
 function showEditVisitaModal(visitaId) {
-    console.log('✏️ Editando visita:', visitaId);
+    console.log('=== ABRIENDO MODAL DE EDICIÓN ===');
+    console.log('ID:', visitaId);
 
-    // Obtener datos actuales de la visita
+    // Obtener datos de la visita
     const formData = new FormData();
     formData.append('action', 'get_visita_details');
     formData.append('visita_id', visitaId);
@@ -15091,13 +15482,135 @@ function showEditVisitaModal(visitaId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                renderEditVisitaModal(data.data);
+                const visita = data.data;
+                
+                // Crear modal de edición
+                const modalHtml = `
+                    <div id="editVisitaModal" class="modal" style="display: block;">
+                        <div class="modal-content" style="max-width: 600px;">
+                            <div class="modal-header-visita">
+                                <h3>✏️ Editar Datos de la Visita</h3>
+                                <span class="close" onclick="closeEditVisitaModal()">&times;</span>
+                            </div>
+                            <div class="modal-body-visita">
+                                <form id="editVisitaForm">
+                                    <input type="hidden" id="edit-visita-id" value="${visita.id}">
+                                    
+                                    <div class="form-group">
+                                        <label>Nombre:</label>
+                                        <input type="text" id="edit-nombre" value="${visita.nombre}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Apellidos:</label>
+                                        <input type="text" id="edit-apellidos" value="${visita.apellidos}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Email:</label>
+                                        <input type="email" id="edit-email" value="${visita.email}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Teléfono:</label>
+                                        <input type="tel" id="edit-telefono" value="${visita.telefono}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Adultos:</label>
+                                        <input type="number" id="edit-adultos" value="${visita.adultos}" min="1" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Niños (5-12 años):</label>
+                                        <input type="number" id="edit-ninos" value="${visita.ninos}" min="0" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Niños menores (-5 años):</label>
+                                        <input type="number" id="edit-ninos-menores" value="${visita.ninos_menores}" min="0" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Motivo de la modificación:</label>
+                                        <textarea id="edit-motivo" rows="3" required placeholder="Explica por qué se modifican los datos..."></textarea>
+                                    </div>
+                                    
+                                    <div class="form-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                                        <button type="button" class="btn-secondary" onclick="closeEditVisitaModal()">Cancelar</button>
+                                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Añadir modal al DOM
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // Event listener para el formulario
+                document.getElementById('editVisitaForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    saveVisitaChanges();
+                });
             } else {
-                alert('❌ Error obteniendo datos de la visita');
+                alert('❌ Error obteniendo datos de la visita: ' + (data.data || 'Error desconocido'));
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('❌ Error:', error);
+            alert('❌ Error de conexión');
+        });
+}
+
+function closeEditVisitaModal() {
+    const modal = document.getElementById('editVisitaModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function saveVisitaChanges() {
+    const visitaId = document.getElementById('edit-visita-id').value;
+    const nombre = document.getElementById('edit-nombre').value;
+    const apellidos = document.getElementById('edit-apellidos').value;
+    const email = document.getElementById('edit-email').value;
+    const telefono = document.getElementById('edit-telefono').value;
+    const adultos = document.getElementById('edit-adultos').value;
+    const ninos = document.getElementById('edit-ninos').value;
+    const ninosMenores = document.getElementById('edit-ninos-menores').value;
+    const motivo = document.getElementById('edit-motivo').value;
+    
+    const formData = new FormData();
+    formData.append('action', 'update_visita_data');
+    formData.append('visita_id', visitaId);
+    formData.append('nombre', nombre);
+    formData.append('apellidos', apellidos);
+    formData.append('email', email);
+    formData.append('telefono', telefono);
+    formData.append('adultos', adultos);
+    formData.append('ninos', ninos);
+    formData.append('ninos_menores', ninosMenores);
+    formData.append('motivo', motivo);
+    formData.append('nonce', reservasAjax.nonce);
+    
+    fetch(reservasAjax.ajax_url, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ ' + data.data);
+                closeEditVisitaModal();
+                loadVisitasReportData();
+            } else {
+                alert('❌ Error: ' + data.data);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error:', error);
             alert('❌ Error de conexión');
         });
 }

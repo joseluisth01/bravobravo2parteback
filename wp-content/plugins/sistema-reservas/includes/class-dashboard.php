@@ -712,6 +712,10 @@ class ReservasDashboard
                             <button class="action-btn" onclick="loadAgencyReservations()">🎫 Mis Reservas</button>
 
                             <button class="action-btn" onclick="loadAgencyProfile()">👤 Mi Perfil</button>
+
+                            <!-- ✅ NUEVO BOTÓN -->
+                            <button class="action-btn" onclick="loadAgencyVisitasReports()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-left: 4px solid #5b21b6;">📊 Informes Visitas Guiadas</button>
+
                             <button class="action-btn" onclick="initAgencyReservaRapida()" style="background: linear-gradient(135deg, #0073aa 0%, #005177 100%); border-left: 4px solid #003f5c;">⚡ Reserva Rápida</button>
                         </div>
                     </div>

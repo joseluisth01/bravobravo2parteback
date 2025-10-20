@@ -15,9 +15,365 @@ let currentVisitasFilters = {
 function loadVisitasReportsSection() {
     console.log('=== CARGANDO SECCIÓN DE INFORMES DE VISITAS GUIADAS ===');
 
+    // ✅ VERIFICAR SI ES AGENCIA
+    const isAgency = window.reservasUser && window.reservasUser.role === 'agencia';
+    const agencySelectorDisplay = isAgency ? 'style="display: none;"' : '';
+
+    // ✅ NUEVO: Mostrar botón PDF solo para super_admin
+    const isSuperAdmin = window.reservasUser && window.reservasUser.role === 'super_admin';
+    const pdfButtonHtml = isSuperAdmin ? `
+        <button class="btn-apply-filters" onclick="getAvailableSchedulesForVisitasPDF()" style="background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);">
+            📄 Descargar PDF
+        </button>
+    ` : '';
+
     document.body.innerHTML = `
         <style>
             /* ===== ESTILOS PARA FILTROS DE VISITAS ===== */
+            #visitaDetailsModal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        #visitaDetailsModal .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 20px;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        .modal-header-visita {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            position: relative;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-header-visita h3 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-header-visita .close {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 32px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header-visita .close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .modal-body-visita {
+            padding: 40px;
+        }
+
+        .visita-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-card-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .detail-card-value {
+            font-size: 18px;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .detail-card-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left: none;
+        }
+
+        .detail-card-highlight .detail-card-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .detail-card-highlight .detail-card-value {
+            color: white;
+            font-size: 24px;
+        }
+
+        .status-badge-modal {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-confirmada {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .status-cancelada {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+        }
+
+        /* ===== ESTILOS PARA MODAL DE EDICIÓN ===== */
+        #editVisitaModal {
+            display: none;
+            position: fixed;
+            z-index: 10001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        #editVisitaModal .modal-content {
+            background: white;
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 20px;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        #editVisitaModal .modal-header-visita {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #f1f5f9;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            #visitaDetailsModal .modal-content,
+            #editVisitaModal .modal-content {
+                margin: 5% 10px;
+                max-width: calc(100% - 20px);
+            }
+
+            .modal-header-visita {
+                padding: 20px;
+            }
+
+            .modal-header-visita h3 {
+                font-size: 20px;
+                padding-right: 40px;
+            }
+
+            .modal-body-visita {
+                padding: 20px;
+            }
+
+            .visita-details-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .detail-card-value {
+                font-size: 16px;
+            }
+
+            .detail-card-highlight .detail-card-value {
+                font-size: 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        /* ===== SCROLLBAR PERSONALIZADO PARA MODALES ===== */
+        #visitaDetailsModal .modal-content::-webkit-scrollbar,
+        #editVisitaModal .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #visitaDetailsModal .modal-content::-webkit-scrollbar-track,
+        #editVisitaModal .modal-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        #visitaDetailsModal .modal-content::-webkit-scrollbar-thumb,
+        #editVisitaModal .modal-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        #visitaDetailsModal .modal-content::-webkit-scrollbar-thumb:hover,
+        #editVisitaModal .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
             .visitas-filters-container {
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 padding: 30px;
@@ -386,45 +742,45 @@ function loadVisitasReportsSection() {
 
         <div class="reports-management">
             <div class="reports-header">
-                <h1>📊 Informes de Visitas Guiadas</h1>
+                <h1>📊 Informes de Visitas Guiadas${isAgency ? ' - ' + (window.reservasUser.agency_name || 'Mi Agencia') : ''}</h1>
                 <div class="reports-actions">
                     <button class="btn-secondary" onclick="goBackToDashboard()">← Volver al Dashboard</button>
                 </div>
             </div>
             
-            <!-- Filtros Mejorados -->
+            <!-- Filtros -->
             <div class="visitas-filters-container">
                 <div class="visitas-filters-header">
                     <h3>🔍 Filtros de Búsqueda</h3>
-                    <p>Selecciona los criterios para generar tu informe personalizado</p>
+                    <p>Selecciona los criterios para generar tu informe</p>
                 </div>
                 
                 <div class="filters-grid">
                     <div class="filter-item">
-                        <label for="visitas-fecha-inicio">📅 Fecha Inicio</label>
+                        <label for="visitas-fecha-inicio">Fecha Inicio:</label>
                         <input type="date" id="visitas-fecha-inicio" value="${new Date().toISOString().split('T')[0]}">
                     </div>
                     <div class="filter-item">
-                        <label for="visitas-fecha-fin">📅 Fecha Fin</label>
+                        <label for="visitas-fecha-fin">Fecha Fin:</label>
                         <input type="date" id="visitas-fecha-fin" value="${new Date().toISOString().split('T')[0]}">
                     </div>
                     <div class="filter-item">
-                        <label for="visitas-tipo-fecha">📆 Tipo de Fecha</label>
+                        <label for="visitas-tipo-fecha">Tipo de Fecha:</label>
                         <select id="visitas-tipo-fecha">
                             <option value="servicio">Fecha de Servicio</option>
                             <option value="compra">Fecha de Compra</option>
                         </select>
                     </div>
                     <div class="filter-item">
-                        <label for="visitas-estado-filtro">✓ Estado</label>
+                        <label for="visitas-estado-filtro">Estado:</label>
                         <select id="visitas-estado-filtro">
                             <option value="confirmadas">Confirmadas</option>
                             <option value="canceladas">Canceladas</option>
                             <option value="todas">Todas</option>
                         </select>
                     </div>
-                    <div class="filter-item">
-                        <label for="visitas-agency-filter">🏢 Agencia</label>
+                    <div class="filter-item" ${agencySelectorDisplay}>
+                        <label for="visitas-agency-filter">Agencia:</label>
                         <select id="visitas-agency-filter">
                             <option value="todas">🔄 Cargando agencias...</option>
                         </select>
@@ -438,6 +794,7 @@ function loadVisitasReportsSection() {
                     <button class="btn-reset-filters" onclick="resetVisitasFilters()">
                         ↺ Restablecer
                     </button>
+                    ${pdfButtonHtml}
                 </div>
             </div>
 
@@ -483,12 +840,15 @@ function loadVisitasReportsSection() {
         </div>
     `;
 
-    // Cargar agencias y luego datos iniciales
-    loadAgenciesForVisitasFilter().then(() => {
+    if (!isAgency) {
+        loadAgenciesForVisitasFilter().then(() => {
+            loadVisitasReportData();
+        });
+    } else {
+        // Para agencias, cargar directamente los datos
         loadVisitasReportData();
-    });
+    }
 
-    // Configurar eventos
     initVisitasReportsEvents();
 }
 
@@ -503,7 +863,7 @@ function loadAgenciesForVisitasFilter() {
             action: 'get_agencies_for_filter',
             nonce: reservasAjax.nonce
         },
-        success: function(response) {
+        success: function (response) {
             if (response.success && response.data) {
                 const select = document.getElementById('visitas-agency-filter');
                 response.data.forEach(agency => {
@@ -522,7 +882,7 @@ function loadAgenciesForVisitasFilter() {
  */
 function loadVisitasReport() {
     console.log('=== CARGANDO INFORME DE VISITAS ===');
-    
+
     showVisitasLoading();
 
     jQuery.ajax({
@@ -534,7 +894,7 @@ function loadVisitasReport() {
             ...currentVisitasFilters,
             page: currentVisitasPage
         },
-        success: function(response) {
+        success: function (response) {
             console.log('Respuesta del servidor:', response);
 
             if (response.success) {
@@ -545,7 +905,7 @@ function loadVisitasReport() {
                 showError('Error cargando informe: ' + response.data);
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error AJAX:', error);
             showError('Error de conexión al cargar el informe');
         }
@@ -557,7 +917,7 @@ function loadVisitasReport() {
  */
 function renderVisitasStats(stats, stats_agencias) {
     const container = document.getElementById('visitas-stats-container');
-    
+
     let html = `
         <div class="stats-grid">
             <div class="stat-card">
@@ -630,7 +990,7 @@ function renderVisitasStats(stats, stats_agencias) {
  */
 function renderVisitasList(visitas) {
     const container = document.getElementById('visitas-list-container');
-    
+
     if (!visitas || visitas.length === 0) {
         container.innerHTML = '<p class="no-results">No se encontraron visitas para los filtros seleccionados</p>';
         return;
@@ -658,7 +1018,7 @@ function renderVisitasList(visitas) {
     visitas.forEach(visita => {
         const fecha = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES');
         const estadoClass = visita.estado === 'confirmada' ? 'status-confirmed' : 'status-cancelled';
-        
+
         html += `
             <tr>
                 <td><strong>${visita.localizador}</strong></td>
@@ -690,14 +1050,14 @@ function renderVisitasList(visitas) {
  */
 function renderVisitasPagination(pagination) {
     const container = document.getElementById('visitas-pagination-container');
-    
+
     if (pagination.total_pages <= 1) {
         container.innerHTML = '';
         return;
     }
 
     let html = '<div class="pagination">';
-    
+
     // Botón anterior
     if (pagination.current_page > 1) {
         html += `<button onclick="changeVisitasPage(${pagination.current_page - 1})">« Anterior</button>`;
@@ -774,7 +1134,7 @@ function searchVisitas() {
             search_type: searchType,
             search_value: searchValue
         },
-        success: function(response) {
+        success: function (response) {
             if (response.success) {
                 document.getElementById('visitas-stats-container').innerHTML = `<p>Resultados de búsqueda: ${response.data.total_found} visitas encontradas</p>`;
                 renderVisitasList(response.data.visitas);
@@ -798,7 +1158,7 @@ function viewVisitaDetails(visitaId) {
             nonce: reservasAjax.nonce,
             visita_id: visitaId
         },
-        success: function(response) {
+        success: function (response) {
             if (response.success) {
                 showVisitaDetailsModal(response.data);
             }
@@ -807,6 +1167,9 @@ function viewVisitaDetails(visitaId) {
 }
 
 function showVisitaDetails(visitaId) {
+    console.log('=== MOSTRANDO DETALLES DE VISITA ===');
+    console.log('ID:', visitaId);
+
     const formData = new FormData();
     formData.append('action', 'get_visita_details');
     formData.append('visita_id', visitaId);
@@ -818,6 +1181,8 @@ function showVisitaDetails(visitaId) {
     })
         .then(response => response.json())
         .then(data => {
+            console.log('Respuesta del servidor:', data);
+
             if (data.success) {
                 const visita = data.data;
                 
@@ -899,7 +1264,14 @@ function showVisitaDetails(visitaId) {
 
                 document.getElementById('visita-details-content').innerHTML = detailsHtml;
                 document.getElementById('visitaDetailsModal').style.display = 'block';
+            } else {
+                console.error('❌ Error:', data);
+                alert('❌ Error obteniendo datos de la visita: ' + (data.data || 'Error desconocido'));
             }
+        })
+        .catch(error => {
+            console.error('❌ Error de conexión:', error);
+            alert('❌ Error de conexión al obtener detalles');
         });
 }
 
@@ -932,7 +1304,7 @@ function cancelVisita(visitaId) {
             visita_id: visitaId,
             motivo_cancelacion: motivo || 'Cancelación administrativa'
         },
-        success: function(response) {
+        success: function (response) {
             if (response.success) {
                 alert('Visita cancelada correctamente');
                 loadVisitasReport();
@@ -965,7 +1337,7 @@ function showError(message) {
  */
 function getAvailableSchedulesForVisitasPDF() {
     console.log('=== OBTENIENDO HORARIOS DISPONIBLES PARA VISITAS ===');
-    
+
     const fecha_inicio = document.getElementById('visitas-fecha-inicio').value;
     const fecha_fin = document.getElementById('visitas-fecha-fin').value;
     const tipo_fecha = document.getElementById('visitas-tipo-fecha').value;
@@ -984,16 +1356,16 @@ function getAvailableSchedulesForVisitasPDF() {
             estado_filtro: estado_filtro,
             agency_filter: agency_filter
         },
-        success: function(response) {
+        success: function (response) {
             console.log('Horarios disponibles:', response);
-            
+
             if (response.success && response.data.schedules) {
                 showSchedulesModalForVisitas(response.data.schedules, response.data);
             } else {
                 alert('No se encontraron horarios disponibles para los filtros seleccionados');
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error obteniendo horarios:', error);
             alert('Error al obtener los horarios disponibles');
         }
@@ -1058,9 +1430,9 @@ function showSchedulesModalForVisitas(schedules, stats) {
                             cursor: pointer;
                             transition: all 0.2s;
                         " onmouseover="this.style.background='#e6f3ff'" onmouseout="this.style.background='#f9f9f9'">
-                            <input type="checkbox" class="schedule-checkbox-visitas" value='${JSON.stringify({hora: schedule.hora})}'>
+                            <input type="checkbox" class="schedule-checkbox-visitas" value='${JSON.stringify({ hora: schedule.hora })}'>
                             <span style="flex: 1;">
-                                <strong>Hora:</strong> ${schedule.hora.substring(0,5)}
+                                <strong>Hora:</strong> ${schedule.hora.substring(0, 5)}
                                 <br>
                                 <small style="color: #666;">
                                     ${schedule.count} visita(s) en ${schedule.days_count} día(s)
@@ -1124,18 +1496,18 @@ function closeSchedulesModalVisitas() {
  */
 function generateVisitasPDFWithSchedules() {
     const checkboxes = document.querySelectorAll('.schedule-checkbox-visitas:checked');
-    
+
     if (checkboxes.length === 0) {
         alert('Por favor, selecciona al menos un horario');
         return;
     }
 
     const selectedSchedules = Array.from(checkboxes).map(cb => JSON.parse(cb.value));
-    
+
     console.log('Horarios seleccionados:', selectedSchedules);
-    
+
     closeSchedulesModalVisitas();
-    
+
     // Generar PDF con los horarios seleccionados
     const fecha_inicio = document.getElementById('visitas-fecha-inicio').value;
     const fecha_fin = document.getElementById('visitas-fecha-fin').value;
@@ -1158,22 +1530,22 @@ function generateVisitasPDFWithSchedules() {
             agency_filter: agency_filter,
             selected_schedules: JSON.stringify(selectedSchedules)
         },
-        success: function(response) {
+        success: function (response) {
             console.log('Respuesta PDF:', response);
-            
+
             if (response.success && response.data.pdf_url) {
                 // Abrir PDF en nueva ventana
                 window.open(response.data.pdf_url, '_blank');
-                
+
                 // Mostrar mensaje de éxito
                 showNotification('PDF generado correctamente', 'success');
             } else {
                 alert('Error generando el PDF: ' + (response.data || 'Error desconocido'));
             }
-            
+
             hideVisitasLoading();
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error AJAX:', error);
             alert('Error de conexión al generar el PDF');
             hideVisitasLoading();
