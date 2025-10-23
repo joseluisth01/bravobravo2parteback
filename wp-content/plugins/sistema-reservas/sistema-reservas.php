@@ -554,6 +554,21 @@ class SistemaReservas
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql_visitas);
 
+        $table_horarios_disabled = $wpdb->prefix . 'reservas_agency_horarios_disabled';
+        $sql_horarios_disabled = "CREATE TABLE $table_horarios_disabled (
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
+    agency_id mediumint(9) NOT NULL,
+    dia varchar(20) NOT NULL,
+    hora time NOT NULL,
+    disabled_at datetime DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY agency_dia_hora (agency_id, dia, hora),
+    KEY agency_id (agency_id)
+) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql_horarios_disabled);
+
         // ✅ TABLA DE RESERVAS ACTUALIZADA CON CAMPO DE RECORDATORIO
         $table_reservas = $wpdb->prefix . 'reservas_reservas';
         $sql_reservas = "CREATE TABLE $table_reservas (
@@ -1662,39 +1677,39 @@ function confirmacion_reserva_shortcode()
         }
 
         function renderAvailableServices(services) {
-    if (!services || services.length === 0) {
-        console.log('❌ No hay servicios para mostrar');
-        return;
-    }
+            if (!services || services.length === 0) {
+                console.log('❌ No hay servicios para mostrar');
+                return;
+            }
 
-    console.log('=== RENDERIZANDO SERVICIOS ===');
-    console.log('Total servicios:', services.length);
+            console.log('=== RENDERIZANDO SERVICIOS ===');
+            console.log('Total servicios:', services.length);
 
-    // ✅ LIMPIAR SERVICIOS EXISTENTES PRIMERO
-    const existingServicesSection = document.querySelector('.additional-services-section');
-    if (existingServicesSection) {
-        console.log('🧹 Limpiando servicios anteriores');
-        existingServicesSection.remove();
-    }
+            // ✅ LIMPIAR SERVICIOS EXISTENTES PRIMERO
+            const existingServicesSection = document.querySelector('.additional-services-section');
+            if (existingServicesSection) {
+                console.log('🧹 Limpiando servicios anteriores');
+                existingServicesSection.remove();
+            }
 
-    // ✅ GUARDAR SERVICIOS GLOBALMENTE
-    window.availableServices = services;
-    console.log('✅ Servicios guardados globalmente:', window.availableServices.length);
+            // ✅ GUARDAR SERVICIOS GLOBALMENTE
+            window.availableServices = services;
+            console.log('✅ Servicios guardados globalmente:', window.availableServices.length);
 
-    // ✅ DEBUG: Ver idiomas de cada servicio
-    services.forEach((s, i) => {
-        console.log(`Servicio ${i+1} ID ${s.id}:`, {
-            nombre: s.agency_name,
-            idiomas_disponibles: s.idiomas_disponibles,
-            tipo: typeof s.idiomas_disponibles
-        });
-    });
+            // ✅ DEBUG: Ver idiomas de cada servicio
+            services.forEach((s, i) => {
+                console.log(`Servicio ${i+1} ID ${s.id}:`, {
+                    nombre: s.agency_name,
+                    idiomas_disponibles: s.idiomas_disponibles,
+                    tipo: typeof s.idiomas_disponibles
+                });
+            });
 
-    // Separar servicio destacado (prioridad 1) del resto
-    const destacado = services.find(s => parseInt(s.orden_prioridad) === 1);
-    const otros = services.filter(s => parseInt(s.orden_prioridad) !== 1);
+            // Separar servicio destacado (prioridad 1) del resto
+            const destacado = services.find(s => parseInt(s.orden_prioridad) === 1);
+            const otros = services.filter(s => parseInt(s.orden_prioridad) !== 1);
 
-    let servicesHtml = `
+            let servicesHtml = `
         <div class="additional-services-section container">
             <h2 class="horarios-titulo">Reserva aquí tu visita guiada a Medina Azahara</h2>
             <p class="services-subtitle">
@@ -1706,9 +1721,9 @@ function confirmacion_reserva_shortcode()
             </p>
     `;
 
-    // Si hay servicio destacado (prioridad 1)
-    if (destacado) {
-        servicesHtml += `
+            // Si hay servicio destacado (prioridad 1)
+            if (destacado) {
+                servicesHtml += `
             <div class="service-card service-card-destacado" style="grid-column: 1 / -1; margin-bottom: 30px;" data-service-id="${destacado.id}">
                 ${destacado.portada_url ? `
                     <div class="service-image" style="height: 250px;">
@@ -1729,14 +1744,14 @@ function confirmacion_reserva_shortcode()
                 </div>
             </div>
         `;
-    }
+            }
 
-    // Otros servicios (grid)
-    if (otros.length > 0) {
-        servicesHtml += `<div class="services-grid">`;
+            // Otros servicios (grid)
+            if (otros.length > 0) {
+                servicesHtml += `<div class="services-grid">`;
 
-        otros.forEach(service => {
-            servicesHtml += `
+                otros.forEach(service => {
+                    servicesHtml += `
                 <div class="service-card" data-service-id="${service.id}">
                     ${service.portada_url ? `
                         <div class="service-image">
@@ -1757,22 +1772,22 @@ function confirmacion_reserva_shortcode()
                     </div>
                 </div>
             `;
-        });
+                });
 
-        servicesHtml += `</div>`;
-    }
+                servicesHtml += `</div>`;
+            }
 
-    servicesHtml += `</div>`;
+            servicesHtml += `</div>`;
 
-    // Insertar HTML
-    const mainContainer = document.querySelector('.confirmacion-container.container');
-    if (mainContainer) {
-        mainContainer.insertAdjacentHTML('afterend', servicesHtml);
-        console.log('✅ HTML de servicios insertado en el DOM');
-    } else {
-        console.error('❌ No se encontró .confirmacion-container');
-    }
-}
+            // Insertar HTML
+            const mainContainer = document.querySelector('.confirmacion-container.container');
+            if (mainContainer) {
+                mainContainer.insertAdjacentHTML('afterend', servicesHtml);
+                console.log('✅ HTML de servicios insertado en el DOM');
+            } else {
+                console.error('❌ No se encontró .confirmacion-container');
+            }
+        }
 
         function selectService(serviceId) {
             console.log('=== SELECT SERVICE ===');

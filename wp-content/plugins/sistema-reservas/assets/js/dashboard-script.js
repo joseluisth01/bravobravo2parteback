@@ -4039,7 +4039,7 @@ function recalcularPreciosEdicion(adultos, residentes, ninos512) {
     });
 
     // Calcular precio base CORRECTO
-    const nuevoPrecioBase = 
+    const nuevoPrecioBase =
         (adultos * precioAdulto) +
         (residentes * precioResidente) +
         (ninos512 * precioNino);
@@ -4051,7 +4051,7 @@ function recalcularPreciosEdicion(adultos, residentes, ninos512) {
 
     // Mantener el descuento actual
     const descuentoActual = parseFloat(document.getElementById('edit-descuento-total').value) || 0;
-    
+
     // Calcular nuevo precio final
     const nuevoPrecioFinal = Math.max(0, nuevoPrecioBase - descuentoActual);
     document.getElementById('edit-precio-final').value = nuevoPrecioFinal.toFixed(2);
@@ -4068,7 +4068,7 @@ function updateFinalPrice() {
     const precioFinal = Math.max(0, precioBase - descuentoTotal);
 
     document.getElementById('edit-precio-final').value = precioFinal.toFixed(2);
-    
+
     console.log('💰 Precio final actualizado por cambio de descuento:', precioFinal);
 }
 
@@ -8397,6 +8397,449 @@ function loadAgencyProfile() {
     });
 }
 
+
+/**
+ * ✅ CARGAR SECCIÓN DE MIS VISITAS GUIADAS
+ */
+function loadAgencyVisitasGuiadas() {
+    console.log('=== CARGANDO MIS VISITAS GUIADAS ===');
+    
+    showLoadingInMainContent();
+    
+    jQuery.ajax({
+        url: reservasAjax.ajax_url,
+        type: 'POST',
+        data: {
+            action: 'get_agency_visitas_config',
+            nonce: reservasAjax.nonce
+        },
+        success: function(response) {
+            console.log('Respuesta visitas:', response);
+            
+            if (response.success) {
+                renderAgencyVisitasGuiadas(response.data);
+            } else {
+                showErrorInMainContent('Error cargando visitas: ' + response.data);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error AJAX:', error);
+            showErrorInMainContent('Error de conexión');
+        }
+    });
+}
+
+function renderAgencyVisitasGuiadas(data) {
+    console.log('Renderizando visitas con data:', data);
+    
+    if (!data.has_service) {
+        jQuery('.dashboard-content').html(`
+            <div class="agency-profile-management">
+                <div class="section-header">
+                    <h2>🗓️ Mis Visitas Guiadas</h2>
+                    <p>No tienes ninguna visita guiada configurada</p>
+                </div>
+                
+                <div class="profile-actions">
+                    <button class="btn-secondary" onclick="loadAgencyProfile()">
+                        ← Volver a Mi Perfil
+                    </button>
+                </div>
+                
+                <div class="no-service-message">
+                    <p style="text-align: center; padding: 40px; color: #666;">
+                        📅 Aún no tienes visitas guiadas configuradas.<br>
+                        Contacta con el administrador para activar este servicio.
+                    </p>
+                </div>
+            </div>
+        `);
+        return;
+    }
+    
+    const service = data.service;
+    const disabledHorarios = data.disabled_horarios || []; // ✅ NUEVO: Lista de horarios deshabilitados
+    
+    // Parsear horarios
+    let horarios = {};
+    try {
+        horarios = typeof service.horarios_disponibles === 'string' 
+            ? JSON.parse(service.horarios_disponibles) 
+            : service.horarios_disponibles || {};
+    } catch(e) {
+        console.error('Error parseando horarios:', e);
+        horarios = {};
+    }
+    
+    // Parsear idiomas
+    let idiomas = {};
+    try {
+        idiomas = typeof service.idiomas_disponibles === 'string' 
+            ? JSON.parse(service.idiomas_disponibles) 
+            : service.idiomas_disponibles || {};
+    } catch(e) {
+        console.error('Error parseando idiomas:', e);
+        idiomas = {};
+    }
+    
+    // Parsear fechas excluidas
+    let fechasExcluidas = {};
+    try {
+        fechasExcluidas = typeof service.fechas_excluidas === 'string' 
+            ? JSON.parse(service.fechas_excluidas) 
+            : service.fechas_excluidas || {};
+    } catch(e) {
+        console.error('Error parseando fechas excluidas:', e);
+        fechasExcluidas = {};
+    }
+    
+    // ✅ CREAR FUNCIÓN HELPER PARA VERIFICAR SI ESTÁ DESHABILITADO
+    function isHorarioDisabled(dia, hora) {
+        return disabledHorarios.some(item => 
+            item.dia === dia && item.hora.substring(0, 5) === hora.substring(0, 5)
+        );
+    }
+    
+    // Generar HTML
+    const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+    const diasNombres = {
+        'lunes': 'Lunes',
+        'martes': 'Martes',
+        'miercoles': 'Miércoles',
+        'jueves': 'Jueves',
+        'viernes': 'Viernes',
+        'sabado': 'Sábado',
+        'domingo': 'Domingo'
+    };
+    
+    let visitasHTML = '';
+    
+    diasSemana.forEach(dia => {
+        if (horarios[dia] && horarios[dia].length > 0) {
+            horarios[dia].forEach(hora => {
+                const idiomasDia = idiomas[dia] || [];
+                const fechasExcluidasDia = fechasExcluidas[dia] || [];
+                
+                // ✅ VERIFICAR SI ESTÁ DESHABILITADO
+                const isDisabled = isHorarioDisabled(dia, hora);
+                
+                // Convertir idiomas a etiquetas
+                const idiomasConfig = {
+                    'espanol': { label: 'Español', flag: '🇪🇸' },
+                    'ingles': { label: 'Inglés', flag: '🇬🇧' },
+                    'frances': { label: 'Francés', flag: '🇫🇷' }
+                };
+                
+                const idiomasHTML = idiomasDia.length > 0 
+                    ? idiomasDia.map(idioma => {
+                        const config = idiomasConfig[idioma] || { label: idioma, flag: '🌍' };
+                        return `<span class="idioma-tag">${config.flag} ${config.label}</span>`;
+                    }).join('')
+                    : '<span class="idioma-tag-empty">Sin idiomas configurados</span>';
+                
+                const fechasHTML = fechasExcluidasDia.length > 0
+                    ? fechasExcluidasDia.map(fecha => `<span class="fecha-excluida-tag">${formatDateSimple(fecha)}</span>`).join('')
+                    : '<span class="fecha-tag-empty">Sin fechas excluidas</span>';
+                
+                // ✅ CAMBIAR ESTILO Y BOTÓN SEGÚN ESTADO
+                const cardClass = isDisabled ? 'visita-card visita-card-disabled' : 'visita-card';
+                const statusBadge = isDisabled 
+                    ? '<span class="status-badge status-disabled">❌ DESHABILITADA</span>' 
+                    : '<span class="status-badge status-active">✅ ACTIVA</span>';
+                
+                const toggleButton = isDisabled
+                    ? `<button class="btn-toggle-visita btn-enable" onclick="toggleVisitaStatus('${dia}', '${hora}', ${isDisabled})" 
+                              title="Habilitar esta visita">
+                          ✅ Habilitar
+                       </button>`
+                    : `<button class="btn-toggle-visita btn-disable" onclick="toggleVisitaStatus('${dia}', '${hora}', ${isDisabled})" 
+                              title="Deshabilitar esta visita">
+                          🔴 Deshabilitar
+                       </button>`;
+                
+                visitasHTML += `
+                    <div class="${cardClass}" data-dia="${dia}" data-hora="${hora}">
+                        <div class="visita-header">
+                            <div>
+                                <h4>${diasNombres[dia]} - ${hora.substring(0, 5)}</h4>
+                                ${statusBadge}
+                            </div>
+                            ${toggleButton}
+                        </div>
+                        
+                        <div class="visita-info">
+                            <div class="info-group">
+                                <strong>💬 Idiomas disponibles:</strong>
+                                <div class="idiomas-list">${idiomasHTML}</div>
+                            </div>
+                            
+                            <div class="info-group">
+                                <strong>🚫 Fechas excluidas:</strong>
+                                <div class="fechas-excluidas-list">${fechasHTML}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    });
+    
+    if (!visitasHTML) {
+        visitasHTML = '<p style="text-align: center; padding: 40px; color: #666;">No hay visitas guiadas configuradas en ningún día.</p>';
+    }
+    
+    const content = `
+        <div class="agency-profile-management">
+            <div class="section-header">
+                <h2>🗓️ Mis Visitas Guiadas</h2>
+                <p>Gestiona la visibilidad de tus visitas - Puedes activar/desactivar cuando quieras</p>
+            </div>
+            
+            <div class="profile-actions">
+                <button class="btn-secondary" onclick="loadAgencyProfile()">
+                    ← Volver a Mi Perfil
+                </button>
+            </div>
+            
+            <div class="visitas-container">
+                ${visitasHTML}
+            </div>
+            
+            <div id="visitas-messages" class="profile-messages"></div>
+        </div>
+        
+        <style>
+        .visitas-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .visita-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+        
+        /* ✅ ESTILO PARA VISITAS DESHABILITADAS */
+        .visita-card-disabled {
+            opacity: 0.6;
+            border-left: 4px solid #dc3545;
+            background: #f8f9fa;
+        }
+        
+        .visita-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f1;
+        }
+        
+        .visita-header h4 {
+            margin: 0 0 8px 0;
+            color: #23282d;
+            font-size: 18px;
+        }
+        
+        /* ✅ BADGE DE ESTADO */
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-disabled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn-toggle-visita {
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        /* ✅ BOTÓN DESHABILITAR (ROJO) */
+        .btn-disable {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-disable:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+        
+        /* ✅ BOTÓN HABILITAR (VERDE) */
+        .btn-enable {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-enable:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+        
+        .visita-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .info-group strong {
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .idiomas-list, .fechas-excluidas-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .idioma-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .idioma-tag-empty {
+            color: #999;
+            font-style: italic;
+            font-size: 13px;
+        }
+        
+        .fecha-excluida-tag {
+            background: #ffc107;
+            color: #333;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .fecha-tag-empty {
+            color: #999;
+            font-style: italic;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 768px) {
+            .visitas-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .visita-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .btn-toggle-visita {
+                width: 100%;
+            }
+        }
+        </style>
+    `;
+    
+    jQuery('.dashboard-content').html(content);
+}
+
+function toggleVisitaStatus(dia, hora, isCurrentlyDisabled) {
+    const action = isCurrentlyDisabled ? 'habilitar' : 'deshabilitar';
+    const actionUpper = isCurrentlyDisabled ? 'Habilitar' : 'Deshabilitar';
+    
+    if (!confirm(`¿Estás seguro de que quieres ${action} la visita de ${dia} a las ${hora}?`)) {
+        return;
+    }
+    
+    showVisitasMessage('info', `⏳ ${actionUpper}ando visita...`);
+    
+    jQuery.ajax({
+        url: reservasAjax.ajax_url,
+        type: 'POST',
+        data: {
+            action: 'toggle_visita_horario',
+            dia: dia,
+            hora: hora,
+            enable: isCurrentlyDisabled ? 1 : 0, // ✅ NUEVO PARÁMETRO
+            nonce: reservasAjax.nonce
+        },
+        success: function(response) {
+            if (response.success) {
+                showVisitasMessage('success', '✅ ' + response.data);
+                // Recargar visitas
+                setTimeout(() => loadAgencyVisitasGuiadas(), 1500);
+            } else {
+                showVisitasMessage('error', '❌ Error: ' + response.data);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            showVisitasMessage('error', '❌ Error de conexión');
+        }
+    });
+}
+
+/**
+ * ✅ MOSTRAR MENSAJE EN VISITAS
+ */
+function showVisitasMessage(type, message) {
+    const messagesDiv = jQuery('#visitas-messages');
+    messagesDiv.html(`<div class="message ${type}">${message}</div>`);
+    messagesDiv[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/**
+ * ✅ FORMATEAR FECHA SIMPLE
+ */
+function formatDateSimple(dateString) {
+    if (!dateString) return '-';
+    try {
+        const date = new Date(dateString + 'T00:00:00');
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    } catch(e) {
+        return dateString;
+    }
+}
+
+// Exponer funciones globalmente
+window.loadAgencyVisitasGuiadas = loadAgencyVisitasGuiadas;
+window.toggleVisitaStatus = toggleVisitaStatus;
+
+
 /**
  * Renderizar la sección de perfil de agencia
  */
@@ -8412,6 +8855,12 @@ function renderAgencyProfile(agencyData) {
                 <button class="btn-primary" onclick="saveAgencyProfile()">
                     💾 Guardar Cambios
                 </button>
+                
+                <!-- ✅ AÑADIR ESTE BOTÓN NUEVO -->
+                <button class="btn-info" onclick="loadAgencyVisitasGuiadas()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    🗓️ Mis Visitas Guiadas
+                </button>
+                
                 <button class="btn-secondary" onclick="goBackToDashboard()">
                     ← Volver al Dashboard
                 </button>
@@ -9123,6 +9572,39 @@ function formatDateForProfile(dateString) {
         return dateString;
     }
 }
+
+
+/**
+ * Cargar sección de Mis Visitas Guiadas
+ */
+function loadAgencyVisitasGuiadas() {
+    console.log('=== CARGANDO MIS VISITAS GUIADAS ===');
+
+    showLoadingInMainContent();
+
+    jQuery.ajax({
+        url: reservasAjax.ajax_url,
+        type: 'POST',
+        data: {
+            action: 'get_agency_visitas_config',
+            nonce: reservasAjax.nonce
+        },
+        success: function (response) {
+            console.log('Respuesta:', response);
+
+            if (response.success) {
+                renderAgencyVisitasGuiadas(response.data);
+            } else {
+                showErrorInMainContent('Error cargando visitas: ' + response.data);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error AJAX:', error);
+            showErrorInMainContent('Error de conexión');
+        }
+    });
+}
+
 
 
 function showEditReservationModal(reservaId) {
@@ -14042,7 +14524,7 @@ function loadVisitasReportsSection() {
     // ✅ VERIFICAR SI ES AGENCIA
     const isAgency = window.reservasUser && window.reservasUser.role === 'agencia';
     const agencySelectorDisplay = isAgency ? 'style="display: none;"' : '';
-    
+
     // ✅ NUEVO: Mostrar botón PDF solo para super_admin
     const isSuperAdmin = window.reservasUser && window.reservasUser.role === 'super_admin';
     const pdfButtonHtml = isSuperAdmin ? `
@@ -15163,7 +15645,7 @@ function renderVisitasReport(data) {
 
     // Estadísticas por agencia con diseño mejorado
     const isAgency = window.reservasUser && window.reservasUser.role === 'agencia';
-    
+
     let agencyStatsHtml = '';
     if (data.stats_por_agencias && data.stats_por_agencias.length > 0 && !isAgency) {
         agencyStatsHtml = `
@@ -15237,9 +15719,9 @@ function renderVisitasReport(data) {
                         <button class="btn-small btn-info" onclick="showVisitaDetails(${visita.id})" title="Ver detalles">👁️</button>
                         <button class="btn-small btn-success" onclick="downloadVisitaPDF(${visita.id}, '${visita.localizador}')" title="Descargar PDF">📄</button>
                         ${visita.estado === 'confirmada' ?
-                            `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
-                            '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
-                        }
+                    `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
+                    '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
+                }
                     </td>
                 </tr>
             `;
@@ -15345,7 +15827,7 @@ function showVisitaDetails(visitaId) {
 
             if (data.success) {
                 const visita = data.data;
-                
+
                 const fechaFormateada = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
                     weekday: 'long',
                     year: 'numeric',
@@ -15588,7 +16070,7 @@ function showEditVisitaModal(visitaId) {
         .then(data => {
             if (data.success) {
                 const visita = data.data;
-                
+
                 // Crear modal de edición
                 const modalHtml = `
                     <div id="editVisitaModal" class="modal" style="display: block;">
@@ -15650,12 +16132,12 @@ function showEditVisitaModal(visitaId) {
                         </div>
                     </div>
                 `;
-                
+
                 // Añadir modal al DOM
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
-                
+
                 // Event listener para el formulario
-                document.getElementById('editVisitaForm').addEventListener('submit', function(e) {
+                document.getElementById('editVisitaForm').addEventListener('submit', function (e) {
                     e.preventDefault();
                     saveVisitaChanges();
                 });
@@ -15686,7 +16168,7 @@ function saveVisitaChanges() {
     const ninos = document.getElementById('edit-ninos').value;
     const ninosMenores = document.getElementById('edit-ninos-menores').value;
     const motivo = document.getElementById('edit-motivo').value;
-    
+
     const formData = new FormData();
     formData.append('action', 'update_visita_data');
     formData.append('visita_id', visitaId);
@@ -15699,7 +16181,7 @@ function saveVisitaChanges() {
     formData.append('ninos_menores', ninosMenores);
     formData.append('motivo', motivo);
     formData.append('nonce', reservasAjax.nonce);
-    
+
     fetch(reservasAjax.ajax_url, {
         method: 'POST',
         body: formData

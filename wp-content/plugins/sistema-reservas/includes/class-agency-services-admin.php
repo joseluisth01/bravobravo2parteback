@@ -442,14 +442,23 @@ class ReservasAgencyServicesAdmin
                 }
             }
 
-            if ($hora_coincide) {
-                // ✅ ASEGURAR QUE idiomas_disponibles NO ES NULL
-                if ($service->idiomas_disponibles === null || empty($service->idiomas_disponibles)) {
-                    error_log('⚠️ Idiomas NULL para servicio ID ' . $service->id . ', estableciendo objeto vacío');
-                    $service->idiomas_disponibles = '{}';
-                }
 
-                error_log('✅ Servicio disponible: ' . $service->agency_name . ' (Idiomas: ' . $service->idiomas_disponibles . ')');
+            $table_disabled = $wpdb->prefix . 'reservas_agency_horarios_disabled';
+            $is_disabled = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM $table_disabled 
+             WHERE agency_id = %d AND dia = %s AND hora = %s",
+                $service->agency_id,
+                $dia_nombre,
+                $hora
+            ));
+
+            if ($is_disabled > 0) {
+                error_log('❌ Horario deshabilitado: ' . $service->agency_name . ' - ' . $dia_nombre . ' ' . $hora);
+                continue; // ✅ SALTAR ESTE SERVICIO
+            }
+
+
+            if ($hora_coincide) {
                 $available_services[] = $service;
             }
         }
