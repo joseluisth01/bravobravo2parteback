@@ -1251,55 +1251,60 @@ class ReservasReportsAdmin
      * Obtener detalles de una reserva específica - CON FECHA DE COMPRA
      */
     public function get_reservation_details()
-    {
-        // ✅ VERIFICACIÓN SIMPLIFICADA TEMPORAL
-        if (!session_id()) {
-            session_start();
-        }
+{
+    // ✅ VERIFICACIÓN SIMPLIFICADA TEMPORAL
+    if (!session_id()) {
+        session_start();
+    }
 
-        if (!isset($_SESSION['reservas_user'])) {
-            wp_send_json_error('Sesión expirada. Recarga la página e inicia sesión nuevamente.');
-            return;
-        }
+    if (!isset($_SESSION['reservas_user'])) {
+        wp_send_json_error('Sesión expirada. Recarga la página e inicia sesión nuevamente.');
+        return;
+    }
 
-        $user = $_SESSION['reservas_user'];
-        if (!in_array($user['role'], ['super_admin', 'admin'])) {
-            wp_send_json_error('Sin permisos');
-            return;
-        }
+    $user = $_SESSION['reservas_user'];
+    if (!in_array($user['role'], ['super_admin', 'admin'])) {
+        wp_send_json_error('Sin permisos');
+        return;
+    }
 
-        global $wpdb;
-        $table_reservas = $wpdb->prefix . 'reservas_reservas';
+    global $wpdb;
+    $table_reservas = $wpdb->prefix . 'reservas_reservas';
 
-        $reserva_id = intval($_POST['reserva_id']);
+    $reserva_id = intval($_POST['reserva_id']);
 
-        $reserva = $wpdb->get_row($wpdb->prepare(
-            "SELECT r.*, s.hora as servicio_hora, s.precio_adulto, s.precio_nino, s.precio_residente
+    // ✅ AÑADIR JOIN CON SERVICIOS PARA OBTENER PRECIOS
+    $reserva = $wpdb->get_row($wpdb->prepare(
+        "SELECT r.*, 
+                s.hora as servicio_hora, 
+                s.precio_adulto, 
+                s.precio_nino, 
+                s.precio_residente
          FROM $table_reservas r
          LEFT JOIN {$wpdb->prefix}reservas_servicios s ON r.servicio_id = s.id
          WHERE r.id = %d",
-            $reserva_id
-        ));
+        $reserva_id
+    ));
 
-        if (!$reserva) {
-            wp_send_json_error('Reserva no encontrada');
-        }
-
-        // Decodificar regla de descuento si existe
-        if ($reserva->regla_descuento_aplicada) {
-            $reserva->regla_descuento_aplicada = json_decode($reserva->regla_descuento_aplicada, true);
-        }
-
-        // ✅ AÑADIR INFORMACIÓN ADICIONAL DE FECHAS
-        $reserva->fecha_compra_formateada = date('d/m/Y H:i', strtotime($reserva->created_at));
-        $reserva->fecha_servicio_formateada = date('d/m/Y', strtotime($reserva->fecha));
-
-        if ($reserva->updated_at && $reserva->updated_at !== $reserva->created_at) {
-            $reserva->fecha_actualizacion_formateada = date('d/m/Y H:i', strtotime($reserva->updated_at));
-        }
-
-        wp_send_json_success($reserva);
+    if (!$reserva) {
+        wp_send_json_error('Reserva no encontrada');
     }
+
+    // Decodificar regla de descuento si existe
+    if ($reserva->regla_descuento_aplicada) {
+        $reserva->regla_descuento_aplicada = json_decode($reserva->regla_descuento_aplicada, true);
+    }
+
+    // ✅ AÑADIR INFORMACIÓN ADICIONAL DE FECHAS
+    $reserva->fecha_compra_formateada = date('d/m/Y H:i', strtotime($reserva->created_at));
+    $reserva->fecha_servicio_formateada = date('d/m/Y', strtotime($reserva->fecha));
+
+    if ($reserva->updated_at && $reserva->updated_at !== $reserva->created_at) {
+        $reserva->fecha_actualizacion_formateada = date('d/m/Y H:i', strtotime($reserva->updated_at));
+    }
+
+    wp_send_json_success($reserva);
+}
 
     /**
      * Actualizar email de una reserva

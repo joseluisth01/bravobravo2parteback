@@ -3965,6 +3965,15 @@ function loadReservationDataForEdit(reservaId) {
             if (data.success) {
                 const reserva = data.data;
 
+                // ✅ GUARDAR PRECIOS DEL SERVICIO GLOBALMENTE
+                window.currentServicePrices = {
+                    precio_adulto: parseFloat(reserva.precio_adulto || 10),
+                    precio_nino: parseFloat(reserva.precio_nino || 5),
+                    precio_residente: parseFloat(reserva.precio_residente || 5)
+                };
+
+                console.log('💾 Precios del servicio guardados:', window.currentServicePrices);
+
                 // Llenar campos de personas
                 document.getElementById('edit-adultos').value = reserva.adultos || 0;
                 document.getElementById('edit-residentes').value = reserva.residentes || 0;
@@ -3976,7 +3985,7 @@ function loadReservationDataForEdit(reservaId) {
                 document.getElementById('edit-descuento-total').value = parseFloat(reserva.descuento_total || 0).toFixed(2);
                 document.getElementById('edit-precio-final').value = parseFloat(reserva.precio_final || 0).toFixed(2);
 
-                // Actualizar totales
+                // Actualizar totales y precios
                 updatePersonsTotal();
             } else {
                 alert('Error cargando datos de la reserva: ' + data.data);
@@ -4006,7 +4015,48 @@ function updatePersonsTotal() {
         document.getElementById('edit-ninos-5-12').value = 0;
         document.getElementById('edit-ninos-menores').value = 0;
         updatePersonsTotal();
+        return;
     }
+
+    // ✅ RECALCULAR PRECIOS AUTOMÁTICAMENTE
+    recalcularPreciosEdicion(adultos, residentes, ninos512);
+}
+
+function recalcularPreciosEdicion(adultos, residentes, ninos512) {
+    // Obtener precios del servicio (guardados al cargar)
+    if (!window.currentServicePrices) {
+        console.warn('⚠️ No hay precios del servicio guardados');
+        return;
+    }
+
+    const precioAdulto = parseFloat(window.currentServicePrices.precio_adulto);
+    const precioResidente = parseFloat(window.currentServicePrices.precio_residente);
+    const precioNino = parseFloat(window.currentServicePrices.precio_nino);
+
+    console.log('🔢 Recalculando con precios:', {
+        adultos, residentes, ninos512,
+        precioAdulto, precioResidente, precioNino
+    });
+
+    // Calcular precio base CORRECTO
+    const nuevoPrecioBase = 
+        (adultos * precioAdulto) +
+        (residentes * precioResidente) +
+        (ninos512 * precioNino);
+
+    console.log('💰 Nuevo precio base calculado:', nuevoPrecioBase);
+
+    // Actualizar campo precio base
+    document.getElementById('edit-precio-base').value = nuevoPrecioBase.toFixed(2);
+
+    // Mantener el descuento actual
+    const descuentoActual = parseFloat(document.getElementById('edit-descuento-total').value) || 0;
+    
+    // Calcular nuevo precio final
+    const nuevoPrecioFinal = Math.max(0, nuevoPrecioBase - descuentoActual);
+    document.getElementById('edit-precio-final').value = nuevoPrecioFinal.toFixed(2);
+
+    console.log('✅ Precios actualizados - Base:', nuevoPrecioBase, 'Descuento:', descuentoActual, 'Final:', nuevoPrecioFinal);
 }
 
 /**
@@ -4018,6 +4068,8 @@ function updateFinalPrice() {
     const precioFinal = Math.max(0, precioBase - descuentoTotal);
 
     document.getElementById('edit-precio-final').value = precioFinal.toFixed(2);
+    
+    console.log('💰 Precio final actualizado por cambio de descuento:', precioFinal);
 }
 
 /**

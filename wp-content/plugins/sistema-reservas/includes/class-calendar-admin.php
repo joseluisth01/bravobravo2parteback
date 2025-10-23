@@ -28,41 +28,41 @@ class ReservasCalendarAdmin
 
     public function get_calendar_data()
     {
-error_log('=== CALENDAR AJAX REQUEST START ===');
-    
-    // ✅ VERIFICAR NONCE CORRECTAMENTE
-    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'reservas_nonce')) {
-        wp_send_json_error('Error de seguridad');
-        return;
-    }
+        error_log('=== CALENDAR AJAX REQUEST START ===');
 
-    header('Content-Type: application/json');
-
-    try {
-        if (!session_id()) {
-            session_start();
-        }
-
-        // ✅ VERIFICAR SESIÓN MÁS FLEXIBLE
-        if (!isset($_SESSION['reservas_user'])) {
-            error_log('❌ No hay usuario en sesión');
-            wp_send_json_error('Sesión expirada. Recarga la página e inicia sesión nuevamente.');
+        // ✅ VERIFICAR NONCE CORRECTAMENTE
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'reservas_nonce')) {
+            wp_send_json_error('Error de seguridad');
             return;
         }
 
-        $user = $_SESSION['reservas_user'];
-        if (!in_array($user['role'], ['super_admin', 'admin'])) {
-            error_log('❌ Usuario sin permisos: ' . $user['role']);
-            wp_send_json_error('Sin permisos');
-            return;
-        }
+        header('Content-Type: application/json');
 
-        // ✅ RESTO DEL CÓDIGO EXISTENTE...
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'reservas_servicios';
+        try {
+            if (!session_id()) {
+                session_start();
+            }
 
-        $month = isset($_POST['month']) ? intval($_POST['month']) : date('n');
-        $year = isset($_POST['year']) ? intval($_POST['year']) : date('Y');
+            // ✅ VERIFICAR SESIÓN MÁS FLEXIBLE
+            if (!isset($_SESSION['reservas_user'])) {
+                error_log('❌ No hay usuario en sesión');
+                wp_send_json_error('Sesión expirada. Recarga la página e inicia sesión nuevamente.');
+                return;
+            }
+
+            $user = $_SESSION['reservas_user'];
+            if (!in_array($user['role'], ['super_admin', 'admin'])) {
+                error_log('❌ Usuario sin permisos: ' . $user['role']);
+                wp_send_json_error('Sin permisos');
+                return;
+            }
+
+            // ✅ RESTO DEL CÓDIGO EXISTENTE...
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'reservas_servicios';
+
+            $month = isset($_POST['month']) ? intval($_POST['month']) : date('n');
+            $year = isset($_POST['year']) ? intval($_POST['year']) : date('Y');
 
             error_log("Loading calendar for: $month/$year");
 
@@ -90,24 +90,24 @@ error_log('=== CALENDAR AJAX REQUEST START ===');
 
             // Organizar por fecha
             $calendar_data = array();
-foreach ($servicios as $servicio) {
-    if (!isset($calendar_data[$servicio->fecha])) {
-        $calendar_data[$servicio->fecha] = array();
-    }
+            foreach ($servicios as $servicio) {
+                if (!isset($calendar_data[$servicio->fecha])) {
+                    $calendar_data[$servicio->fecha] = array();
+                }
 
-    $calendar_data[$servicio->fecha][] = array(
-        'id' => $servicio->id,
-        'hora' => substr($servicio->hora, 0, 5),
-        'plazas_totales' => $servicio->plazas_totales,
-        'plazas_disponibles' => $servicio->plazas_disponibles, // ✅ YA ESTÁ
-        'precio_adulto' => $servicio->precio_adulto,
-        'precio_nino' => $servicio->precio_nino,
-        'precio_residente' => $servicio->precio_residente,
-        'tiene_descuento' => $servicio->tiene_descuento,
-        'porcentaje_descuento' => $servicio->porcentaje_descuento,
-        'enabled' => $servicio->enabled
-    );
-}
+                $calendar_data[$servicio->fecha][] = array(
+                    'id' => $servicio->id,
+                    'hora' => substr($servicio->hora, 0, 5),
+                    'plazas_totales' => $servicio->plazas_totales,
+                    'plazas_disponibles' => $servicio->plazas_disponibles, // ✅ YA ESTÁ
+                    'precio_adulto' => $servicio->precio_adulto,
+                    'precio_nino' => $servicio->precio_nino,
+                    'precio_residente' => $servicio->precio_residente,
+                    'tiene_descuento' => $servicio->tiene_descuento,
+                    'porcentaje_descuento' => $servicio->porcentaje_descuento,
+                    'enabled' => $servicio->enabled
+                );
+            }
 
             error_log('✅ Calendar data prepared successfully');
             die(json_encode(['success' => true, 'data' => $calendar_data]));
@@ -146,7 +146,7 @@ foreach ($servicios as $servicio) {
         $precio_residente = floatval($_POST['precio_residente']);
         $service_id = isset($_POST['service_id']) ? intval($_POST['service_id']) : 0;
 
-        // ✅ NUEVO CAMPO: ENABLED
+        // Campo enabled
         $enabled = isset($_POST['enabled']) ? 1 : 0;
 
         // Campos de descuento
@@ -163,13 +163,13 @@ foreach ($servicios as $servicio) {
 
         $dias_anticipacion = ReservasConfigurationAdmin::get_dias_anticipacion_minima();
 
-        // ✅ CORREGIR CÁLCULO DE FECHA MÍNIMA
+        // Calcular fecha mínima
         $fecha_minima = date('Y-m-d');
         if ($dias_anticipacion > 0) {
             $fecha_minima = date('Y-m-d', strtotime("+$dias_anticipacion days"));
         }
 
-        // ✅ CAMBIO AQUÍ: Solo validar si NO es super_admin
+        // Solo validar si NO es super_admin
         if ($user['role'] !== 'super_admin') {
             if ($fecha < $fecha_minima) {
                 wp_send_json_error("No se pueden crear servicios para fechas anteriores a $fecha_minima (mínimo $dias_anticipacion días de anticipación)");
@@ -189,14 +189,49 @@ foreach ($servicios as $servicio) {
             $descuento_minimo_personas = 1;
         }
 
+        // ✅ CAMBIO PRINCIPAL: Calcular plazas_disponibles correctamente
+        $plazas_disponibles = $plazas_totales;
 
+        if ($service_id > 0) {
+            // ✅ SI ESTAMOS EDITANDO, CALCULAR LAS PLAZAS OCUPADAS
+
+            // 1. Obtener el servicio actual
+            $servicio_actual = $wpdb->get_row($wpdb->prepare(
+                "SELECT plazas_totales, plazas_disponibles FROM $table_name WHERE id = %d",
+                $service_id
+            ));
+
+            if ($servicio_actual) {
+                // 2. Calcular cuántas plazas están ocupadas actualmente
+                $plazas_ocupadas = $servicio_actual->plazas_totales - $servicio_actual->plazas_disponibles;
+
+                error_log("✅ Servicio ID $service_id - Plazas totales antiguas: {$servicio_actual->plazas_totales}");
+                error_log("✅ Plazas disponibles antiguas: {$servicio_actual->plazas_disponibles}");
+                error_log("✅ Plazas ocupadas calculadas: $plazas_ocupadas");
+                error_log("✅ Nuevas plazas totales: $plazas_totales");
+
+                // 3. Calcular las nuevas plazas disponibles
+                // Plazas disponibles = Plazas totales nuevas - Plazas ocupadas
+                $plazas_disponibles = $plazas_totales - $plazas_ocupadas;
+
+                // 4. Validar que no sea negativo
+                if ($plazas_disponibles < 0) {
+                    wp_send_json_error("Error: No puedes reducir las plazas totales a $plazas_totales porque ya hay $plazas_ocupadas plazas ocupadas con reservas confirmadas.");
+                    return;
+                }
+
+                error_log("✅ Nuevas plazas disponibles calculadas: $plazas_disponibles");
+            } else {
+                error_log("⚠️ No se encontró el servicio actual, usando plazas_totales como disponibles");
+            }
+        }
 
         $data = array(
             'fecha' => $fecha,
             'hora' => $hora,
             'hora_vuelta' => $hora_vuelta,
             'plazas_totales' => $plazas_totales,
-            'plazas_disponibles' => $plazas_totales,
+            'plazas_disponibles' => $plazas_disponibles, // ✅ AHORA USA EL VALOR CALCULADO
             'precio_adulto' => $precio_adulto,
             'precio_nino' => $precio_nino,
             'precio_residente' => $precio_residente,
@@ -206,16 +241,24 @@ foreach ($servicios as $servicio) {
             'descuento_minimo_personas' => $descuento_minimo_personas,
             'descuento_acumulable' => $descuento_acumulable,
             'descuento_prioridad' => $descuento_prioridad,
-            'enabled' => $enabled, // ✅ NUEVO CAMPO
+            'enabled' => $enabled,
             'status' => 'active'
         );
 
         if ($service_id > 0) {
             // Actualizar
             $result = $wpdb->update($table_name, $data, array('id' => $service_id));
+
+            if ($result !== false) {
+                error_log("✅ Servicio $service_id actualizado - Plazas disponibles: $plazas_disponibles");
+            }
         } else {
-            // Insertar
+            // Insertar (nuevo servicio)
             $result = $wpdb->insert($table_name, $data);
+
+            if ($result !== false) {
+                error_log("✅ Nuevo servicio creado - Plazas disponibles: $plazas_disponibles");
+            }
         }
 
         if ($result !== false) {
