@@ -654,85 +654,87 @@ jQuery(document).ready(function ($) {
     };
 
     window.proceedToDetails = function () {
-    console.log('=== INICIANDO proceedToDetails SIN REDSYS (MODO DESARROLLO) ===');
+        console.log('=== INICIANDO proceedToDetails SIN REDSYS (MODO DESARROLLO) ===');
 
-    if (!selectedDate || !selectedServiceId) {
-        alert('Error: No hay fecha o servicio seleccionado');
-        return;
-    }
-
-    const service = findServiceById(selectedServiceId);
-    if (!service) {
-        alert('Error: No se encontraron datos del servicio');
-        return;
-    }
-
-    const adultos = parseInt($('#adultos').val()) || 0;
-    const residentes = parseInt($('#residentes').val()) || 0;
-    const ninos_5_12 = parseInt($('#ninos-5-12').val()) || 0;
-    const ninos_menores = parseInt($('#ninos-menores').val()) || 0;
-
-    let totalPrice = '0';
-    try {
-        const totalPriceElement = $('#total-price');
-        if (totalPriceElement.length > 0) {
-            const totalPriceText = totalPriceElement.text();
-            totalPrice = totalPriceText.replace('€', '').trim();
+        if (!selectedDate || !selectedServiceId) {
+            alert('Error: No hay fecha o servicio seleccionado');
+            return;
         }
-    } catch (error) {
-        console.error('Error obteniendo precio total:', error);
-    }
 
-    const reservationData = {
-        fecha: selectedDate,
-        service_id: selectedServiceId,
-        hora_ida: service.hora,
-        hora_vuelta: service.hora_vuelta || '',
-        adultos: adultos,
-        residentes: residentes,
-        ninos_5_12: ninos_5_12,
-        ninos_menores: ninos_menores,
-        precio_adulto: service.precio_adulto,
-        precio_nino: service.precio_nino,
-        precio_residente: service.precio_residente,
-        total_price: totalPrice,
-        descuento_grupo: $('#total-discount').text().includes('€') ?
-            parseFloat($('#total-discount').text().replace('€', '').replace('-', '')) : 0,
-        regla_descuento_aplicada: window.lastDiscountRule || null
-    };
+        const service = findServiceById(selectedServiceId);
+        if (!service) {
+            alert('Error: No se encontraron datos del servicio');
+            return;
+        }
 
-    console.log('Datos de reserva preparados:', reservationData);
+        const adultos = parseInt($('#adultos').val()) || 0;
+        const residentes = parseInt($('#residentes').val()) || 0;
+        const ninos_5_12 = parseInt($('#ninos-5-12').val()) || 0;
+        const ninos_menores = parseInt($('#ninos-menores').val()) || 0;
 
-    try {
-        const dataString = JSON.stringify(reservationData);
-        sessionStorage.setItem('reservationData', dataString);
-        console.log('Datos guardados en sessionStorage exitosamente');
-    } catch (error) {
-        console.error('Error guardando en sessionStorage:', error);
-        alert('Error guardando los datos de la reserva: ' + error.message);
-        return;
-    }
+        // ❌ ELIMINAR ESTA LÍNEA - NO CONFIAR EN EL PRECIO DEL FRONTEND
+        // let totalPrice = '0';
+        // try {
+        //     const totalPriceElement = $('#total-price');
+        //     if (totalPriceElement.length > 0) {
+        //         const totalPriceText = totalPriceElement.text();
+        //         totalPrice = totalPriceText.replace('€', '').trim();
+        //     }
+        // } catch (error) {
+        //     console.error('Error obteniendo precio total:', error);
+        // }
 
-    // ✅ CALCULAR URL DESTINO DE FORMA MEJORADA
-    let targetUrl;
-    const currentPath = window.location.pathname;
+        const reservationData = {
+            fecha: selectedDate,
+            service_id: selectedServiceId,
+            hora_ida: service.hora,
+            hora_vuelta: service.hora_vuelta || '',
+            adultos: adultos,
+            residentes: residentes,
+            ninos_5_12: ninos_5_12,
+            ninos_menores: ninos_menores,
+            precio_adulto: service.precio_adulto,
+            precio_nino: service.precio_nino,
+            precio_residente: service.precio_residente,
+            // ❌ ELIMINAR: total_price: totalPrice,
+            // ❌ ELIMINAR: descuento_grupo: $('#total-discount').text().includes('€') ?
+            //     parseFloat($('#total-discount').text().replace('€', '').replace('-', '')) : 0,
+            // ✅ SOLO ENVIAR INFORMACIÓN PARA RECALCULAR
+            regla_descuento_aplicada: window.lastDiscountRule || null
+        };
 
-    if (currentPath.includes('/bravo/')) {
-        targetUrl = window.location.origin + '/bravo/detalles-reserva/';
-    } else if (currentPath.includes('/')) {
-        const pathParts = currentPath.split('/').filter(part => part !== '');
-        if (pathParts.length > 0 && pathParts[0] !== 'detalles-reserva') {
-            targetUrl = window.location.origin + '/' + pathParts[0] + '/detalles-reserva/';
+        console.log('Datos de reserva preparados:', reservationData);
+
+        try {
+            const dataString = JSON.stringify(reservationData);
+            sessionStorage.setItem('reservationData', dataString);
+            console.log('Datos guardados en sessionStorage exitosamente');
+        } catch (error) {
+            console.error('Error guardando en sessionStorage:', error);
+            alert('Error guardando los datos de la reserva: ' + error.message);
+            return;
+        }
+
+        // ✅ CALCULAR URL DESTINO
+        let targetUrl;
+        const currentPath = window.location.pathname;
+
+        if (currentPath.includes('/bravo/')) {
+            targetUrl = window.location.origin + '/bravo/detalles-reserva/';
+        } else if (currentPath.includes('/')) {
+            const pathParts = currentPath.split('/').filter(part => part !== '');
+            if (pathParts.length > 0 && pathParts[0] !== 'detalles-reserva') {
+                targetUrl = window.location.origin + '/' + pathParts[0] + '/detalles-reserva/';
+            } else {
+                targetUrl = window.location.origin + '/detalles-reserva/';
+            }
         } else {
             targetUrl = window.location.origin + '/detalles-reserva/';
         }
-    } else {
-        targetUrl = window.location.origin + '/detalles-reserva/';
-    }
 
-    console.log('Redirigiendo a:', targetUrl);
-    window.location.href = targetUrl;
-};
+        console.log('Redirigiendo a:', targetUrl);
+        window.location.href = targetUrl;
+    };
 
     window.selectDate = selectDate;
     window.findServiceById = findServiceById;
@@ -854,7 +856,7 @@ function processReservation() {
 
             if (data && data.success) {
                 console.log("✅ Reserva procesada correctamente");
-                
+
                 // ✅ REDIRIGIR A PÁGINA DE CONFIRMACIÓN
                 if (data.data.redirect_url) {
                     console.log("Redirigiendo a:", data.data.redirect_url);

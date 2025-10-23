@@ -40,6 +40,36 @@ class ReservasProcessor
                 return;
             }
 
+            $datos_reserva_json = stripslashes($_POST['reservation_data']);
+    $datos_reserva = json_decode($datos_reserva_json, true);
+    
+    if (!isset($datos_reserva['calculo_completo']) || !isset($datos_reserva['calculo_completo']['firma'])) {
+        error_log('❌ INTENTO DE MANIPULACIÓN: No hay firma digital en el precio');
+        wp_send_json_error('Error de seguridad: precio no validado');
+        return;
+    }
+
+    $firma_recibida = $datos_reserva['calculo_completo']['firma'];
+    $firma_data = $datos_reserva['calculo_completo']['firma_data'];
+    
+    // ✅ RECALCULAR FIRMA PARA VERIFICAR
+    $firma_calculada = hash_hmac('sha256', json_encode($firma_data), wp_salt('nonce'));
+    
+    if ($firma_recibida !== $firma_calculada) {
+        error_log('❌ INTENTO DE MANIPULACIÓN: Firma digital no coincide');
+        error_log('Firma recibida: ' . $firma_recibida);
+        error_log('Firma calculada: ' . $firma_calculada);
+        wp_send_json_error('Error de seguridad: precio manipulado');
+        return;
+    }
+
+    // ✅ VERIFICAR QUE EL TIMESTAMP NO SEA MUY ANTIGUO (máx. 30 minutos)
+    if ((time() - $firma_data['timestamp']) > 1800) {
+        error_log('❌ INTENTO DE MANIPULACIÓN: Precio expirado');
+        wp_send_json_error('La sesión ha expirado. Por favor, vuelve a calcular el precio.');
+        return;
+    }
+
             // Validar y sanitizar datos del formulario
             $datos_personales = $this->validar_datos_personales();
             if (!$datos_personales['valido']) {

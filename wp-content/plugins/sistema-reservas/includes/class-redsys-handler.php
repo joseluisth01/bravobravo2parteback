@@ -19,17 +19,35 @@ function generar_formulario_redsys($reserva_data) {
         error_log('🟡 USANDO CONFIGURACIÓN DE PRUEBAS');
     }
     
-    $total_price = null;
-    if (isset($reserva_data['total_price'])) {
-        $total_price = $reserva_data['total_price'];
-    } elseif (isset($reserva_data['precio_final'])) {
-        $total_price = $reserva_data['precio_final'];
+    // ✅ VERIFICAR FIRMA DIGITAL ANTES DE PROCEDER
+    if (!isset($reserva_data['calculo_completo']) || !isset($reserva_data['calculo_completo']['firma'])) {
+        error_log('❌ INTENTO DE MANIPULACIÓN: No hay firma digital');
+        throw new Exception('Error de seguridad: precio no validado');
     }
     
-    if ($total_price) {
-        $total_price = str_replace(['€', ' ', ','], ['', '', '.'], $total_price);
-        $total_price = floatval($total_price);
+    $firma_recibida = $reserva_data['calculo_completo']['firma'];
+    $firma_data = $reserva_data['calculo_completo']['firma_data'];
+    
+    // ✅ RECALCULAR FIRMA PARA VERIFICAR
+    $firma_calculada = hash_hmac('sha256', json_encode($firma_data), wp_salt('nonce'));
+    
+    if ($firma_recibida !== $firma_calculada) {
+        error_log('❌ INTENTO DE MANIPULACIÓN: Firma digital no coincide');
+        error_log('Firma recibida: ' . $firma_recibida);
+        error_log('Firma calculada: ' . $firma_calculada);
+        throw new Exception('Error de seguridad: precio manipulado');
     }
+    
+    // ✅ VERIFICAR TIMESTAMP (máximo 30 minutos)
+    if ((time() - $firma_data['timestamp']) > 1800) {
+        error_log('❌ Firma expirada');
+        throw new Exception('La sesión ha expirado. Por favor, vuelve a calcular el precio.');
+    }
+    
+    // ✅ USAR PRECIO FIRMADO, NO EL QUE VIENE EN total_price
+    $total_price = floatval($reserva_data['calculo_completo']['precio_final']);
+    
+    error_log('✅ Firma verificada correctamente. Precio validado: ' . $total_price . '€');
     
     if (!$total_price || $total_price <= 0) {
         throw new Exception('El importe debe ser mayor que 0. Recibido: ' . $total_price);

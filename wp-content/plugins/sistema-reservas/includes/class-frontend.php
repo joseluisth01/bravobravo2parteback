@@ -16,7 +16,10 @@ class ReservasFrontend
         add_action('wp_ajax_nopriv_calculate_price', array($this, 'calculate_price'));
 
         add_action('wp_ajax_get_configuration', array($this, 'get_configuration'));
-add_action('wp_ajax_nopriv_get_configuration', array($this, 'get_configuration'));
+        add_action('wp_ajax_nopriv_get_configuration', array($this, 'get_configuration'));
+
+        add_action('wp_ajax_calculate_price_secure', array($this, 'calculate_price_secure'));
+        add_action('wp_ajax_nopriv_calculate_price_secure', array($this, 'calculate_price_secure'));
     }
 
     public function enqueue_frontend_assets()
@@ -71,6 +74,172 @@ add_action('wp_ajax_nopriv_get_configuration', array($this, 'get_configuration')
                 'nonce' => wp_create_nonce('reservas_nonce')
             ));
         }
+    }
+
+    /**
+     * ✅ VERSIÓN SEGURA: Calcular precio SIEMPRE en el backend
+     */
+    public function calculate_price_secure()
+    {
+        if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+            wp_die('Error de seguridad');
+        }
+
+        // ✅ OBTENER Y VALIDAR DATOS
+        $service_id = intval($_POST['service_id']);
+        $adultos = max(0, intval($_POST['adultos']));
+        $residentes = max(0, intval($_POST['residentes']));
+        $ninos_5_12 = max(0, intval($_POST['ninos_5_12']));
+        $ninos_menores = max(0, intval($_POST['ninos_menores']));
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_servicios';
+
+        // Obtener datos del servicio
+        $servicio = $wpdb->get_row($wpdb->prepare(
+            "SELECT *, tiene_descuento, porcentaje_descuento, descuento_tipo, descuento_minimo_personas,
+            descuento_acumulable, descuento_prioridad
+         FROM $table_name WHERE id = %d",
+            $service_id
+        ));
+
+        if (!$servicio) {
+            wp_send_json_error('Servicio no encontrado');
+            return;
+        }
+
+        // ✅ CALCULAR TOTAL DE PERSONAS QUE OCUPAN PLAZA
+        $total_personas_con_plaza = $adultos + $residentes + $ninos_5_12;
+
+        // ✅ CALCULAR PRECIO BASE (todos pagan precio de adulto inicialmente)
+        $precio_base = 0;
+        $precio_base += $adultos * $servicio->precio_adulto;
+        $precio_base += $residentes * $servicio->precio_adulto;
+        $precio_base += $ninos_5_12 * $servicio->precio_adulto;
+
+        // ✅ CALCULAR DESCUENTOS INDIVIDUALES
+        $descuento_total = 0;
+
+        // Descuento por ser residente
+        $descuento_residentes = $residentes * ($servicio->precio_adulto - $servicio->precio_residente);
+        $descuento_total += $descuento_residentes;
+
+        // Descuento por ser niño
+        $descuento_ninos = $ninos_5_12 * ($servicio->precio_adulto - $servicio->precio_nino);
+        $descuento_total += $descuento_ninos;
+
+        // ✅ INICIALIZAR VARIABLES DE DESCUENTO
+        $descuento_grupo = 0;
+        $descuento_servicio = 0;
+        $regla_aplicada = null;
+        $aplicar_descuento_servicio = false;
+
+        // ✅ PASO 1: CALCULAR DESCUENTO POR GRUPO (REGLAS GLOBALES)
+        if ($total_personas_con_plaza > 0) {
+            if (!class_exists('ReservasDiscountsAdmin')) {
+                require_once RESERVAS_PLUGIN_PATH . 'includes/class-discounts-admin.php';
+            }
+
+            $subtotal_para_grupo = $precio_base - $descuento_total;
+
+            $discount_info = ReservasDiscountsAdmin::calculate_discount(
+                $total_personas_con_plaza,
+                $subtotal_para_grupo,
+                'total'
+            );
+
+            if ($discount_info['discount_applied']) {
+                $descuento_grupo = $discount_info['discount_amount'];
+                $regla_aplicada = array(
+                    'rule_name' => $discount_info['rule_name'],
+                    'discount_percentage' => $discount_info['discount_percentage'],
+                    'minimum_persons' => $discount_info['minimum_persons']
+                );
+            }
+        }
+
+        // ✅ PASO 2: CALCULAR DESCUENTO ESPECÍFICO DEL SERVICIO
+        if ($servicio->tiene_descuento && floatval($servicio->porcentaje_descuento) > 0) {
+            if ($servicio->descuento_tipo === 'fijo') {
+                $aplicar_descuento_servicio = true;
+            } elseif ($servicio->descuento_tipo === 'por_grupo') {
+                $minimo_requerido = intval($servicio->descuento_minimo_personas);
+                if ($total_personas_con_plaza >= $minimo_requerido) {
+                    $aplicar_descuento_servicio = true;
+                }
+            }
+
+            if ($aplicar_descuento_servicio) {
+                $subtotal_actual = $precio_base - $descuento_total;
+                $descuento_servicio = ($subtotal_actual * floatval($servicio->porcentaje_descuento)) / 100;
+            }
+        }
+
+        // ✅ PASO 3: APLICAR LÓGICA DE ACUMULACIÓN/PRIORIDAD
+        $descuento_final_grupo = 0;
+        $descuento_final_servicio = 0;
+        $regla_final_aplicada = null;
+
+        if ($aplicar_descuento_servicio && $descuento_grupo > 0) {
+            $acumulable = $servicio->descuento_acumulable == '1';
+
+            if ($acumulable) {
+                $descuento_final_grupo = $descuento_grupo;
+                $descuento_final_servicio = $descuento_servicio;
+                $regla_final_aplicada = $regla_aplicada;
+                $descuento_total += $descuento_grupo + $descuento_servicio;
+            } else {
+                $prioridad = $servicio->descuento_prioridad ?? 'servicio';
+
+                if ($prioridad === 'servicio') {
+                    $descuento_final_servicio = $descuento_servicio;
+                    $descuento_total += $descuento_servicio;
+                } else {
+                    $descuento_final_grupo = $descuento_grupo;
+                    $regla_final_aplicada = $regla_aplicada;
+                    $descuento_total += $descuento_grupo;
+                }
+            }
+        } elseif ($aplicar_descuento_servicio) {
+            $descuento_final_servicio = $descuento_servicio;
+            $descuento_total += $descuento_servicio;
+        } elseif ($descuento_grupo > 0) {
+            $descuento_final_grupo = $descuento_grupo;
+            $regla_final_aplicada = $regla_aplicada;
+            $descuento_total += $descuento_grupo;
+        }
+
+        // ✅ CALCULAR TOTAL FINAL
+        $precio_final = $precio_base - $descuento_total;
+        if ($precio_final < 0) $precio_final = 0;
+
+        // ✅ GENERAR FIRMA DIGITAL DEL PRECIO
+        $firma_data = array(
+            'service_id' => $service_id,
+            'adultos' => $adultos,
+            'residentes' => $residentes,
+            'ninos_5_12' => $ninos_5_12,
+            'ninos_menores' => $ninos_menores,
+            'precio_final' => $precio_final,
+            'timestamp' => time()
+        );
+
+        $firma = hash_hmac('sha256', json_encode($firma_data), wp_salt('nonce'));
+
+        // ✅ PREPARAR RESPUESTA CON FIRMA
+        $response_data = array(
+            'precio_base' => round($precio_base, 2),
+            'descuento_residentes' => round($descuento_residentes, 2),
+            'descuento_ninos' => round($descuento_ninos, 2),
+            'descuento_grupo' => round($descuento_final_grupo, 2),
+            'descuento_servicio' => round($descuento_final_servicio, 2),
+            'precio_final' => round($precio_final, 2),
+            'regla_descuento_aplicada' => $regla_final_aplicada,
+            'firma' => $firma,
+            'firma_data' => $firma_data
+        );
+
+        wp_send_json_success($response_data);
     }
 
     public function render_booking_form()
@@ -192,41 +361,41 @@ add_action('wp_ajax_nopriv_get_configuration', array($this, 'get_configuration')
         return ob_get_clean();
     }
 
-public function get_available_services()
-{
-    if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
-        wp_die('Error de seguridad');
-    }
+    public function get_available_services()
+    {
+        if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+            wp_die('Error de seguridad');
+        }
 
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'reservas_servicios';
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_servicios';
 
-    $month = intval($_POST['month']);
-    $year = intval($_POST['year']);
+        $month = intval($_POST['month']);
+        $year = intval($_POST['year']);
 
-    // Calcular primer y último día del mes
-    $first_day = sprintf('%04d-%02d-01', $year, $month);
-    $last_day = date('Y-m-t', strtotime($first_day));
+        // Calcular primer y último día del mes
+        $first_day = sprintf('%04d-%02d-01', $year, $month);
+        $last_day = date('Y-m-t', strtotime($first_day));
 
-    // ✅ OBTENER CONFIGURACIÓN DE DÍAS DE ANTICIPACIÓN
-    if (!class_exists('ReservasConfigurationAdmin')) {
-        require_once RESERVAS_PLUGIN_PATH . 'includes/class-configuration-admin.php';
-    }
+        // ✅ OBTENER CONFIGURACIÓN DE DÍAS DE ANTICIPACIÓN
+        if (!class_exists('ReservasConfigurationAdmin')) {
+            require_once RESERVAS_PLUGIN_PATH . 'includes/class-configuration-admin.php';
+        }
 
-    $dias_anticipacion = ReservasConfigurationAdmin::get_dias_anticipacion_minima();
+        $dias_anticipacion = ReservasConfigurationAdmin::get_dias_anticipacion_minima();
 
-    // ✅ FECHAS IMPORTANTES
-    $fecha_hoy = date('Y-m-d');
-    $hora_actual = date('H:i:s');
-    $datetime_actual = date('Y-m-d H:i:s');
+        // ✅ FECHAS IMPORTANTES
+        $fecha_hoy = date('Y-m-d');
+        $hora_actual = date('H:i:s');
+        $datetime_actual = date('Y-m-d H:i:s');
 
-    error_log("FRONTEND: Días anticipación: $dias_anticipacion");
-    error_log("FRONTEND: Fecha hoy: $fecha_hoy");
-    error_log("FRONTEND: Hora actual: $hora_actual");
+        error_log("FRONTEND: Días anticipación: $dias_anticipacion");
+        error_log("FRONTEND: Fecha hoy: $fecha_hoy");
+        error_log("FRONTEND: Hora actual: $hora_actual");
 
-    // ✅ CONSULTA CORREGIDA: SIEMPRE PERMITIR HOY, APLICAR ANTICIPACIÓN SOLO A FUTURO
-    $servicios = $wpdb->get_results($wpdb->prepare(
-        "SELECT id, fecha, hora, hora_vuelta, plazas_disponibles, precio_adulto, precio_nino, precio_residente, 
+        // ✅ CONSULTA CORREGIDA: SIEMPRE PERMITIR HOY, APLICAR ANTICIPACIÓN SOLO A FUTURO
+        $servicios = $wpdb->get_results($wpdb->prepare(
+            "SELECT id, fecha, hora, hora_vuelta, plazas_disponibles, precio_adulto, precio_nino, precio_residente, 
         tiene_descuento, porcentaje_descuento, descuento_tipo, descuento_minimo_personas
         FROM $table_name 
         WHERE fecha BETWEEN %s AND %s 
@@ -237,81 +406,81 @@ public function get_available_services()
             fecha >= %s
         )
         ORDER BY fecha, hora",
-        $first_day,              // Rango del mes
-        $last_day,               // Rango del mes  
-        $fecha_hoy               // ✅ PERMITIR DESDE HOY EN ADELANTE (sin restricción de anticipación aquí)
-    ));
+            $first_day,              // Rango del mes
+            $last_day,               // Rango del mes  
+            $fecha_hoy               // ✅ PERMITIR DESDE HOY EN ADELANTE (sin restricción de anticipación aquí)
+        ));
 
-    error_log("FRONTEND: Servicios encontrados en consulta: " . count($servicios));
+        error_log("FRONTEND: Servicios encontrados en consulta: " . count($servicios));
 
-    // ✅ FILTRAR SERVICIOS DESPUÉS DE LA CONSULTA
-    $servicios_filtrados = array();
-    
-    foreach ($servicios as $servicio) {
-        $incluir_servicio = true;
-        
-        // ✅ APLICAR LÓGICA DE DÍAS DE ANTICIPACIÓN
-        if ($servicio->fecha === $fecha_hoy) {
-            // Para HOY: Solo filtrar por hora (servicios futuros)
-            $servicio_datetime = $servicio->fecha . ' ' . $servicio->hora;
-            if ($servicio_datetime <= $datetime_actual) {
-                $incluir_servicio = false;
-                error_log("FRONTEND: Servicio excluido (hora pasada para hoy): {$servicio->fecha} {$servicio->hora}");
-            } else {
-                error_log("FRONTEND: Servicio incluido (hora futura para hoy): {$servicio->fecha} {$servicio->hora}");
-            }
-        } else if ($servicio->fecha > $fecha_hoy) {
-            // Para FECHAS FUTURAS: Aplicar días de anticipación
-            if ($dias_anticipacion > 0) {
-                $fecha_minima_futura = date('Y-m-d', strtotime("+$dias_anticipacion days"));
-                if ($servicio->fecha < $fecha_minima_futura) {
+        // ✅ FILTRAR SERVICIOS DESPUÉS DE LA CONSULTA
+        $servicios_filtrados = array();
+
+        foreach ($servicios as $servicio) {
+            $incluir_servicio = true;
+
+            // ✅ APLICAR LÓGICA DE DÍAS DE ANTICIPACIÓN
+            if ($servicio->fecha === $fecha_hoy) {
+                // Para HOY: Solo filtrar por hora (servicios futuros)
+                $servicio_datetime = $servicio->fecha . ' ' . $servicio->hora;
+                if ($servicio_datetime <= $datetime_actual) {
                     $incluir_servicio = false;
-                    error_log("FRONTEND: Servicio excluido (no cumple días anticipación): {$servicio->fecha} (mínimo: $fecha_minima_futura)");
+                    error_log("FRONTEND: Servicio excluido (hora pasada para hoy): {$servicio->fecha} {$servicio->hora}");
                 } else {
-                    error_log("FRONTEND: Servicio incluido (cumple días anticipación): {$servicio->fecha}");
+                    error_log("FRONTEND: Servicio incluido (hora futura para hoy): {$servicio->fecha} {$servicio->hora}");
+                }
+            } else if ($servicio->fecha > $fecha_hoy) {
+                // Para FECHAS FUTURAS: Aplicar días de anticipación
+                if ($dias_anticipacion > 0) {
+                    $fecha_minima_futura = date('Y-m-d', strtotime("+$dias_anticipacion days"));
+                    if ($servicio->fecha < $fecha_minima_futura) {
+                        $incluir_servicio = false;
+                        error_log("FRONTEND: Servicio excluido (no cumple días anticipación): {$servicio->fecha} (mínimo: $fecha_minima_futura)");
+                    } else {
+                        error_log("FRONTEND: Servicio incluido (cumple días anticipación): {$servicio->fecha}");
+                    }
+                } else {
+                    error_log("FRONTEND: Servicio incluido (sin restricción anticipación): {$servicio->fecha}");
                 }
             } else {
-                error_log("FRONTEND: Servicio incluido (sin restricción anticipación): {$servicio->fecha}");
+                // Para FECHAS PASADAS: Excluir
+                $incluir_servicio = false;
+                error_log("FRONTEND: Servicio excluido (fecha pasada): {$servicio->fecha}");
             }
-        } else {
-            // Para FECHAS PASADAS: Excluir
-            $incluir_servicio = false;
-            error_log("FRONTEND: Servicio excluido (fecha pasada): {$servicio->fecha}");
+
+            if ($incluir_servicio) {
+                $servicios_filtrados[] = $servicio;
+            }
         }
-        
-        if ($incluir_servicio) {
-            $servicios_filtrados[] = $servicio;
+
+        error_log("FRONTEND: Servicios después de filtrado: " . count($servicios_filtrados));
+
+        // Organizar por fecha
+        $calendar_data = array();
+        foreach ($servicios_filtrados as $servicio) {
+            if (!isset($calendar_data[$servicio->fecha])) {
+                $calendar_data[$servicio->fecha] = array();
+            }
+
+            $calendar_data[$servicio->fecha][] = array(
+                'id' => $servicio->id,
+                'hora' => substr($servicio->hora, 0, 5),
+                'hora_vuelta' => $servicio->hora_vuelta ? substr($servicio->hora_vuelta, 0, 5) : '',
+                'plazas_disponibles' => $servicio->plazas_disponibles,
+                'precio_adulto' => $servicio->precio_adulto,
+                'precio_nino' => $servicio->precio_nino,
+                'precio_residente' => $servicio->precio_residente,
+                'tiene_descuento' => $servicio->tiene_descuento,
+                'porcentaje_descuento' => $servicio->porcentaje_descuento,
+                'descuento_tipo' => $servicio->descuento_tipo ?? 'fijo',
+                'descuento_minimo_personas' => $servicio->descuento_minimo_personas ?? 1
+            );
         }
+
+        error_log("FRONTEND: Fechas con servicios finales: " . implode(', ', array_keys($calendar_data)));
+
+        wp_send_json_success($calendar_data);
     }
-
-    error_log("FRONTEND: Servicios después de filtrado: " . count($servicios_filtrados));
-
-    // Organizar por fecha
-    $calendar_data = array();
-    foreach ($servicios_filtrados as $servicio) {
-        if (!isset($calendar_data[$servicio->fecha])) {
-            $calendar_data[$servicio->fecha] = array();
-        }
-
-        $calendar_data[$servicio->fecha][] = array(
-            'id' => $servicio->id,
-            'hora' => substr($servicio->hora, 0, 5),
-            'hora_vuelta' => $servicio->hora_vuelta ? substr($servicio->hora_vuelta, 0, 5) : '',
-            'plazas_disponibles' => $servicio->plazas_disponibles,
-            'precio_adulto' => $servicio->precio_adulto,
-            'precio_nino' => $servicio->precio_nino,
-            'precio_residente' => $servicio->precio_residente,
-            'tiene_descuento' => $servicio->tiene_descuento,
-            'porcentaje_descuento' => $servicio->porcentaje_descuento,
-            'descuento_tipo' => $servicio->descuento_tipo ?? 'fijo',
-            'descuento_minimo_personas' => $servicio->descuento_minimo_personas ?? 1
-        );
-    }
-
-    error_log("FRONTEND: Fechas con servicios finales: " . implode(', ', array_keys($calendar_data)));
-
-    wp_send_json_success($calendar_data);
-}
 
     public function calculate_price()
     {
@@ -657,10 +826,9 @@ public function get_available_services()
                 }
             }
 
-            // ✅ FUNCIÓN QUE RELLENA LOS DATOS EN LA PÁGINA DE DETALLES - ARREGLADA
             function fillReservationDetailsDirectly(data) {
-                console.log("=== RELLENANDO DETALLES ===");
-                console.log("Datos recibidos:", data);
+                console.log('=== RELLENANDO DETALLES CON RECÁLCULO SEGURO ===');
+                console.log('Datos recibidos:', data);
 
                 // Formatear fecha
                 let fechaFormateada = "-";
@@ -685,63 +853,58 @@ public function get_available_services()
                 jQuery("#num-ninos-5-12").text(data.ninos_5_12 || 0);
                 jQuery("#num-ninos-menores").text(data.ninos_menores || 0);
 
-                // ✅ OBTENER PRECIOS DEL SERVICIO
-                const precioAdulto = parseFloat(data.precio_adulto) || 0;
-                const precioNino = parseFloat(data.precio_nino) || 0;
-                const precioResidente = parseFloat(data.precio_residente) || 0;
+                // ✅ SOLICITAR RECÁLCULO SEGURO AL BACKEND
+                console.log('🔒 Solicitando recálculo seguro de precios al servidor...');
 
-                const adultos = parseInt(data.adultos) || 0;
-                const residentes = parseInt(data.residentes) || 0;
-                const ninos_5_12 = parseInt(data.ninos_5_12) || 0;
-                const ninos_menores = parseInt(data.ninos_menores) || 0;
+                jQuery.ajax({
+                    url: reservasAjax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'calculate_price_secure',
+                        nonce: reservasAjax.nonce,
+                        service_id: data.service_id,
+                        adultos: data.adultos,
+                        residentes: data.residentes,
+                        ninos_5_12: data.ninos_5_12,
+                        ninos_menores: data.ninos_menores
+                    },
+                    success: function(response) {
+                        console.log('📊 Respuesta del servidor:', response);
 
-                // ✅ CALCULAR PERSONAS QUE OCUPAN PLAZA
-                const totalPersonasConPlaza = adultos + residentes + ninos_5_12;
+                        if (response.success && response.data) {
+                            const precio = response.data;
 
-                // ✅ CALCULAR PRECIO BASE (todos empiezan pagando precio de adulto)
-                const importeBase = totalPersonasConPlaza * precioAdulto;
+                            // ✅ MOSTRAR PRECIOS CALCULADOS POR EL SERVIDOR
+                            jQuery("#importe-base").text(formatPrice(precio.precio_base));
+                            jQuery("#descuento-residentes").text(formatPrice(-precio.descuento_residentes));
+                            jQuery("#descuento-menores").text(formatPrice(-precio.descuento_ninos));
 
-                // ✅ CALCULAR DESCUENTOS INDIVIDUALES
-                const descuentoResidentes = residentes * (precioAdulto - precioResidente);
-                const descuentoNinos = ninos_5_12 * (precioAdulto - precioNino);
+                            // Descuento por grupo
+                            if (precio.descuento_grupo > 0) {
+                                jQuery("#descuento-grupo-detalle").text(formatPrice(-precio.descuento_grupo));
+                                jQuery("#descuento-grupo-row").show();
+                            } else {
+                                jQuery("#descuento-grupo-row").hide();
+                            }
 
-                // ✅ MOSTRAR PRECIOS CALCULADOS
-                jQuery("#importe-base").text(formatPrice(importeBase));
-                jQuery("#descuento-residentes").text(formatPrice(-descuentoResidentes));
-                jQuery("#descuento-menores").text(formatPrice(-descuentoNinos));
+                            // ✅ PRECIO FINAL VALIDADO POR EL SERVIDOR
+                            jQuery("#total-reserva").text(formatPrice(precio.precio_final));
 
-                // ✅ MOSTRAR DESCUENTO POR GRUPO SOLO SI REALMENTE SE APLICÓ
-                const descuentoGrupo = parseFloat(data.descuento_grupo) || 0;
+                            // ✅ GUARDAR PRECIO VALIDADO EN sessionStorage
+                            data.calculo_completo = precio;
+                            sessionStorage.setItem('reservationData', JSON.stringify(data));
 
-                console.log("Datos de descuento:");
-                console.log("- Total personas con plaza:", totalPersonasConPlaza);
-                console.log("- Descuento grupo en datos:", descuentoGrupo);
-                console.log("- Regla aplicada:", data.regla_descuento_aplicada);
-
-                if (descuentoGrupo > 0 && data.regla_descuento_aplicada) {
-                    // Solo mostrar si realmente hay descuento por grupo
-                    jQuery("#descuento-grupo-detalle").text(formatPrice(-descuentoGrupo));
-                    jQuery("#descuento-grupo-row").show();
-                    console.log("✅ Mostrando descuento por grupo:", descuentoGrupo);
-                } else {
-                    // Ocultar la fila de descuento por grupo
-                    jQuery("#descuento-grupo-row").hide();
-                    console.log("❌ Ocultando descuento por grupo (no aplica)");
-                }
-
-                // ✅ MOSTRAR TOTAL FINAL
-                jQuery("#total-reserva").text(formatPrice(data.total_price || "0"));
-
-                console.log("✅ Detalles rellenados correctamente");
-                console.log("Resumen:");
-                console.log("- Importe base:", formatPrice(importeBase));
-                console.log("- Descuento residentes:", formatPrice(-descuentoResidentes));
-                console.log("- Descuento niños:", formatPrice(-descuentoNinos));
-                console.log("- Descuento grupo:", descuentoGrupo > 0 ? formatPrice(-descuentoGrupo) : "No aplica");
-                console.log("- Total final:", formatPrice(data.total_price || "0"));
-                console.log("=== VERIFICACIÓN FINAL DE PRECIO ===");
-console.log("Precio total en datos:", data.total_price);
-console.log("Tipo de dato:", typeof data.total_price);
+                            console.log('✅ Precios validados y guardados correctamente');
+                        } else {
+                            console.error('❌ Error en respuesta del servidor');
+                            alert('Error al calcular el precio. Por favor, recarga la página.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('❌ Error de conexión:', error);
+                        alert('Error de conexión al calcular el precio. Por favor, recarga la página.');
+                    }
+                });
             }
 
             function formatPrice(price) {
