@@ -277,7 +277,13 @@ function calculateTotalPrice() {
     const ninos = parseInt(jQuery('#ninos-visita').val()) || 0;
     const ninosMenores = parseInt(jQuery('#ninos-menores-visita').val()) || 0;
 
-    // ✅ CAMBIO: Solicitar cálculo seguro al servidor
+    // ✅ CAMBIO: Si no hay personas, mostrar 0€
+    if (adultos + ninos + ninosMenores === 0) {
+        jQuery('#total-visita').text('0,00€');
+        return;
+    }
+
+    // ✅ SOLICITAR CÁLCULO SEGURO AL SERVIDOR
     console.log('🔒 Solicitando cálculo seguro de precios al servidor...');
 
     jQuery.ajax({
@@ -300,17 +306,33 @@ function calculateTotalPrice() {
                 // ✅ MOSTRAR PRECIO VALIDADO POR EL SERVIDOR
                 jQuery('#total-visita').text(formatPrice(precio.precio_final));
 
-                console.log('✅ Precio validado y mostrado correctamente');
+                // ✅ GUARDAR FIRMA PARA VALIDACIÓN POSTERIOR
+                window.precioValidado = {
+                    precio_final: precio.precio_final,
+                    firma: precio.firma,
+                    firma_data: precio.firma_data
+                };
+
+                console.log('✅ Precio validado y mostrado correctamente:', precio.precio_final + '€');
             } else {
                 console.error('❌ Error en respuesta del servidor');
-                jQuery('#total-visita').text('0€');
+                jQuery('#total-visita').text('0,00€');
             }
         },
         error: function(xhr, status, error) {
             console.error('❌ Error de conexión:', error);
-            jQuery('#total-visita').text('0€');
+            jQuery('#total-visita').text('0,00€');
         }
     });
+}
+
+
+/**
+ * Formatear precio
+ */
+function formatPrice(price) {
+    const numPrice = parseFloat(price) || 0;
+    return numPrice.toFixed(2).replace('.', ',') + '€';
 }
 
 /**
@@ -422,11 +444,13 @@ function processVisitaReservation() {
         return;
     }
 
-    // ❌ ELIMINAR ESTAS LÍNEAS - NO CONFIAR EN EL PRECIO DEL FRONTEND
-    // const totalText = jQuery('#total-visita').text();
-    // const total = parseFloat(totalText.replace('€', '').trim());
+    // ✅ VERIFICAR QUE TENEMOS PRECIO VALIDADO
+    if (!window.precioValidado) {
+        alert('Error: No se pudo validar el precio. Por favor, recarga la página.');
+        return;
+    }
 
-    // ✅ PREPARAR DATOS SIN PRECIO - EL SERVIDOR LO CALCULARÁ
+    // ✅ PREPARAR DATOS CON FIRMA DE SEGURIDAD
     const reservationData = {
         action: 'process_visita_reservation',
         nonce: reservasVisitaAjax.nonce,
@@ -437,15 +461,16 @@ function processVisitaReservation() {
         adultos: adultos,
         ninos: ninos,
         ninos_menores: ninosMenores,
-        // ❌ NO ENVIAR: total: total,
         nombre: nombre,
         apellidos: apellidos,
         email: email,
         telefono: telefono,
         idioma: idiomaSeleccionado,
+        // ✅ INCLUIR FIRMA PARA VALIDACIÓN EN SERVIDOR
+        precio_validado: window.precioValidado
     };
 
-    console.log('Datos a enviar (sin precio):', reservationData);
+    console.log('Datos a enviar con firma de seguridad:', reservationData);
 
     // Deshabilitar botón y mostrar estado de carga
     const processBtn = jQuery('.complete-btn');
@@ -463,7 +488,7 @@ function processVisitaReservation() {
             if (response.success) {
                 console.log('✅ Reserva procesada correctamente');
 
-                // Guardar datos para la página de confirmación (incluyendo precio validado)
+                // Guardar datos para la página de confirmación
                 sessionStorage.setItem('visitaConfirmationData', JSON.stringify({
                     localizador: response.data.localizador,
                     fecha: serviceData.fecha,
@@ -471,7 +496,7 @@ function processVisitaReservation() {
                     adultos: adultos,
                     ninos: ninos,
                     ninos_menores: ninosMenores,
-                    total: response.data.precio_validado, // ✅ USAR PRECIO DEL SERVIDOR
+                    total: response.data.precio_validado,
                     nombre: nombre,
                     apellidos: apellidos,
                     email: email
