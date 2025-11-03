@@ -8403,9 +8403,9 @@ function loadAgencyProfile() {
  */
 function loadAgencyVisitasGuiadas() {
     console.log('=== CARGANDO MIS VISITAS GUIADAS ===');
-    
+
     showLoadingInMainContent();
-    
+
     jQuery.ajax({
         url: reservasAjax.ajax_url,
         type: 'POST',
@@ -8413,16 +8413,16 @@ function loadAgencyVisitasGuiadas() {
             action: 'get_agency_visitas_config',
             nonce: reservasAjax.nonce
         },
-        success: function(response) {
+        success: function (response) {
             console.log('Respuesta visitas:', response);
-            
+
             if (response.success) {
                 renderAgencyVisitasGuiadas(response.data);
             } else {
                 showErrorInMainContent('Error cargando visitas: ' + response.data);
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error AJAX:', error);
             showErrorInMainContent('Error de conexión');
         }
@@ -8431,7 +8431,7 @@ function loadAgencyVisitasGuiadas() {
 
 function renderAgencyVisitasGuiadas(data) {
     console.log('Renderizando visitas con data:', data);
-    
+
     if (!data.has_service) {
         jQuery('.dashboard-content').html(`
             <div class="agency-profile-management">
@@ -8456,50 +8456,50 @@ function renderAgencyVisitasGuiadas(data) {
         `);
         return;
     }
-    
+
     const service = data.service;
     const disabledHorarios = data.disabled_horarios || []; // ✅ NUEVO: Lista de horarios deshabilitados
-    
+
     // Parsear horarios
     let horarios = {};
     try {
-        horarios = typeof service.horarios_disponibles === 'string' 
-            ? JSON.parse(service.horarios_disponibles) 
+        horarios = typeof service.horarios_disponibles === 'string'
+            ? JSON.parse(service.horarios_disponibles)
             : service.horarios_disponibles || {};
-    } catch(e) {
+    } catch (e) {
         console.error('Error parseando horarios:', e);
         horarios = {};
     }
-    
+
     // Parsear idiomas
     let idiomas = {};
     try {
-        idiomas = typeof service.idiomas_disponibles === 'string' 
-            ? JSON.parse(service.idiomas_disponibles) 
+        idiomas = typeof service.idiomas_disponibles === 'string'
+            ? JSON.parse(service.idiomas_disponibles)
             : service.idiomas_disponibles || {};
-    } catch(e) {
+    } catch (e) {
         console.error('Error parseando idiomas:', e);
         idiomas = {};
     }
-    
+
     // Parsear fechas excluidas
     let fechasExcluidas = {};
     try {
-        fechasExcluidas = typeof service.fechas_excluidas === 'string' 
-            ? JSON.parse(service.fechas_excluidas) 
+        fechasExcluidas = typeof service.fechas_excluidas === 'string'
+            ? JSON.parse(service.fechas_excluidas)
             : service.fechas_excluidas || {};
-    } catch(e) {
+    } catch (e) {
         console.error('Error parseando fechas excluidas:', e);
         fechasExcluidas = {};
     }
-    
+
     // ✅ CREAR FUNCIÓN HELPER PARA VERIFICAR SI ESTÁ DESHABILITADO
     function isHorarioDisabled(dia, hora) {
-        return disabledHorarios.some(item => 
+        return disabledHorarios.some(item =>
             item.dia === dia && item.hora.substring(0, 5) === hora.substring(0, 5)
         );
     }
-    
+
     // Generar HTML
     const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
     const diasNombres = {
@@ -8511,42 +8511,42 @@ function renderAgencyVisitasGuiadas(data) {
         'sabado': 'Sábado',
         'domingo': 'Domingo'
     };
-    
+
     let visitasHTML = '';
-    
+
     diasSemana.forEach(dia => {
         if (horarios[dia] && horarios[dia].length > 0) {
             horarios[dia].forEach(hora => {
                 const idiomasDia = idiomas[dia] || [];
                 const fechasExcluidasDia = fechasExcluidas[dia] || [];
-                
+
                 // ✅ VERIFICAR SI ESTÁ DESHABILITADO
                 const isDisabled = isHorarioDisabled(dia, hora);
-                
+
                 // Convertir idiomas a etiquetas
                 const idiomasConfig = {
                     'espanol': { label: 'Español', flag: '🇪🇸' },
                     'ingles': { label: 'Inglés', flag: '🇬🇧' },
                     'frances': { label: 'Francés', flag: '🇫🇷' }
                 };
-                
-                const idiomasHTML = idiomasDia.length > 0 
+
+                const idiomasHTML = idiomasDia.length > 0
                     ? idiomasDia.map(idioma => {
                         const config = idiomasConfig[idioma] || { label: idioma, flag: '🌍' };
                         return `<span class="idioma-tag">${config.flag} ${config.label}</span>`;
                     }).join('')
                     : '<span class="idioma-tag-empty">Sin idiomas configurados</span>';
-                
+
                 const fechasHTML = fechasExcluidasDia.length > 0
                     ? fechasExcluidasDia.map(fecha => `<span class="fecha-excluida-tag">${formatDateSimple(fecha)}</span>`).join('')
                     : '<span class="fecha-tag-empty">Sin fechas excluidas</span>';
-                
+
                 // ✅ CAMBIAR ESTILO Y BOTÓN SEGÚN ESTADO
                 const cardClass = isDisabled ? 'visita-card visita-card-disabled' : 'visita-card';
-                const statusBadge = isDisabled 
-                    ? '<span class="status-badge status-disabled">❌ DESHABILITADA</span>' 
+                const statusBadge = isDisabled
+                    ? '<span class="status-badge status-disabled">❌ DESHABILITADA</span>'
                     : '<span class="status-badge status-active">✅ ACTIVA</span>';
-                
+
                 const toggleButton = isDisabled
                     ? `<button class="btn-toggle-visita btn-enable" onclick="toggleVisitaStatus('${dia}', '${hora}', ${isDisabled})" 
                               title="Habilitar esta visita">
@@ -8556,7 +8556,7 @@ function renderAgencyVisitasGuiadas(data) {
                               title="Deshabilitar esta visita">
                           🔴 Deshabilitar
                        </button>`;
-                
+
                 visitasHTML += `
                     <div class="${cardClass}" data-dia="${dia}" data-hora="${hora}">
                         <div class="visita-header">
@@ -8583,11 +8583,11 @@ function renderAgencyVisitasGuiadas(data) {
             });
         }
     });
-    
+
     if (!visitasHTML) {
         visitasHTML = '<p style="text-align: center; padding: 40px; color: #666;">No hay visitas guiadas configuradas en ningún día.</p>';
     }
-    
+
     const content = `
         <div class="agency-profile-management">
             <div class="section-header">
@@ -8769,20 +8769,20 @@ function renderAgencyVisitasGuiadas(data) {
         }
         </style>
     `;
-    
+
     jQuery('.dashboard-content').html(content);
 }
 
 function toggleVisitaStatus(dia, hora, isCurrentlyDisabled) {
     const action = isCurrentlyDisabled ? 'habilitar' : 'deshabilitar';
     const actionUpper = isCurrentlyDisabled ? 'Habilitar' : 'Deshabilitar';
-    
+
     if (!confirm(`¿Estás seguro de que quieres ${action} la visita de ${dia} a las ${hora}?`)) {
         return;
     }
-    
+
     showVisitasMessage('info', `⏳ ${actionUpper}ando visita...`);
-    
+
     jQuery.ajax({
         url: reservasAjax.ajax_url,
         type: 'POST',
@@ -8793,7 +8793,7 @@ function toggleVisitaStatus(dia, hora, isCurrentlyDisabled) {
             enable: isCurrentlyDisabled ? 1 : 0, // ✅ NUEVO PARÁMETRO
             nonce: reservasAjax.nonce
         },
-        success: function(response) {
+        success: function (response) {
             if (response.success) {
                 showVisitasMessage('success', '✅ ' + response.data);
                 // Recargar visitas
@@ -8802,7 +8802,7 @@ function toggleVisitaStatus(dia, hora, isCurrentlyDisabled) {
                 showVisitasMessage('error', '❌ Error: ' + response.data);
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             console.error('Error:', error);
             showVisitasMessage('error', '❌ Error de conexión');
         }
@@ -8830,7 +8830,7 @@ function formatDateSimple(dateString) {
             month: '2-digit',
             year: 'numeric'
         });
-    } catch(e) {
+    } catch (e) {
         return dateString;
     }
 }
@@ -11594,12 +11594,12 @@ function renderAgencyReservationsSection() {
                 </div>
                 
                 <!-- Pestaña 2: Buscar Billetes -->
-                <div id="tab-agency-search" class="tab-panel">
+                <div id="tab-search" class="tab-panel">
                     <div class="search-section">
-                        <h3>Buscar Mis Billetes</h3>
+                        <h3>Buscar Billetes</h3>
                         <div class="search-form">
                             <div class="search-row">
-                                <select id="agency-search-type">
+                                <select id="search-type">
                                     <option value="localizador">Localizador</option>
                                     <option value="email">Email</option>
                                     <option value="telefono">Teléfono</option>
@@ -11607,12 +11607,25 @@ function renderAgencyReservationsSection() {
                                     <option value="fecha_emision">Fecha de Emisión</option>
                                     <option value="fecha_servicio">Fecha de Servicio</option>
                                 </select>
-                                <input type="text" id="agency-search-value" placeholder="Introduce el valor a buscar...">
-                                <button class="btn-primary" onclick="searchAgencyReservations()">🔍 Buscar</button>
+                                <input type="text" id="search-value" placeholder="Introduce el valor a buscar...">
+                                
+                                <!-- ✅ NUEVO: Filtros de fecha -->
+                                <div class="date-filters">
+                                    <label>
+                                        <input type="checkbox" id="search-all-dates" checked onchange="toggleSearchDateFilters()">
+                                        Todos los días
+                                    </label>
+                                    <div id="search-date-inputs" style="display: none;">
+                                        <input type="date" id="search-fecha-inicio" placeholder="Fecha inicio">
+                                        <input type="date" id="search-fecha-fin" placeholder="Fecha fin">
+                                    </div>
+                                </div>
+                                
+                                <button class="btn-primary" onclick="searchReservations()">🔍 Buscar</button>
                             </div>
                         </div>
                         
-                        <div id="agency-search-results" class="search-results">
+                        <div id="search-results" class="search-results">
                             <!-- Resultados de búsqueda se cargarán aquí -->
                         </div>
                     </div>
@@ -15616,7 +15629,7 @@ function renderVisitasReport(data) {
     // ✅ VERIFICAR ROL DEL USUARIO
     const isSuperAdmin = window.reservasUser && window.reservasUser.role === 'super_admin';
     const isAgency = window.reservasUser && window.reservasUser.role === 'agencia';
-    
+
     console.log('🔍 Renderizando informe - Usuario:', window.reservasUser);
     console.log('🔍 Es super_admin:', isSuperAdmin);
     console.log('🔍 Es agencia:', isAgency);

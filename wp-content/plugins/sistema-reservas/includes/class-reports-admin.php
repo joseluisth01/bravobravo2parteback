@@ -1164,93 +1164,7 @@ class ReservasReportsAdmin
         wp_send_json_success($agencies);
     }
 
-    /**
-     * Buscar reservas por diferentes criterios
-     */
-    public function search_reservations()
-    {
-        // ✅ VERIFICACIÓN SIMPLIFICADA TEMPORAL
-        if (!session_id()) {
-            session_start();
-        }
-
-        if (!isset($_SESSION['reservas_user'])) {
-            wp_send_json_error('Sesión expirada. Recarga la página e inicia sesión nuevamente.');
-            return;
-        }
-
-        $user = $_SESSION['reservas_user'];
-        if (!in_array($user['role'], ['super_admin', 'admin'])) {
-            wp_send_json_error('Sin permisos');
-            return;
-        }
-
-        global $wpdb;
-        $table_reservas = $wpdb->prefix . 'reservas_reservas';
-
-        $search_type = sanitize_text_field($_POST['search_type']);
-        $search_value = sanitize_text_field($_POST['search_value']);
-
-        $where_clause = '';
-        $search_params = array();
-
-        switch ($search_type) {
-            case 'localizador':
-                $where_clause = "WHERE r.localizador LIKE %s";
-                $search_params[] = '%' . $search_value . '%';
-                break;
-
-            case 'email':
-                $where_clause = "WHERE r.email LIKE %s";
-                $search_params[] = '%' . $search_value . '%';
-                break;
-
-            case 'telefono':
-                $where_clause = "WHERE r.telefono LIKE %s";
-                $search_params[] = '%' . $search_value . '%';
-                break;
-
-            case 'fecha_emision':
-                $where_clause = "WHERE DATE(r.created_at) = %s";
-                $search_params[] = $search_value;
-                break;
-
-            case 'fecha_servicio':
-                $where_clause = "WHERE r.fecha = %s";
-                $search_params[] = $search_value;
-                break;
-
-            case 'nombre':
-                $where_clause = "WHERE (r.nombre LIKE %s OR r.apellidos LIKE %s)";
-                $search_params[] = '%' . $search_value . '%';
-                $search_params[] = '%' . $search_value . '%';
-                break;
-
-            default:
-                wp_send_json_error('Tipo de búsqueda no válido');
-        }
-
-        $query = "SELECT r.*, s.hora as servicio_hora 
-                  FROM $table_reservas r
-                  LEFT JOIN {$wpdb->prefix}reservas_servicios s ON r.servicio_id = s.id
-                  $where_clause
-                  ORDER BY r.created_at DESC
-                  LIMIT 50";
-
-        $reservas = $wpdb->get_results($wpdb->prepare($query, ...$search_params));
-
-        wp_send_json_success(array(
-            'reservas' => $reservas,
-            'search_type' => $search_type,
-            'search_value' => $search_value,
-            'total_found' => count($reservas)
-        ));
-    }
-
-    /**
-     * Obtener detalles de una reserva específica - CON FECHA DE COMPRA
-     */
-    public function get_reservation_details()
+public function search_reservations()
 {
     // ✅ VERIFICACIÓN SIMPLIFICADA TEMPORAL
     if (!session_id()) {
@@ -1271,11 +1185,113 @@ class ReservasReportsAdmin
     global $wpdb;
     $table_reservas = $wpdb->prefix . 'reservas_reservas';
 
-    $reserva_id = intval($_POST['reserva_id']);
+    $search_type = sanitize_text_field($_POST['search_type']);
+    $search_value = sanitize_text_field($_POST['search_value']);
+    
+    // ✅ PARÁMETROS DE FECHA OPCIONALES
+    $enable_date_filter = isset($_POST['enable_date_filter']) && $_POST['enable_date_filter'] === '1';
+    $fecha_inicio = sanitize_text_field($_POST['fecha_inicio'] ?? '');
+    $fecha_fin = sanitize_text_field($_POST['fecha_fin'] ?? '');
 
-    // ✅ AÑADIR JOIN CON SERVICIOS PARA OBTENER PRECIOS
-    $reserva = $wpdb->get_row($wpdb->prepare(
-        "SELECT r.*, 
+    $where_conditions = array();
+    $search_params = array();
+
+    // ✅ CONDICIÓN PRINCIPAL (SIEMPRE REQUERIDA)
+    switch ($search_type) {
+        case 'localizador':
+            $where_conditions[] = "r.localizador LIKE %s";
+            $search_params[] = '%' . $search_value . '%';
+            break;
+
+        case 'email':
+            $where_conditions[] = "r.email LIKE %s";
+            $search_params[] = '%' . $search_value . '%';
+            break;
+
+        case 'telefono':
+            $where_conditions[] = "r.telefono LIKE %s";
+            $search_params[] = '%' . $search_value . '%';
+            break;
+
+        case 'fecha_emision':
+            $where_conditions[] = "DATE(r.created_at) = %s";
+            $search_params[] = $search_value;
+            break;
+
+        case 'fecha_servicio':
+            $where_conditions[] = "r.fecha = %s";
+            $search_params[] = $search_value;
+            break;
+
+        case 'nombre':
+            $where_conditions[] = "(r.nombre LIKE %s OR r.apellidos LIKE %s)";
+            $search_params[] = '%' . $search_value . '%';
+            $search_params[] = '%' . $search_value . '%';
+            break;
+
+        default:
+            wp_send_json_error('Tipo de búsqueda no válido');
+            return;
+    }
+
+    // ✅ AÑADIR FILTRO DE FECHAS ADICIONAL SI ESTÁ ACTIVADO
+    if ($enable_date_filter && !empty($fecha_inicio) && !empty($fecha_fin)) {
+        $where_conditions[] = "r.fecha BETWEEN %s AND %s";
+        $search_params[] = $fecha_inicio;
+        $search_params[] = $fecha_fin;
+    }
+
+    $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
+
+    $query = "SELECT r.*, s.hora as servicio_hora 
+              FROM $table_reservas r
+              LEFT JOIN {$wpdb->prefix}reservas_servicios s ON r.servicio_id = s.id
+              $where_clause
+              ORDER BY r.created_at DESC
+              LIMIT 100";
+
+    $reservas = $wpdb->get_results($wpdb->prepare($query, ...$search_params));
+
+    wp_send_json_success(array(
+        'reservas' => $reservas,
+        'search_type' => $search_type,
+        'search_value' => $search_value,
+        'fecha_inicio' => $fecha_inicio,
+        'fecha_fin' => $fecha_fin,
+        'enable_date_filter' => $enable_date_filter,
+        'total_found' => count($reservas)
+    ));
+}
+
+    /**
+     * Obtener detalles de una reserva específica - CON FECHA DE COMPRA
+     */
+    public function get_reservation_details()
+    {
+        // ✅ VERIFICACIÓN SIMPLIFICADA TEMPORAL
+        if (!session_id()) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['reservas_user'])) {
+            wp_send_json_error('Sesión expirada. Recarga la página e inicia sesión nuevamente.');
+            return;
+        }
+
+        $user = $_SESSION['reservas_user'];
+        if (!in_array($user['role'], ['super_admin', 'admin'])) {
+            wp_send_json_error('Sin permisos');
+            return;
+        }
+
+        global $wpdb;
+        $table_reservas = $wpdb->prefix . 'reservas_reservas';
+
+        $reserva_id = intval($_POST['reserva_id']);
+
+        // ✅ AÑADIR JOIN CON SERVICIOS PARA OBTENER PRECIOS
+        $reserva = $wpdb->get_row($wpdb->prepare(
+            "SELECT r.*, 
                 s.hora as servicio_hora, 
                 s.precio_adulto, 
                 s.precio_nino, 
@@ -1283,28 +1299,28 @@ class ReservasReportsAdmin
          FROM $table_reservas r
          LEFT JOIN {$wpdb->prefix}reservas_servicios s ON r.servicio_id = s.id
          WHERE r.id = %d",
-        $reserva_id
-    ));
+            $reserva_id
+        ));
 
-    if (!$reserva) {
-        wp_send_json_error('Reserva no encontrada');
+        if (!$reserva) {
+            wp_send_json_error('Reserva no encontrada');
+        }
+
+        // Decodificar regla de descuento si existe
+        if ($reserva->regla_descuento_aplicada) {
+            $reserva->regla_descuento_aplicada = json_decode($reserva->regla_descuento_aplicada, true);
+        }
+
+        // ✅ AÑADIR INFORMACIÓN ADICIONAL DE FECHAS
+        $reserva->fecha_compra_formateada = date('d/m/Y H:i', strtotime($reserva->created_at));
+        $reserva->fecha_servicio_formateada = date('d/m/Y', strtotime($reserva->fecha));
+
+        if ($reserva->updated_at && $reserva->updated_at !== $reserva->created_at) {
+            $reserva->fecha_actualizacion_formateada = date('d/m/Y H:i', strtotime($reserva->updated_at));
+        }
+
+        wp_send_json_success($reserva);
     }
-
-    // Decodificar regla de descuento si existe
-    if ($reserva->regla_descuento_aplicada) {
-        $reserva->regla_descuento_aplicada = json_decode($reserva->regla_descuento_aplicada, true);
-    }
-
-    // ✅ AÑADIR INFORMACIÓN ADICIONAL DE FECHAS
-    $reserva->fecha_compra_formateada = date('d/m/Y H:i', strtotime($reserva->created_at));
-    $reserva->fecha_servicio_formateada = date('d/m/Y', strtotime($reserva->fecha));
-
-    if ($reserva->updated_at && $reserva->updated_at !== $reserva->created_at) {
-        $reserva->fecha_actualizacion_formateada = date('d/m/Y H:i', strtotime($reserva->updated_at));
-    }
-
-    wp_send_json_success($reserva);
-}
 
     /**
      * Actualizar email de una reserva
