@@ -317,7 +317,7 @@ class ReservasFrontend
                                     <span>NIÑOS (DE 5 A 12 AÑOS): <span id="price-ninos">5€</span></span>
                                 </div>
                                 <div class="price-notes">
-                                    <img src="https://dev.tictac-comunicacion.es/bravo/wp-content/uploads/2025/07/Vector-14.svg" alt="">
+                                    <img src="https://dev-tictac.com/bravobravo2parteback/wp-content/uploads/2025/10/Vector-14.svg" alt="">
                                     <div class="notas">
                                         <p>*NIÑOS (Menores de 5 años): 0€ (viajan gratis).</p>
                                         <p>*RESIDENTES en Córdoba: 50% de descuento.</p>
@@ -674,7 +674,7 @@ class ReservasFrontend
         ob_start();
     ?>
         <div id="reservas-detalles" class="container reservas-details-container">
-            <br><br>
+            <br>
             <button type="button" class="back-btn" onclick="goBackToBooking()">
                 <img src="https://autobusmedinaazahara.com/wp-content/uploads/2025/07/Vector-15.svg" alt="">VOLVER A MODIFICAR RESERVA
             </button>
@@ -682,7 +682,7 @@ class ReservasFrontend
             <div class="details-summary">
                 <h2>DETALLES DE LA RESERVA</h2>
                 <div class="details-grid">
-                    <div class="details-section">
+                    <div class="details-section sectionfechas">
                         <h3>FECHAS Y HORAS</h3>
                         <div class="detail-row">
                             <span class="label">FECHA AUTOBÚS IDA:</span>

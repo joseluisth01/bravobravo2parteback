@@ -1337,7 +1337,7 @@ function confirmacion_reserva_shortcode()
             }
 
             .success-banner h1 {
-                font-size: 30px !important;
+                font-size: 22px !important;
                 margin: 0px !important;
             }
 
@@ -1359,7 +1359,6 @@ function confirmacion_reserva_shortcode()
             margin: 0;
             padding: 15px;
             font-size: 24px;
-            font-weight: bold;
             letter-spacing: 2px;
             border-top-left-radius: 20px;
             border-top-right-radius: 20px;
@@ -1502,11 +1501,11 @@ function confirmacion_reserva_shortcode()
             }
 
             .success-banner {
-                padding: 30px 20px;
+                padding: 0px;
             }
 
             .success-banner h1 {
-                font-size: 28px;
+                font-size: 22px;
             }
 
             .content-section {

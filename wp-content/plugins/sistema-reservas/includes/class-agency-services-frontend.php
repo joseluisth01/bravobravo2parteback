@@ -25,6 +25,9 @@ class ReservasAgencyServicesFrontend
 
         add_action('wp_ajax_generate_visita_pdf_download', array($this, 'generate_visita_pdf_download'));
         add_action('wp_ajax_nopriv_generate_visita_pdf_download', array($this, 'generate_visita_pdf_download'));
+
+        add_action('wp_ajax_calculate_visita_price_secure', array($this, 'calculate_visita_price_secure'));
+        add_action('wp_ajax_nopriv_calculate_visita_price_secure', array($this, 'calculate_visita_price_secure'));
     }
 
     public function enqueue_assets()
@@ -104,7 +107,7 @@ class ReservasAgencyServicesFrontend
                         </div>
 
                         <div class="info-notes">
-                            <img style="width: 30px;" src="https://dev.tictac-comunicacion.es/bravobravo2parte/wp-content/uploads/2025/10/Vector-20.svg" alt="">
+                            <img style="width: 30px;" src="https://dev-tictac.com/bravobravo2parte/wp-content/uploads/2025/10/Vector-20.svg" alt="">
                             <div>
                                 <p>*Visita guiada de 3 horas y media aprox.</p>
                                 <p>*Sistema de radioguías para grupos con más de 10 componentes</p>
@@ -217,6 +220,78 @@ class ReservasAgencyServicesFrontend
         return ob_get_clean();
     }
 
+
+    /**
+     * ✅ CALCULAR PRECIO SEGURO (SERVIDOR) - NUEVA FUNCIÓN
+     */
+    public function calculate_visita_price_secure()
+    {
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+            wp_send_json_error('Error de seguridad');
+            return;
+        }
+
+        $service_id = intval($_POST['service_id'] ?? 0);
+        $adultos = max(0, intval($_POST['adultos'] ?? 0));
+        $ninos = max(0, intval($_POST['ninos'] ?? 0));
+        $ninos_menores = max(0, intval($_POST['ninos_menores'] ?? 0));
+
+        if ($service_id <= 0) {
+            wp_send_json_error('Service ID inválido');
+            return;
+        }
+
+        global $wpdb;
+        $table_services = $wpdb->prefix . 'reservas_agency_services';
+
+        $servicio = $wpdb->get_row($wpdb->prepare(
+            "SELECT precio_adulto, precio_nino, precio_nino_menor 
+         FROM $table_services 
+         WHERE id = %d AND servicio_activo = 1",
+            $service_id
+        ));
+
+        if (!$servicio) {
+            wp_send_json_error('Servicio no encontrado');
+            return;
+        }
+
+        // ✅ CALCULAR PRECIO EN EL SERVIDOR
+        $precio_adulto = floatval($servicio->precio_adulto);
+        $precio_nino = floatval($servicio->precio_nino);
+        $precio_nino_menor = floatval($servicio->precio_nino_menor);
+
+        $precio_final = ($adultos * $precio_adulto) +
+            ($ninos * $precio_nino) +
+            ($ninos_menores * $precio_nino_menor);
+
+        // ✅ GENERAR FIRMA DIGITAL DEL PRECIO
+        $firma_data = array(
+            'service_id' => $service_id,
+            'adultos' => $adultos,
+            'ninos' => $ninos,
+            'ninos_menores' => $ninos_menores,
+            'precio_final' => $precio_final,
+            'timestamp' => time()
+        );
+
+        $firma = hash_hmac('sha256', json_encode($firma_data), wp_salt('nonce'));
+
+        wp_send_json_success(array(
+            'precio_final' => round($precio_final, 2),
+            'firma' => $firma,
+            'firma_data' => $firma_data,
+            'debug' => array(
+                'adultos' => $adultos,
+                'ninos' => $ninos,
+                'ninos_menores' => $ninos_menores,
+                'precio_adulto' => $precio_adulto,
+                'precio_nino' => $precio_nino,
+                'precio_nino_menor' => $precio_nino_menor
+            )
+        ));
+    }
+
     /**
      * Renderizar página de confirmación de reserva de visita
      */
@@ -256,7 +331,6 @@ class ReservasAgencyServicesFrontend
                 color: white;
                 text-align: center;
                 padding: 20px;
-                font-weight: bold;
                 letter-spacing: 2px;
                 border-top-left-radius: 15px;
                 border-top-right-radius: 15px;
@@ -554,7 +628,7 @@ class ReservasAgencyServicesFrontend
             $adultos = intval($_POST['adultos']);
             $ninos = intval($_POST['ninos']);
             $ninos_menores = intval($_POST['ninos_menores']);
-            $total = floatval($_POST['total']);
+            // ❌ NO CONFIAR EN ESTE VALOR: $total = floatval($_POST['total']);
             $nombre = sanitize_text_field($_POST['nombre']);
             $apellidos = sanitize_text_field($_POST['apellidos']);
             $email = sanitize_email($_POST['email']);
@@ -575,21 +649,33 @@ class ReservasAgencyServicesFrontend
             global $wpdb;
             $table_services = $wpdb->prefix . 'reservas_agency_services';
 
-            // ✅ OBTENER DATOS COMPLETOS DEL SERVICIO Y LA AGENCIA
+            // ✅ OBTENER DATOS COMPLETOS DEL SERVICIO Y RECALCULAR PRECIO
             $servicio = $wpdb->get_row($wpdb->prepare(
                 "SELECT s.*, a.agency_name, a.email as agency_email, a.inicial_localizador,
-     a.cif, a.razon_social, a.domicilio_fiscal, a.phone, a.contact_person
-     FROM $table_services s
-     INNER JOIN {$wpdb->prefix}reservas_agencies a ON s.agency_id = a.id
-     WHERE s.id = %d AND s.servicio_activo = 1",
+                    a.cif, a.razon_social, a.domicilio_fiscal, a.phone, a.contact_person
+             FROM $table_services s
+             INNER JOIN {$wpdb->prefix}reservas_agencies a ON s.agency_id = a.id
+             WHERE s.id = %d AND s.servicio_activo = 1",
                 $service_id
             ));
+
             if (!$servicio) {
                 wp_send_json_error('Servicio no encontrado');
                 return;
             }
 
-            // ✅ GENERAR LOCALIZADOR PARA VISITA GUIADA
+            // ✅ RECALCULAR PRECIO EN EL SERVIDOR (NUNCA CONFIAR EN EL FRONTEND)
+            $precio_adulto = floatval($servicio->precio_adulto);
+            $precio_nino = floatval($servicio->precio_nino);
+            $precio_nino_menor = floatval($servicio->precio_nino_menor);
+
+            $total_calculado = ($adultos * $precio_adulto) +
+                ($ninos * $precio_nino) +
+                ($ninos_menores * $precio_nino_menor);
+
+            error_log('✅ Precio recalculado en servidor: ' . $total_calculado);
+
+            // ✅ GENERAR LOCALIZADOR
             $localizador = $this->generar_localizador_visita($agency_id, $servicio->inicial_localizador);
 
             $table_visitas = $wpdb->prefix . 'reservas_visitas';
@@ -609,7 +695,7 @@ class ReservasAgencyServicesFrontend
                 'ninos_menores' => $ninos_menores,
                 'total_personas' => $adultos + $ninos + $ninos_menores,
                 'idioma' => $idioma,
-                'precio_total' => $total,
+                'precio_total' => $total_calculado, // ✅ USAR PRECIO CALCULADO EN SERVIDOR
                 'estado' => 'confirmada',
                 'metodo_pago' => 'pendiente_tpv',
                 'created_at' => current_time('mysql')
@@ -624,6 +710,7 @@ class ReservasAgencyServicesFrontend
 
             $reserva_id = $wpdb->insert_id;
 
+            // Preparar datos completos para emails
             $reserva_completa = array_merge($insert_data, array(
                 'id' => $reserva_id,
                 'precio_adulto' => $servicio->precio_adulto,
@@ -637,7 +724,7 @@ class ReservasAgencyServicesFrontend
                 'agency_domicilio_fiscal' => $servicio->domicilio_fiscal ?? '',
                 'agency_email' => $servicio->agency_email ?? '',
                 'agency_phone' => $servicio->phone ?? '',
-                'idioma' => $idioma // ✅ ASEGURAR QUE ESTÁ AQUÍ
+                'idioma' => $idioma
             ));
 
             // ✅ ENVIAR EMAIL DE CONFIRMACIÓN
@@ -658,7 +745,8 @@ class ReservasAgencyServicesFrontend
                 'mensaje' => 'Reserva procesada correctamente',
                 'redirect_url' => $redirect_url,
                 'localizador' => $localizador,
-                'reserva_id' => $reserva_id
+                'reserva_id' => $reserva_id,
+                'precio_validado' => $total_calculado // ✅ DEVOLVER PRECIO VALIDADO
             ));
         } catch (Exception $e) {
             error_log('ERROR procesando reserva visita: ' . $e->getMessage());

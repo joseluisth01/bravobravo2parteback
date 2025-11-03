@@ -275,25 +275,41 @@ function calculateTotalPrice() {
 
     const adultos = parseInt(jQuery('#adultos-visita').val()) || 0;
     const ninos = parseInt(jQuery('#ninos-visita').val()) || 0;
-    const ninosMenores = parseInt(jQuery('#ninos-menores-visita').val()) || 0; // ✅ NUEVO
+    const ninosMenores = parseInt(jQuery('#ninos-menores-visita').val()) || 0;
 
-    // ✅ USAR PRECIOS DINÁMICOS DEL SERVICIO
-    const precioAdulto = parseFloat(serviceData.precio_adulto) || 0;
-    const precioNino = parseFloat(serviceData.precio_nino) || 0;
-    const precioNinoMenor = parseFloat(serviceData.precio_nino_menor) || 0; // ✅ NUEVO
+    // ✅ CAMBIO: Solicitar cálculo seguro al servidor
+    console.log('🔒 Solicitando cálculo seguro de precios al servidor...');
 
-    const total = (adultos * precioAdulto) + (ninos * precioNino) + (ninosMenores * precioNinoMenor); // ✅ MODIFICADO
+    jQuery.ajax({
+        url: reservasVisitaAjax.ajax_url,
+        type: 'POST',
+        data: {
+            action: 'calculate_visita_price_secure',
+            nonce: reservasVisitaAjax.nonce,
+            service_id: serviceData.id,
+            adultos: adultos,
+            ninos: ninos,
+            ninos_menores: ninosMenores
+        },
+        success: function(response) {
+            console.log('📊 Respuesta del servidor:', response);
 
-    jQuery('#total-visita').text(total.toFixed(2) + '€');
+            if (response.success && response.data) {
+                const precio = response.data;
 
-    console.log('💰 Precio calculado:', {
-        adultos: adultos,
-        ninos: ninos,
-        ninosMenores: ninosMenores, // ✅ NUEVO
-        precioAdulto: precioAdulto,
-        precioNino: precioNino,
-        precioNinoMenor: precioNinoMenor, // ✅ NUEVO
-        total: total
+                // ✅ MOSTRAR PRECIO VALIDADO POR EL SERVIDOR
+                jQuery('#total-visita').text(formatPrice(precio.precio_final));
+
+                console.log('✅ Precio validado y mostrado correctamente');
+            } else {
+                console.error('❌ Error en respuesta del servidor');
+                jQuery('#total-visita').text('0€');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('❌ Error de conexión:', error);
+            jQuery('#total-visita').text('0€');
+        }
     });
 }
 
@@ -397,9 +413,8 @@ function processVisitaReservation() {
     // Validar personas
     const adultos = parseInt(jQuery('#adultos-visita').val()) || 0;
     const ninos = parseInt(jQuery('#ninos-visita').val()) || 0;
-    const ninosMenores = parseInt(jQuery('#ninos-menores-visita').val()) || 0; // ✅ NUEVO
+    const ninosMenores = parseInt(jQuery('#ninos-menores-visita').val()) || 0;
     const idiomaSeleccionado = jQuery('#idioma-visita').val() || 'español';
-
 
     if (adultos < 1) {
         alert('Debe haber al menos un adulto en la reserva.');
@@ -407,11 +422,11 @@ function processVisitaReservation() {
         return;
     }
 
-    // Obtener total
-    const totalText = jQuery('#total-visita').text();
-    const total = parseFloat(totalText.replace('€', '').trim());
+    // ❌ ELIMINAR ESTAS LÍNEAS - NO CONFIAR EN EL PRECIO DEL FRONTEND
+    // const totalText = jQuery('#total-visita').text();
+    // const total = parseFloat(totalText.replace('€', '').trim());
 
-    // Preparar datos para enviar
+    // ✅ PREPARAR DATOS SIN PRECIO - EL SERVIDOR LO CALCULARÁ
     const reservationData = {
         action: 'process_visita_reservation',
         nonce: reservasVisitaAjax.nonce,
@@ -421,8 +436,8 @@ function processVisitaReservation() {
         hora: serviceData.hora,
         adultos: adultos,
         ninos: ninos,
-        ninos_menores: ninosMenores, // ✅ NUEVO
-        total: total,
+        ninos_menores: ninosMenores,
+        // ❌ NO ENVIAR: total: total,
         nombre: nombre,
         apellidos: apellidos,
         email: email,
@@ -430,7 +445,7 @@ function processVisitaReservation() {
         idioma: idiomaSeleccionado,
     };
 
-    console.log('Datos a enviar:', reservationData);
+    console.log('Datos a enviar (sin precio):', reservationData);
 
     // Deshabilitar botón y mostrar estado de carga
     const processBtn = jQuery('.complete-btn');
@@ -442,21 +457,21 @@ function processVisitaReservation() {
         url: reservasVisitaAjax.ajax_url,
         type: 'POST',
         data: reservationData,
-        success: function (response) {
+        success: function(response) {
             console.log('Respuesta del servidor:', response);
 
             if (response.success) {
                 console.log('✅ Reserva procesada correctamente');
 
-                // Guardar datos para la página de confirmación
+                // Guardar datos para la página de confirmación (incluyendo precio validado)
                 sessionStorage.setItem('visitaConfirmationData', JSON.stringify({
                     localizador: response.data.localizador,
                     fecha: serviceData.fecha,
                     hora: serviceData.hora,
                     adultos: adultos,
                     ninos: ninos,
-                    ninos_menores: ninosMenores, // ✅ NUEVO
-                    total: total,
+                    ninos_menores: ninosMenores,
+                    total: response.data.precio_validado, // ✅ USAR PRECIO DEL SERVIDOR
                     nombre: nombre,
                     apellidos: apellidos,
                     email: email
@@ -470,7 +485,7 @@ function processVisitaReservation() {
                 processBtn.prop('disabled', false).text(originalText);
             }
         },
-        error: function (xhr, status, error) {
+        error: function(xhr, status, error) {
             console.error('❌ Error AJAX:', error);
             console.error('Response:', xhr.responseText);
             alert('Error de conexión al procesar la reserva. Por favor, inténtalo de nuevo.');

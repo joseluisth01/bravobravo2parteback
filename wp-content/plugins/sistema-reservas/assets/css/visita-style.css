@@ -401,7 +401,6 @@ display: flex
 
 .person-selector{
     justify-content: space-between !important;
-    flex-direction: column !important;
     gap: 5px !important;
 }
 
