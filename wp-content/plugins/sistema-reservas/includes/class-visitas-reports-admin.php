@@ -329,7 +329,7 @@ class ReservasVisitasReportsAdmin
     }
 }
 
-    public function cancel_visita()
+public function cancel_visita()
 {
     if (!wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
         wp_send_json_error('Error de seguridad');
@@ -347,9 +347,9 @@ class ReservasVisitasReportsAdmin
 
     $user = $_SESSION['reservas_user'];
     
-    // ✅ MODIFICADO: Permitir agencias cancelar sus propias visitas
-    if (!in_array($user['role'], ['super_admin', 'admin', 'agencia'])) {
-        wp_send_json_error('Sin permisos');
+    // ✅ MODIFICADO: Solo permitir a super_admin cancelar visitas
+    if ($user['role'] !== 'super_admin') {
+        wp_send_json_error('Sin permisos para cancelar visitas');
         return;
     }
 

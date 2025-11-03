@@ -988,6 +988,9 @@ function renderVisitasStats(stats, stats_agencias) {
 /**
  * Renderizar lista de visitas
  */
+/**
+ * Renderizar lista de visitas
+ */
 function renderVisitasList(visitas) {
     const container = document.getElementById('visitas-list-container');
 
@@ -995,6 +998,12 @@ function renderVisitasList(visitas) {
         container.innerHTML = '<p class="no-results">No se encontraron visitas para los filtros seleccionados</p>';
         return;
     }
+
+    // ✅ VERIFICAR ROL DEL USUARIO
+    const isSuperAdmin = window.reservasUser && window.reservasUser.role === 'super_admin';
+    
+    console.log('🔍 Renderizando lista - Usuario:', window.reservasUser);
+    console.log('🔍 Es super_admin:', isSuperAdmin);
 
     let html = `
         <h3>Listado de Visitas (${visitas.length})</h3>
@@ -1019,6 +1028,12 @@ function renderVisitasList(visitas) {
         const fecha = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES');
         const estadoClass = visita.estado === 'confirmada' ? 'status-confirmed' : 'status-cancelled';
 
+        // ✅ BOTÓN DE CANCELAR SOLO PARA SUPER_ADMIN Y SOLO SI ESTÁ CONFIRMADA
+        let cancelButton = '';
+        if (visita.estado === 'confirmada' && isSuperAdmin) {
+            cancelButton = `<button class="btn-small btn-danger" onclick="cancelVisita(${visita.id})">Cancelar</button>`;
+        }
+
         html += `
             <tr>
                 <td><strong>${visita.localizador}</strong></td>
@@ -1031,7 +1046,7 @@ function renderVisitasList(visitas) {
                 <td><span class="status-badge ${estadoClass}">${visita.estado}</span></td>
                 <td>
                     <button class="btn-small" onclick="viewVisitaDetails(${visita.id})">Ver</button>
-                    ${visita.estado === 'confirmada' ? `<button class="btn-small btn-danger" onclick="cancelVisita(${visita.id})">Cancelar</button>` : ''}
+                    ${cancelButton}
                 </td>
             </tr>
         `;
@@ -1185,7 +1200,7 @@ function showVisitaDetails(visitaId) {
 
             if (data.success) {
                 const visita = data.data;
-                
+
                 const fechaFormateada = new Date(visita.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
                     weekday: 'long',
                     year: 'numeric',

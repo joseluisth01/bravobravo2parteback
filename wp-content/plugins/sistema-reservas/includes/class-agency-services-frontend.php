@@ -222,77 +222,80 @@ class ReservasAgencyServicesFrontend
 
 
     /**
- * ✅ CALCULAR PRECIO SEGURO (SERVIDOR) - VERSIÓN CORREGIDA
- */
-public function calculate_visita_price_secure()
-{
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
-        wp_send_json_error('Error de seguridad');
-        return;
-    }
+     * ✅ CALCULAR PRECIO SEGURO (SERVIDOR) - VERSIÓN CORREGIDA
+     */
+    public function calculate_visita_price_secure()
+    {
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+            wp_send_json_error('Error de seguridad');
+            return;
+        }
 
-    $service_id = intval($_POST['service_id'] ?? 0);
-    $adultos = max(0, intval($_POST['adultos'] ?? 0));
-    $ninos = max(0, intval($_POST['ninos'] ?? 0));
-    $ninos_menores = max(0, intval($_POST['ninos_menores'] ?? 0));
+        $service_id = intval($_POST['service_id'] ?? 0);
+        $adultos = max(0, intval($_POST['adultos'] ?? 0));
+        $ninos = max(0, intval($_POST['ninos'] ?? 0));
+        $ninos_menores = max(0, intval($_POST['ninos_menores'] ?? 0));
 
-    if ($service_id <= 0) {
-        wp_send_json_error('Service ID inválido');
-        return;
-    }
+        if ($service_id <= 0) {
+            wp_send_json_error('Service ID inválido');
+            return;
+        }
 
-    global $wpdb;
-    $table_services = $wpdb->prefix . 'reservas_agency_services';
+        global $wpdb;
+        $table_services = $wpdb->prefix . 'reservas_agency_services';
 
-    $servicio = $wpdb->get_row($wpdb->prepare(
-        "SELECT precio_adulto, precio_nino, precio_nino_menor 
+        $servicio = $wpdb->get_row($wpdb->prepare(
+            "SELECT precio_adulto, precio_nino, precio_nino_menor 
          FROM $table_services 
          WHERE id = %d AND servicio_activo = 1",
-        $service_id
-    ));
+            $service_id
+        ));
 
-    if (!$servicio) {
-        wp_send_json_error('Servicio no encontrado');
-        return;
-    }
+        if (!$servicio) {
+            wp_send_json_error('Servicio no encontrado');
+            return;
+        }
 
-    // ✅ CALCULAR PRECIO EN EL SERVIDOR
-    $precio_adulto = floatval($servicio->precio_adulto);
-    $precio_nino = floatval($servicio->precio_nino);
-    $precio_nino_menor = floatval($servicio->precio_nino_menor);
+        // ✅ CALCULAR PRECIO EN EL SERVIDOR
+        $precio_adulto = floatval($servicio->precio_adulto);
+        $precio_nino = floatval($servicio->precio_nino);
+        $precio_nino_menor = floatval($servicio->precio_nino_menor);
 
-    $precio_final = ($adultos * $precio_adulto) +
-        ($ninos * $precio_nino) +
-        ($ninos_menores * $precio_nino_menor);
+        $precio_final = ($adultos * $precio_adulto) +
+            ($ninos * $precio_nino) +
+            ($ninos_menores * $precio_nino_menor);
 
-    // ✅ GENERAR FIRMA DIGITAL DEL PRECIO (SERVIDOR)
-    $firma_data = array(
-        'service_id' => $service_id,
-        'adultos' => $adultos,
-        'ninos' => $ninos,
-        'ninos_menores' => $ninos_menores,
-        'precio_final' => round($precio_final, 2),
-        'timestamp' => time()
-    );
+        // ✅ GENERAR FIRMA DIGITAL CON CLAVE SECRETA ESPECÍFICA
+        $secret_key = 'reservas_visitas_secret_' . wp_salt('auth');
 
-    // ✅ USAR CLAVE CONSISTENTE
-    $secret_key = defined('AUTH_KEY') ? AUTH_KEY : wp_salt('auth');
-    $firma = hash_hmac('sha256', json_encode($firma_data), $secret_key);
+        $timestamp = time();
 
-    wp_send_json_success(array(
-        'precio_final' => round($precio_final, 2),
-        'firma' => $firma,
-        'firma_data' => $firma_data,
-        'debug' => array(
+        $firma_data = array(
+            'service_id' => $service_id,
             'adultos' => $adultos,
             'ninos' => $ninos,
             'ninos_menores' => $ninos_menores,
-            'precio_adulto' => $precio_adulto,
-            'precio_nino' => $precio_nino,
-            'precio_nino_menor' => $precio_nino_menor
-        )
-    ));
-}
+            'precio_final' => round($precio_final, 2),
+            'timestamp' => $timestamp
+        );
+
+        $firma = hash_hmac('sha256', json_encode($firma_data), $secret_key);
+
+        wp_send_json_success(array(
+            'precio_final' => round($precio_final, 2),
+            'firma' => $firma,
+            'firma_data' => $firma_data,
+            'timestamp' => $timestamp,
+            'debug' => array(
+                'adultos' => $adultos,
+                'ninos' => $ninos,
+                'ninos_menores' => $ninos_menores,
+                'precio_adulto' => $precio_adulto,
+                'precio_nino' => $precio_nino,
+                'precio_nino_menor' => $precio_nino_menor
+            )
+        ));
+    }
 
     /**
      * Renderizar página de confirmación de reserva de visita
@@ -633,54 +636,7 @@ public function calculate_visita_price_secure()
         $telefono = sanitize_text_field($_POST['telefono']);
         $idioma = sanitize_text_field($_POST['idioma'] ?? 'español');
 
-        if (!isset($_POST['precio_validado']) || !is_array($_POST['precio_validado'])) {
-    error_log('❌ INTENTO DE MANIPULACIÓN: No hay firma digital');
-    wp_send_json_error('Error de seguridad: precio no validado');
-    return;
-}
-
-$precio_validado = $_POST['precio_validado'];
-$firma_recibida = $precio_validado['firma'] ?? '';
-$firma_data = $precio_validado['firma_data'] ?? array();
-
-// ✅ USAR LA MISMA CLAVE QUE EN calculate_visita_price_secure
-$secret_key = defined('AUTH_KEY') ? AUTH_KEY : wp_salt('auth');
-$firma_calculada = hash_hmac('sha256', json_encode($firma_data), $secret_key);
-
-if ($firma_recibida !== $firma_calculada) {
-    error_log('❌ INTENTO DE MANIPULACIÓN: Firma digital no coincide');
-    error_log('Firma recibida: ' . $firma_recibida);
-    error_log('Firma calculada: ' . $firma_calculada);
-    error_log('Datos firmados: ' . json_encode($firma_data));
-    wp_send_json_error('Error de seguridad: precio manipulado');
-    return;
-}
-
-// ✅ VERIFICAR TIMESTAMP (máximo 30 minutos)
-if ((time() - intval($firma_data['timestamp'])) > 1800) {
-    error_log('❌ Firma expirada');
-    wp_send_json_error('La sesión ha expirado. Por favor, vuelve a calcular el precio.');
-    return;
-}
-
-// ✅ VERIFICAR QUE LOS DATOS COINCIDEN
-if (intval($firma_data['service_id']) != $service_id ||
-    intval($firma_data['adultos']) != $adultos ||
-    intval($firma_data['ninos']) != $ninos ||
-    intval($firma_data['ninos_menores']) != $ninos_menores) {
-    error_log('❌ INTENTO DE MANIPULACIÓN: Datos no coinciden con la firma');
-    error_log('service_id: ' . $firma_data['service_id'] . ' vs ' . $service_id);
-    error_log('adultos: ' . $firma_data['adultos'] . ' vs ' . $adultos);
-    error_log('ninos: ' . $firma_data['ninos'] . ' vs ' . $ninos);
-    error_log('ninos_menores: ' . $firma_data['ninos_menores'] . ' vs ' . $ninos_menores);
-    wp_send_json_error('Error de seguridad: datos manipulados');
-    return;
-}
-
-// ✅ USAR PRECIO FIRMADO
-$total_calculado = floatval($precio_validado['precio_final']);
-
-error_log('✅ Firma verificada correctamente. Precio validado: ' . $total_calculado . '€');
+        error_log('Datos recibidos: service_id=' . $service_id . ', adultos=' . $adultos . ', ninos=' . $ninos . ', ninos_menores=' . $ninos_menores);
 
         // Validar datos básicos
         if ($adultos < 1) {
@@ -711,6 +667,17 @@ error_log('✅ Firma verificada correctamente. Precio validado: ' . $total_calcu
             return;
         }
 
+        // ✅ CALCULAR PRECIO EN EL SERVIDOR
+        $precio_adulto = floatval($servicio->precio_adulto);
+        $precio_nino = floatval($servicio->precio_nino);
+        $precio_nino_menor = floatval($servicio->precio_nino_menor);
+
+        $total_calculado = ($adultos * $precio_adulto) + 
+                          ($ninos * $precio_nino) + 
+                          ($ninos_menores * $precio_nino_menor);
+
+        error_log('Precio calculado: ' . $total_calculado . '€');
+
         // ✅ GENERAR LOCALIZADOR
         $localizador = $this->generar_localizador_visita($agency_id, $servicio->inicial_localizador);
 
@@ -731,7 +698,7 @@ error_log('✅ Firma verificada correctamente. Precio validado: ' . $total_calcu
             'ninos_menores' => $ninos_menores,
             'total_personas' => $adultos + $ninos + $ninos_menores,
             'idioma' => $idioma,
-            'precio_total' => $total_calculado, // ✅ USAR PRECIO VALIDADO
+            'precio_total' => $total_calculado,
             'estado' => 'confirmada',
             'metodo_pago' => 'pendiente_tpv',
             'created_at' => current_time('mysql')
@@ -740,11 +707,13 @@ error_log('✅ Firma verificada correctamente. Precio validado: ' . $total_calcu
         $result = $wpdb->insert($table_visitas, $insert_data);
 
         if ($result === false) {
+            error_log('Error insertando reserva: ' . $wpdb->last_error);
             wp_send_json_error('Error guardando la reserva: ' . $wpdb->last_error);
             return;
         }
 
         $reserva_id = $wpdb->insert_id;
+        error_log('✅ Reserva guardada con ID: ' . $reserva_id);
 
         // Preparar datos completos para emails
         $reserva_completa = array_merge($insert_data, array(
@@ -782,7 +751,7 @@ error_log('✅ Firma verificada correctamente. Precio validado: ' . $total_calcu
             'redirect_url' => $redirect_url,
             'localizador' => $localizador,
             'reserva_id' => $reserva_id,
-            'precio_validado' => $total_calculado
+            'precio_total' => $total_calculado
         ));
     } catch (Exception $e) {
         error_log('ERROR procesando reserva visita: ' . $e->getMessage());

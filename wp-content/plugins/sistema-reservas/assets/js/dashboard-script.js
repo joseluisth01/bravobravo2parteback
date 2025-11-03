@@ -15613,6 +15613,14 @@ function loadVisitasReportData(page = 1) {
  * ✅ RENDERIZAR INFORME DE VISITAS CON DESGLOSE POR AGENCIAS MEJORADO
  */
 function renderVisitasReport(data) {
+    // ✅ VERIFICAR ROL DEL USUARIO
+    const isSuperAdmin = window.reservasUser && window.reservasUser.role === 'super_admin';
+    const isAgency = window.reservasUser && window.reservasUser.role === 'agencia';
+    
+    console.log('🔍 Renderizando informe - Usuario:', window.reservasUser);
+    console.log('🔍 Es super_admin:', isSuperAdmin);
+    console.log('🔍 Es agencia:', isAgency);
+
     // Mostrar estadísticas generales
     const statsHtml = `
         <div class="stats-cards">
@@ -15644,8 +15652,6 @@ function renderVisitasReport(data) {
     `;
 
     // Estadísticas por agencia con diseño mejorado
-    const isAgency = window.reservasUser && window.reservasUser.role === 'agencia';
-
     let agencyStatsHtml = '';
     if (data.stats_por_agencias && data.stats_por_agencias.length > 0 && !isAgency) {
         agencyStatsHtml = `
@@ -15705,6 +15711,14 @@ function renderVisitasReport(data) {
             const fechaFormateada = new Date(visita.fecha).toLocaleDateString('es-ES');
             const estadoClass = visita.estado === 'confirmada' ? 'status-confirmada' : 'status-cancelada';
 
+            // ✅ BOTÓN DE CANCELAR SOLO PARA SUPER_ADMIN
+            let cancelButton = '';
+            if (visita.estado === 'confirmada' && isSuperAdmin) {
+                cancelButton = `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>`;
+            } else if (visita.estado === 'cancelada') {
+                cancelButton = '<span style="color: #999; font-size: 11px;">CANCELADA</span>';
+            }
+
             tableHtml += `
                 <tr>
                     <td><strong>${visita.localizador}</strong></td>
@@ -15718,10 +15732,7 @@ function renderVisitasReport(data) {
                     <td>
                         <button class="btn-small btn-info" onclick="showVisitaDetails(${visita.id})" title="Ver detalles">👁️</button>
                         <button class="btn-small btn-success" onclick="downloadVisitaPDF(${visita.id}, '${visita.localizador}')" title="Descargar PDF">📄</button>
-                        ${visita.estado === 'confirmada' ?
-                    `<button class="btn-small btn-danger" onclick="cancelVisitaData(${visita.id})" title="Cancelar">❌</button>` :
-                    '<span style="color: #999; font-size: 11px;">CANCELADA</span>'
-                }
+                        ${cancelButton}
                     </td>
                 </tr>
             `;

@@ -1640,21 +1640,7 @@ function confirmacion_reserva_shortcode()
                 });
         }
 
-        // ✅ NUEVA FUNCIÓN: Mostrar mensaje cuando no hay servicios
-        function showNoServicesMessage() {
-            const mainContainer = document.querySelector('.confirmacion-container.container');
-            if (mainContainer) {
-                const messageHtml = `
-            <div class="additional-services-section container" style="padding: 40px; text-align: center;">
-                <h2 class="horarios-titulo">No hay servicios de visitas guiadas disponibles</h2>
-                <p style="font-size: 16px; color: #666; margin-top: 15px;">
-                    Lo sentimos, no hay visitas guiadas disponibles para la fecha y hora de tu reserva de autobús.
-                </p>
-            </div>
-        `;
-                mainContainer.insertAdjacentHTML('afterend', messageHtml);
-            }
-        }
+
 
         // ✅ NUEVA FUNCIÓN: Mostrar error al cargar servicios
         function showServicesError() {

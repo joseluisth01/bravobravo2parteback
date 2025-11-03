@@ -277,53 +277,29 @@ function calculateTotalPrice() {
     const ninos = parseInt(jQuery('#ninos-visita').val()) || 0;
     const ninosMenores = parseInt(jQuery('#ninos-menores-visita').val()) || 0;
 
-    // ✅ CAMBIO: Si no hay personas, mostrar 0€
     if (adultos + ninos + ninosMenores === 0) {
         jQuery('#total-visita').text('0,00€');
         return;
     }
 
-    // ✅ SOLICITAR CÁLCULO SEGURO AL SERVIDOR
-    console.log('🔒 Solicitando cálculo seguro de precios al servidor...');
+    // ✅ CÁLCULO SIMPLE EN EL CLIENTE
+    const precio_adulto = parseFloat(serviceData.precio_adulto) || 0;
+    const precio_nino = parseFloat(serviceData.precio_nino) || 0;
+    const precio_nino_menor = parseFloat(serviceData.precio_nino_menor) || 0;
 
-    jQuery.ajax({
-        url: reservasVisitaAjax.ajax_url,
-        type: 'POST',
-        data: {
-            action: 'calculate_visita_price_secure',
-            nonce: reservasVisitaAjax.nonce,
-            service_id: serviceData.id,
-            adultos: adultos,
-            ninos: ninos,
-            ninos_menores: ninosMenores
-        },
-        success: function(response) {
-            console.log('📊 Respuesta del servidor:', response);
+    const precio_final = (adultos * precio_adulto) + (ninos * precio_nino) + (ninosMenores * precio_nino_menor);
 
-            if (response.success && response.data) {
-                const precio = response.data;
+    jQuery('#total-visita').text(formatPrice(precio_final));
 
-                // ✅ MOSTRAR PRECIO VALIDADO POR EL SERVIDOR
-                jQuery('#total-visita').text(formatPrice(precio.precio_final));
+    // ✅ GUARDAR DATOS SIMPLES
+    window.precioCalculado = {
+        precio_final: precio_final,
+        adultos: adultos,
+        ninos: ninos,
+        ninos_menores: ninosMenores
+    };
 
-                // ✅ GUARDAR FIRMA PARA VALIDACIÓN POSTERIOR
-                window.precioValidado = {
-                    precio_final: precio.precio_final,
-                    firma: precio.firma,
-                    firma_data: precio.firma_data
-                };
-
-                console.log('✅ Precio validado y mostrado correctamente:', precio.precio_final + '€');
-            } else {
-                console.error('❌ Error en respuesta del servidor');
-                jQuery('#total-visita').text('0,00€');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('❌ Error de conexión:', error);
-            jQuery('#total-visita').text('0,00€');
-        }
-    });
+    console.log('✅ Precio calculado:', precio_final + '€');
 }
 
 
@@ -444,13 +420,7 @@ function processVisitaReservation() {
         return;
     }
 
-    // ✅ VERIFICAR QUE TENEMOS PRECIO VALIDADO
-    if (!window.precioValidado) {
-        alert('Error: No se pudo validar el precio. Por favor, recarga la página.');
-        return;
-    }
-
-    // ✅ PREPARAR DATOS CON FIRMA DE SEGURIDAD
+    // ✅ PREPARAR DATOS SIN VALIDACIÓN DE FIRMA
     const reservationData = {
         action: 'process_visita_reservation',
         nonce: reservasVisitaAjax.nonce,
@@ -465,12 +435,10 @@ function processVisitaReservation() {
         apellidos: apellidos,
         email: email,
         telefono: telefono,
-        idioma: idiomaSeleccionado,
-        // ✅ INCLUIR FIRMA PARA VALIDACIÓN EN SERVIDOR
-        precio_validado: window.precioValidado
+        idioma: idiomaSeleccionado
     };
 
-    console.log('Datos a enviar con firma de seguridad:', reservationData);
+    console.log('📤 Datos a enviar:', reservationData);
 
     // Deshabilitar botón y mostrar estado de carga
     const processBtn = jQuery('.complete-btn');
@@ -483,7 +451,7 @@ function processVisitaReservation() {
         type: 'POST',
         data: reservationData,
         success: function(response) {
-            console.log('Respuesta del servidor:', response);
+            console.log('📡 Respuesta del servidor:', response);
 
             if (response.success) {
                 console.log('✅ Reserva procesada correctamente');
@@ -496,7 +464,7 @@ function processVisitaReservation() {
                     adultos: adultos,
                     ninos: ninos,
                     ninos_menores: ninosMenores,
-                    total: response.data.precio_validado,
+                    total: response.data.precio_total,
                     nombre: nombre,
                     apellidos: apellidos,
                     email: email
@@ -572,19 +540,19 @@ function loadConfirmationData() {
  */
 function goBackToServices() {
     console.log('=== VOLVIENDO A SERVICIOS ===');
-    
+
     // ✅ OBTENER LOCALIZADOR DE MÚLTIPLES FUENTES
     let localizador = null;
-    
+
     // Primero intentar desde URL
     const urlParams = new URLSearchParams(window.location.search);
     localizador = urlParams.get('localizador');
-    
+
     if (!localizador) {
         // Intentar desde sessionStorage
         localizador = sessionStorage.getItem('current_localizador');
     }
-    
+
     if (!localizador) {
         // Intentar desde datos del servicio
         try {
@@ -607,7 +575,7 @@ function goBackToServices() {
 
     if (currentPath.includes('/')) {
         const pathParts = currentPath.split('/').filter(part => part !== '');
-        
+
         if (pathParts.length > 0 && pathParts[0] !== 'confirmacion-reserva') {
             targetUrl = window.location.origin + '/' + pathParts[0] + '/confirmacion-reserva/';
         } else {
@@ -616,7 +584,7 @@ function goBackToServices() {
     } else {
         targetUrl = window.location.origin + '/confirmacion-reserva/';
     }
-    
+
     // ✅ AÑADIR LOCALIZADOR A LA URL
     if (localizador) {
         targetUrl += '?localizador=' + localizador;
