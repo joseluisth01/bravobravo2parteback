@@ -3198,17 +3198,17 @@ function initReportsEvents() {
         }
     });
 
-    document.getElementById('enable-date-filter').addEventListener('change', function() {
-    const dateInputs = document.getElementById('search-date-inputs');
-    if (this.checked) {
-        dateInputs.style.display = 'flex';
-    } else {
-        dateInputs.style.display = 'none';
-        // Limpiar campos al desactivar
-        document.getElementById('search-fecha-inicio').value = '';
-        document.getElementById('search-fecha-fin').value = '';
-    }
-});
+    document.getElementById('enable-date-filter').addEventListener('change', function () {
+        const dateInputs = document.getElementById('search-date-inputs');
+        if (this.checked) {
+            dateInputs.style.display = 'flex';
+        } else {
+            dateInputs.style.display = 'none';
+            // Limpiar campos al desactivar
+            document.getElementById('search-fecha-inicio').value = '';
+            document.getElementById('search-fecha-fin').value = '';
+        }
+    });
 
     const pdfButton = document.getElementById('download-pdf-report');
     if (pdfButton) {
@@ -3603,8 +3603,8 @@ function searchReservations() {
 
 
 function renderSearchResults(data) {
-        let filtrosTexto = `Búsqueda por <strong>${data.search_type}</strong>: "${data.search_value}"`;
-    
+    let filtrosTexto = `Búsqueda por <strong>${data.search_type}</strong>: "${data.search_value}"`;
+
     if (data.enable_date_filter && data.fecha_inicio && data.fecha_fin) {
         const fechaInicioFormat = new Date(data.fecha_inicio).toLocaleDateString('es-ES');
         const fechaFinFormat = new Date(data.fecha_fin).toLocaleDateString('es-ES');
@@ -6947,7 +6947,55 @@ function renderDayHoursEdit(day) {
                 <span>${dayLabel}</span>
             </label>
             <div class="hours-container" id="edit-hours-${day}" style="display: none;">
-                <div class="hours-list" data-day="${day}"></div>
+                
+                <!-- ✅ NUEVO: Selector de modo -->
+                <div class="mode-selector" style="margin-bottom: 20px; padding: 15px; background: #f0f8ff; border-radius: 6px; border: 2px solid #0073aa;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #0073aa;">📅 Modo de Disponibilidad</label>
+                    <div style="display: flex; gap: 20px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="modo_${day}" value="recurrente" checked onchange="toggleModeConfig('${day}', 'recurrente')" style="margin-right: 8px;">
+                            <span style="font-size: 14px;">🔁 Todos los ${dayLabel} (con exclusiones)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="radio" name="modo_${day}" value="especifico" onchange="toggleModeConfig('${day}', 'especifico')" style="margin-right: 8px;">
+                            <span style="font-size: 14px;">📆 Fechas específicas</span>
+                        </label>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 8px;">
+                        <strong>Recurrente:</strong> Disponible todos los ${dayLabel}<br>
+                        <strong>Específico:</strong> Solo días concretos que selecciones
+                    </small>
+                </div>
+
+                <!-- ✅ CONFIGURACIÓN MODO RECURRENTE -->
+                <div id="config-recurrente-${day}" class="mode-config-section">
+                    <div class="hours-list" data-day="${day}"></div>
+                    <button type="button" class="btn-add-hour" onclick="addHourSlot('${day}', true)">+ Añadir horario</button>
+                    
+                    <div class="excluded-dates-section" style="margin-top: 20px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
+                        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
+                        <div class="excluded-dates-list"></div>
+                        <button type="button" class="btn-add-excluded-date-edit" data-day="${day}">+ Añadir Fecha Excluida</button>
+                    </div>
+                </div>
+
+                <!-- ✅ CONFIGURACIÓN MODO ESPECÍFICO (NUEVA) -->
+                <div id="config-especifico-${day}" class="mode-config-section" style="display: none;">
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                        <p style="margin: 0; font-size: 13px; color: #856404;">
+                            ℹ️ <strong>Modo fechas específicas:</strong> Añade los días concretos en los que este servicio estará disponible. 
+                            Cada fecha puede tener su propio horario.
+                        </p>
+                    </div>
+                    
+                    <div class="specific-dates-list" data-day="${day}"></div>
+                    <button type="button" class="btn-add-specific-date" data-day="${day}" onclick="addSpecificDateSlot('${day}')">
+                        + Añadir Fecha Específica
+                    </button>
+                </div>
+
+                <!-- Idiomas y demás configuración común -->
                 <div class="idiomas-section" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px;">
                     <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">🌍 Idiomas Disponibles</label>
                     <div class="idiomas-checkboxes" data-day="${day}">
@@ -6966,17 +7014,136 @@ function renderDayHoursEdit(day) {
                     </div>
                     <small style="color: #666; display: block; margin-top: 5px;">Selecciona los idiomas que estarán disponibles para este día</small>
                 </div>
-                <button type="button" class="btn-add-hour" onclick="addHourSlot('${day}', true)">+ Añadir horario</button>
-                
-                <div class="excluded-dates-section">
-                    <label style="display: block; font-weight: 600; margin-bottom: 10px; color: #666;">📅 Fechas Excluidas (opcional)</label>
-                    <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Añade fechas específicas en las que NO quieras que aparezca este servicio.</p>
-                    <div class="excluded-dates-list"></div>
-                    <button type="button" class="btn-add-excluded-date-edit" data-day="${day}">+ Añadir Fecha Excluida</button>
-                </div>
             </div>
         </div>
     `;
+}
+
+
+/**
+ * ✅ NUEVA: Cambiar entre modo recurrente y específico
+ */
+function toggleModeConfig(day, mode) {
+    console.log(`Cambiando modo de ${day} a: ${mode}`);
+
+    const recurrenteDiv = document.getElementById(`config-recurrente-${day}`);
+    const especificoDiv = document.getElementById(`config-especifico-${day}`);
+
+    if (mode === 'recurrente') {
+        recurrenteDiv.style.display = 'block';
+        especificoDiv.style.display = 'none';
+    } else {
+        recurrenteDiv.style.display = 'none';
+        especificoDiv.style.display = 'block';
+    }
+}
+
+/**
+ * ✅ NUEVA: Añadir slot de fecha específica
+ */
+function addSpecificDateSlot(day) {
+    console.log('Añadiendo fecha específica para:', day);
+
+    const container = document.querySelector(`#edit-hours-${day} .specific-dates-list`);
+
+    if (!container) {
+        console.error('No se encontró contenedor de fechas específicas');
+        return;
+    }
+
+    const slotId = `specific-${day}-${Date.now()}`;
+
+    const slot = document.createElement('div');
+    slot.className = 'specific-date-slot';
+    slot.id = slotId;
+    slot.style.cssText = `
+        display: grid;
+        grid-template-columns: 200px 1fr auto;
+        gap: 10px;
+        align-items: start;
+        padding: 15px;
+        background: white;
+        border: 2px solid #0073aa;
+        border-radius: 6px;
+        margin-bottom: 15px;
+    `;
+
+    slot.innerHTML = `
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 12px;">📅 Fecha</label>
+            <input type="date" 
+                   name="fechas_especificas[${day}][fecha][]" 
+                   required 
+                   min="${new Date().toISOString().split('T')[0]}"
+                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 12px;">🕐 Horarios</label>
+            <div class="hours-for-specific-date" data-slot-id="${slotId}"></div>
+            <button type="button" 
+                    class="btn-add-hour-specific" 
+                    onclick="addHourToSpecificDate('${slotId}')"
+                    style="margin-top: 5px; padding: 5px 10px; font-size: 12px; background: #0073aa; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                + Añadir hora
+            </button>
+        </div>
+        
+        <button type="button" 
+                onclick="removeSpecificDateSlot('${slotId}')" 
+                title="Eliminar fecha"
+                style="background: #d63638; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+            ✕
+        </button>
+    `;
+
+    container.appendChild(slot);
+
+    // Añadir primer horario automáticamente
+    addHourToSpecificDate(slotId);
+}
+
+/**
+ * ✅ NUEVA: Añadir horario a una fecha específica
+ */
+function addHourToSpecificDate(slotId) {
+    const container = document.querySelector(`#${slotId} .hours-for-specific-date`);
+
+    if (!container) {
+        console.error('No se encontró contenedor de horas');
+        return;
+    }
+
+    const hourDiv = document.createElement('div');
+    hourDiv.className = 'hour-slot-specific';
+    hourDiv.style.cssText = 'display: flex; gap: 5px; margin-bottom: 5px;';
+
+    const day = slotId.split('-')[1]; // Extraer día del ID
+
+    hourDiv.innerHTML = `
+        <input type="time" 
+               name="fechas_especificas[${day}][hora][]" 
+               required
+               style="flex: 1; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+        <button type="button" 
+                onclick="this.parentElement.remove()" 
+                title="Eliminar hora"
+                style="background: #d63638; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">
+            ✕
+        </button>
+    `;
+
+    container.appendChild(hourDiv);
+}
+
+/**
+ * ✅ NUEVA: Eliminar slot de fecha específica
+ */
+function removeSpecificDateSlot(slotId) {
+    const slot = document.getElementById(slotId);
+    if (slot && confirm('¿Eliminar esta fecha específica?')) {
+        slot.remove();
+    }
 }
 
 /**
@@ -7294,9 +7461,6 @@ function saveAgencyServiceOnEdit(agencyId) {
     console.log('Agency ID:', agencyId);
 
     const servicioActivo = jQuery('#edit_servicio_activo').is(':checked');
-    const fechasExcluidas = collectFechasExcluidasData();
-
-
 
     // ✅ CREAR FormData CORRECTAMENTE
     const serviceFormData = new FormData();
@@ -7306,70 +7470,157 @@ function saveAgencyServiceOnEdit(agencyId) {
     serviceFormData.append('servicio_activo', servicioActivo ? '1' : '0');
 
     if (servicioActivo) {
-        // Recopilar horarios usando la función auxiliar
-        const horarios = collectHorariosData();
+        // ✅ RECOPILAR HORARIOS Y MODOS (ACTUALIZADO)
+        const horarios_data = {};
+        const modos_data = {};
 
-        if (Object.keys(horarios).length === 0) {
-            alert('Error: Debes seleccionar al menos un día con horarios');
+        jQuery('.edit-day-checkbox:checked').each(function () {
+            const dia = jQuery(this).val();
+            const modo = jQuery(`input[name="modo_${dia}"]:checked`).val() || 'recurrente';
+
+            modos_data[dia] = modo;
+
+            if (modo === 'recurrente') {
+                // ✅ Modo recurrente: array de horas
+                const horas = [];
+                jQuery(`#edit-hours-${dia} .hours-list input[type="time"]`).each(function () {
+                    if (jQuery(this).val()) {
+                        horas.push(jQuery(this).val());
+                    }
+                });
+
+                if (horas.length > 0) {
+                    horarios_data[dia] = horas;
+                }
+            } else if (modo === 'especifico') {
+                // ✅ Modo específico: objeto { fecha: [horas] }
+                const fechasEspecificas = {};
+
+                jQuery(`#edit-hours-${dia} .specific-date-slot`).each(function () {
+                    const fecha = jQuery(this).find('input[type="date"]').val();
+                    const horas = [];
+
+                    jQuery(this).find('input[type="time"]').each(function () {
+                        if (jQuery(this).val()) {
+                            horas.push(jQuery(this).val());
+                        }
+                    });
+
+                    if (fecha && horas.length > 0) {
+                        fechasEspecificas[fecha] = horas;
+                    }
+                });
+
+                if (Object.keys(fechasEspecificas).length > 0) {
+                    horarios_data[dia] = fechasEspecificas;
+                }
+            }
+        });
+
+        // ✅ VALIDACIÓN MEJORADA
+        const diasMarcados = jQuery('.edit-day-checkbox:checked').length;
+
+        if (diasMarcados > 0 && Object.keys(horarios_data).length === 0) {
+            alert('Error: Debes configurar horarios para los días seleccionados');
             return;
         }
 
-        Object.keys(horarios).forEach(day => {
-            horarios[day].forEach((hora, index) => {
-                serviceFormData.append(`horarios[${day}][]`, hora);
+        // ✅ SOLO AÑADIR SI HAY HORARIOS CONFIGURADOS
+        if (Object.keys(horarios_data).length > 0) {
+            console.log('📋 Horarios recopilados:', horarios_data);
+            console.log('📋 Modos recopilados:', modos_data);
+
+            serviceFormData.append('horarios_disponibles', JSON.stringify(horarios_data));
+            serviceFormData.append('modo_disponibilidad', JSON.stringify(modos_data));
+
+            // ✅ RECOPILAR FECHAS EXCLUIDAS (solo para modo recurrente)
+            const fechasExcluidas = {};
+
+            jQuery('.edit-day-checkbox:checked').each(function () {
+                const dia = jQuery(this).val();
+                const modo = modos_data[dia];
+
+                if (modo === 'recurrente') {
+                    // Solo recopilar fechas excluidas en modo recurrente
+                    const fechas = [];
+                    jQuery(`#edit-hours-${dia} .excluded-dates-list input[type="date"]`).each(function () {
+                        if (jQuery(this).val()) {
+                            fechas.push(jQuery(this).val());
+                        }
+                    });
+
+                    if (fechas.length > 0) {
+                        fechasExcluidas[dia] = fechas;
+                    }
+                }
             });
-        });
 
-        Object.keys(fechasExcluidas).forEach(day => {
-            fechasExcluidas[day].forEach((fecha, index) => {
-                serviceFormData.append(`fechas_excluidas[${day}][]`, fecha);
+            if (Object.keys(fechasExcluidas).length > 0) {
+                serviceFormData.append('fechas_excluidas', JSON.stringify(fechasExcluidas));
+            }
+
+            // ✅ RECOPILAR IDIOMAS
+            const idiomas_data = {};
+
+            jQuery('.edit-day-checkbox:checked').each(function () {
+                const dia = jQuery(this).val();
+                const idiomas = [];
+
+                jQuery(`#edit-hours-${dia} .idiomas-checkboxes input[type="checkbox"]:checked`).each(function () {
+                    let idioma = jQuery(this).val();
+                    if (idioma === 'español') {
+                        idioma = 'espanol';
+                    }
+                    idiomas.push(idioma);
+                });
+
+                if (idiomas.length > 0) {
+                    idiomas_data[dia] = idiomas;
+                }
             });
-        });
 
-        const idiomas = collectIdiomasData();
+            if (Object.keys(idiomas_data).length === 0) {
+                alert('Error: Debes seleccionar al menos un idioma para cada día activo');
+                return;
+            }
 
-        if (Object.keys(idiomas).length === 0) {
-            alert('Error: Debes seleccionar al menos un idioma para cada día activo');
-            return;
-        }
-        Object.keys(idiomas).forEach(day => {
-            idiomas[day].forEach((idioma, index) => {
-                serviceFormData.append(`idiomas[${day}][]`, idioma);
-            });
-        });
+            serviceFormData.append('idiomas_disponibles', JSON.stringify(idiomas_data));
 
-        // Validar y añadir precios
-        const precioAdulto = parseFloat(jQuery('#edit_precio_adulto_servicio').val());
-        if (!precioAdulto || precioAdulto <= 0) {
-            alert('Error: El precio de adulto debe ser mayor a 0');
-            return;
-        }
+            // ✅ VALIDAR Y AÑADIR PRECIOS
+            const precioAdulto = parseFloat(jQuery('#edit_precio_adulto_servicio').val());
+            if (!precioAdulto || precioAdulto <= 0) {
+                alert('Error: El precio de adulto debe ser mayor a 0');
+                return;
+            }
 
-        serviceFormData.append('precio_adulto', precioAdulto);
-        serviceFormData.append('precio_nino', jQuery('#edit_precio_nino_servicio').val());
-        serviceFormData.append('precio_nino_menor', jQuery('#edit_precio_nino_menor_servicio').val()); // ✅ NUEVO
-        serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val());
-        serviceFormData.append('titulo', jQuery('#edit_titulo_servicio').val());
-        serviceFormData.append('orden_prioridad', jQuery('#edit_orden_prioridad').val());
+            serviceFormData.append('precio_adulto', precioAdulto);
+            serviceFormData.append('precio_nino', jQuery('#edit_precio_nino_servicio').val());
+            serviceFormData.append('precio_nino_menor', jQuery('#edit_precio_nino_menor_servicio').val());
+            serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val());
+            serviceFormData.append('titulo', jQuery('#edit_titulo_servicio').val());
+            serviceFormData.append('orden_prioridad', jQuery('#edit_orden_prioridad').val());
 
-        // ✅ CRÍTICO: Verificar y añadir archivos CORRECTAMENTE
-        const logoInput = document.getElementById('edit_logo_image');
-        const portadaInput = document.getElementById('edit_portada_image');
+            // ✅ CRÍTICO: Verificar y añadir archivos CORRECTAMENTE
+            const logoInput = document.getElementById('edit_logo_image');
+            const portadaInput = document.getElementById('edit_portada_image');
 
-        if (logoInput && logoInput.files && logoInput.files.length > 0) {
-            const logoFile = logoInput.files[0];
-            console.log('✅ Logo nuevo detectado:', logoFile.name, logoFile.size, 'bytes');
-            serviceFormData.append('logo_image', logoFile);
+            if (logoInput && logoInput.files && logoInput.files.length > 0) {
+                const logoFile = logoInput.files[0];
+                console.log('✅ Logo nuevo detectado:', logoFile.name, logoFile.size, 'bytes');
+                serviceFormData.append('logo_image', logoFile);
+            } else {
+                console.log('ℹ️ No hay logo nuevo');
+            }
+
+            if (portadaInput && portadaInput.files && portadaInput.files.length > 0) {
+                const portadaFile = portadaInput.files[0];
+                console.log('✅ Portada nueva detectada:', portadaFile.name, portadaFile.size, 'bytes');
+                serviceFormData.append('portada_image', portadaFile);
+            } else {
+                console.log('ℹ️ No hay portada nueva');
+            }
         } else {
-            console.log('ℹ️ No hay logo nuevo');
-        }
-
-        if (portadaInput && portadaInput.files && portadaInput.files.length > 0) {
-            const portadaFile = portadaInput.files[0];
-            console.log('✅ Portada nueva detectada:', portadaFile.name, portadaFile.size, 'bytes');
-            serviceFormData.append('portada_image', portadaFile);
-        } else {
-            console.log('ℹ️ No hay portada nueva');
+            console.log('ℹ️ Servicio activo pero sin días configurados - guardando como desactivado');
         }
     }
 

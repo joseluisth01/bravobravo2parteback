@@ -351,92 +351,172 @@ function populateServiceForm(serviceData, isEdit) {
     jQuery('#' + prefix + 'titulo_servicio').val(serviceData.titulo || '');
     jQuery('#' + prefix + 'orden_prioridad').val(serviceData.orden_prioridad || 999);
 
-    // ✅ CARGAR DÍAS Y HORARIOS MEJORADO
+    // ✅ CARGAR DÍAS, HORARIOS Y MODO
     if (serviceData.horarios_disponibles) {
         let horarios;
+        let modos = {};
 
         try {
-            // Intentar parsear si es string
             if (typeof serviceData.horarios_disponibles === 'string') {
                 horarios = JSON.parse(serviceData.horarios_disponibles);
             } else {
                 horarios = serviceData.horarios_disponibles;
             }
 
-            console.log('✅ Horarios parseados correctamente:', horarios);
+            // ✅ CARGAR MODOS DE DISPONIBILIDAD
+            if (serviceData.modo_disponibilidad) {
+                if (typeof serviceData.modo_disponibilidad === 'string') {
+                    modos = JSON.parse(serviceData.modo_disponibilidad);
+                } else {
+                    modos = serviceData.modo_disponibilidad;
+                }
+            }
+
+            console.log('✅ Horarios parseados:', horarios);
+            console.log('✅ Modos parseados:', modos);
         } catch (e) {
-            console.error('❌ Error parseando horarios:', e);
-            console.error('Dato recibido:', serviceData.horarios_disponibles);
+            console.error('❌ Error parseando horarios/modos:', e);
             horarios = {};
+            modos = {};
         }
 
-        // ✅ VALIDAR QUE horarios es un objeto
         if (!horarios || typeof horarios !== 'object') {
             console.warn('⚠️ Horarios inválidos, usando objeto vacío');
             horarios = {};
         }
 
-        // ✅ LIMPIAR TODOS LOS CHECKBOXES Y HORARIOS ANTES DE CARGAR
+        // ✅ LIMPIAR ANTES DE CARGAR
         if (isEdit) {
             jQuery('.edit-day-checkbox').prop('checked', false);
             jQuery('[id^="edit-hours-"]').hide();
             jQuery('.hours-list').empty();
-        } else {
-            jQuery('.day-checkbox input[type="checkbox"]').prop('checked', false);
-            jQuery('[id^="hours-"]').hide();
-            jQuery('.hours-list').empty();
+            jQuery('.specific-dates-list').empty();
         }
 
-        // Recorrer días y sus horarios
+        // Recorrer días y cargar según modo
         Object.keys(horarios).forEach(day => {
             console.log(`Procesando día: ${day}`);
 
-            const dayCheckbox = isEdit
-                ? jQuery(`.edit-day-checkbox[value="${day}"]`)
-                : jQuery(`.day-checkbox input[value="${day}"]`).not('.edit-day-checkbox');
+            const dayCheckbox = jQuery(`.edit-day-checkbox[value="${day}"]`);
 
             if (dayCheckbox.length > 0) {
-                // Marcar checkbox
                 dayCheckbox.prop('checked', true);
-                console.log(`✅ Checkbox marcado para ${day}`);
-
-                // Mostrar contenedor de horarios
                 toggleDayHours(dayCheckbox[0], isEdit);
 
-                // Obtener contenedor de horarios
-                const prefix2 = isEdit ? 'edit-' : '';
-                const hoursList = document.querySelector(`#${prefix2}hours-${day} .hours-list`);
+                const modo = modos[day] || 'recurrente';
+                console.log(`Modo para ${day}: ${modo}`);
 
-                if (!hoursList) {
-                    console.error(`❌ No se encontró hours-list para el día: ${day}`);
-                    return;
+                // ✅ MARCAR RADIO BUTTON CORRECTO
+                jQuery(`input[name="modo_${day}"][value="${modo}"]`).prop('checked', true);
+                toggleModeConfig(day, modo);
+
+                if (modo === 'recurrente') {
+                    // ✅ MODO RECURRENTE (código actual)
+                    const hoursList = document.querySelector(`#edit-hours-${day} .hours-list`);
+                    if (hoursList) {
+                        hoursList.innerHTML = '';
+                        const horasDelDia = Array.isArray(horarios[day]) ? horarios[day] : [];
+
+                        horasDelDia.forEach((hora) => {
+                            const hourSlot = document.createElement('div');
+                            hourSlot.className = 'hour-slot';
+                            hourSlot.innerHTML = `
+                            <input type="time" name="horarios[${day}][]" value="${hora}" required>
+                            <button type="button" class="btn-remove-hour" onclick="removeHourSlot(this)">✕</button>
+                        `;
+                            hoursList.appendChild(hourSlot);
+                        });
+                    }
+                } else if (modo === 'especifico') {
+                    // ✅ MODO ESPECÍFICO (NUEVO)
+                    const specificList = document.querySelector(`#edit-hours-${day} .specific-dates-list`);
+                    if (specificList) {
+                        specificList.innerHTML = '';
+
+                        // horarios[day] será un objeto: { "2025-11-15": ["10:00", "12:00"], "2025-11-22": ["11:00"] }
+                        const fechasEspecificas = horarios[day];
+
+                        if (typeof fechasEspecificas === 'object' && !Array.isArray(fechasEspecificas)) {
+                            Object.keys(fechasEspecificas).forEach(fecha => {
+                                const horas = fechasEspecificas[fecha];
+                                const slotId = `specific-${day}-${Date.now()}-${Math.random()}`;
+
+                                const slot = document.createElement('div');
+                                slot.className = 'specific-date-slot';
+                                slot.id = slotId;
+                                slot.style.cssText = `
+                                display: grid;
+                                grid-template-columns: 200px 1fr auto;
+                                gap: 10px;
+                                align-items: start;
+                                padding: 15px;
+                                background: white;
+                                border: 2px solid #0073aa;
+                                border-radius: 6px;
+                                margin-bottom: 15px;
+                            `;
+
+                                slot.innerHTML = `
+                                <div>
+                                    <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 12px;">📅 Fecha</label>
+                                    <input type="date" 
+                                           name="fechas_especificas[${day}][fecha][]" 
+                                           value="${fecha}"
+                                           required 
+                                           min="${new Date().toISOString().split('T')[0]}"
+                                           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                
+                                <div>
+                                    <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 12px;">🕐 Horarios</label>
+                                    <div class="hours-for-specific-date" data-slot-id="${slotId}"></div>
+                                    <button type="button" 
+                                            class="btn-add-hour-specific" 
+                                            onclick="addHourToSpecificDate('${slotId}')"
+                                            style="margin-top: 5px; padding: 5px 10px; font-size: 12px; background: #0073aa; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                        + Añadir hora
+                                    </button>
+                                </div>
+                                
+                                <button type="button" 
+                                        onclick="removeSpecificDateSlot('${slotId}')" 
+                                        title="Eliminar fecha"
+                                        style="background: #d63638; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                    ✕
+                                </button>
+                            `;
+
+                                specificList.appendChild(slot);
+
+                                // Añadir horarios para esta fecha
+                                const hoursContainer = slot.querySelector('.hours-for-specific-date');
+                                horas.forEach(hora => {
+                                    const hourDiv = document.createElement('div');
+                                    hourDiv.className = 'hour-slot-specific';
+                                    hourDiv.style.cssText = 'display: flex; gap: 5px; margin-bottom: 5px;';
+
+                                    hourDiv.innerHTML = `
+                                    <input type="time" 
+                                           name="fechas_especificas[${day}][hora][]" 
+                                           value="${hora}"
+                                           required
+                                           style="flex: 1; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                                    <button type="button" 
+                                            onclick="this.parentElement.remove()" 
+                                            title="Eliminar hora"
+                                            style="background: #d63638; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">
+                                        ✕
+                                    </button>
+                                `;
+
+                                    hoursContainer.appendChild(hourDiv);
+                                });
+                            });
+                        }
+                    }
                 }
-
-                // Limpiar horarios existentes
-                hoursList.innerHTML = '';
-
-                // ✅ VALIDAR QUE horarios[day] es un array
-                const horasDelDia = Array.isArray(horarios[day]) ? horarios[day] : [];
-
-                console.log(`Añadiendo ${horasDelDia.length} horarios para ${day}:`, horasDelDia);
-
-                // Añadir cada horario
-                horasDelDia.forEach((hora, index) => {
-                    const hourSlot = document.createElement('div');
-                    hourSlot.className = 'hour-slot';
-                    hourSlot.innerHTML = `
-                        <input type="time" name="horarios[${day}][]" value="${hora}" required>
-                        <button type="button" class="btn-remove-hour" onclick="removeHourSlot(this)">✕</button>
-                    `;
-                    hoursList.appendChild(hourSlot);
-                    console.log(`✅ Horario ${index + 1}/${horasDelDia.length} añadido para ${day}: ${hora}`);
-                });
-            } else {
-                console.warn(`⚠️ No se encontró checkbox para el día: ${day}`);
             }
         });
-
-        console.log('✅ Todos los horarios cargados correctamente');
     } else {
         console.log('ℹ️ No hay horarios disponibles en los datos');
     }

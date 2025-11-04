@@ -178,6 +178,17 @@ class ReservasAgencyServicesAdmin
             return;
         }
 
+        if (isset($_POST['modo_disponibilidad'])) {
+    $modos_data = $_POST['modo_disponibilidad'];
+    if (is_array($modos_data)) {
+        $data['modo_disponibilidad'] = json_encode($modos_data);
+    } else {
+        $data['modo_disponibilidad'] = $modos_data;
+    }
+} else {
+    $data['modo_disponibilidad'] = null;
+}
+
         // ✅ VERIFICAR PERMISOS DEL SISTEMA DE RESERVAS
         if ($_SESSION['reservas_user']['role'] !== 'super_admin') {
             wp_send_json_error('Sin permisos para gestionar servicios de agencias');
@@ -360,34 +371,34 @@ class ReservasAgencyServicesAdmin
     }
 
     public static function get_available_services($fecha, $hora)
-    {
-        error_log('=== GET AVAILABLE SERVICES ===');
-        error_log('Fecha: ' . $fecha);
-        error_log('Hora: ' . $hora);
+{
+    error_log('=== GET AVAILABLE SERVICES ===');
+    error_log('Fecha: ' . $fecha);
+    error_log('Hora: ' . $hora);
 
-        global $wpdb;
-        $table_services = $wpdb->prefix . 'reservas_agency_services';
-        $table_agencies = $wpdb->prefix . 'reservas_agencies';
+    global $wpdb;
+    $table_services = $wpdb->prefix . 'reservas_agency_services';
+    $table_agencies = $wpdb->prefix . 'reservas_agencies';
 
-        // Obtener día de la semana en español
-        $fecha_obj = new DateTime($fecha);
-        $dia_numero = $fecha_obj->format('N'); // 1 (lunes) a 7 (domingo)
+    // Obtener día de la semana en español
+    $fecha_obj = new DateTime($fecha);
+    $dia_numero = $fecha_obj->format('N'); // 1 (lunes) a 7 (domingo)
 
-        $dias_semana = [
-            1 => 'lunes',
-            2 => 'martes',
-            3 => 'miercoles',
-            4 => 'jueves',
-            5 => 'viernes',
-            6 => 'sabado',
-            7 => 'domingo'
-        ];
+    $dias_semana = [
+        1 => 'lunes',
+        2 => 'martes',
+        3 => 'miercoles',
+        4 => 'jueves',
+        5 => 'viernes',
+        6 => 'sabado',
+        7 => 'domingo'
+    ];
 
-        $dia_nombre = $dias_semana[$dia_numero];
-        error_log('Día de la semana: ' . $dia_nombre);
+    $dia_nombre = $dias_semana[$dia_numero];
+    error_log('Día de la semana: ' . $dia_nombre);
 
-        // Obtener todos los servicios activos
-        $services = $wpdb->get_results("
+    // Obtener todos los servicios activos
+    $services = $wpdb->get_results("
         SELECT s.*, a.agency_name, a.contact_person, a.email, a.phone
         FROM $table_services s
         INNER JOIN $table_agencies a ON s.agency_id = a.id
@@ -396,22 +407,40 @@ class ReservasAgencyServicesAdmin
         ORDER BY s.orden_prioridad ASC, s.created_at ASC
     ");
 
-        error_log('Total servicios activos: ' . count($services));
+    error_log('Total servicios activos: ' . count($services));
 
-        $available_services = array();
+    $available_services = array();
 
-        foreach ($services as $service) {
-            // ✅ DEBUG DE IDIOMAS
-            error_log('🔍 Servicio ID ' . $service->id . ' - Idiomas en BD: ' . ($service->idiomas_disponibles ?? 'NULL'));
+    foreach ($services as $service) {
+        // ✅ DEBUG DE IDIOMAS
+        error_log('🔍 Servicio ID ' . $service->id . ' - Idiomas en BD: ' . ($service->idiomas_disponibles ?? 'NULL'));
 
-            // Verificar si el servicio está disponible este día
-            $dias_disponibles = explode(',', $service->dias_disponibles);
+        // Verificar si el servicio está disponible este día
+        $dias_disponibles = explode(',', $service->dias_disponibles);
 
-            if (!in_array($dia_nombre, $dias_disponibles)) {
-                continue;
-            }
+        if (!in_array($dia_nombre, $dias_disponibles)) {
+            error_log('❌ Servicio no disponible para ' . $dia_nombre);
+            continue;
+        }
 
-            // Verificar fechas excluidas
+        // ✅ OBTENER HORARIOS Y MODOS
+        $horarios = json_decode($service->horarios_disponibles, true);
+        $modos = json_decode($service->modo_disponibilidad, true);
+
+        if (!isset($horarios[$dia_nombre])) {
+            error_log('❌ No hay horarios para ' . $dia_nombre);
+            continue;
+        }
+
+        // ✅ DETERMINAR MODO (recurrente por defecto si no existe)
+        $modo = isset($modos[$dia_nombre]) ? $modos[$dia_nombre] : 'recurrente';
+
+        error_log("🔍 Servicio ID {$service->id} - Modo: $modo para $dia_nombre");
+
+        $hora_coincide = false;
+
+        if ($modo === 'recurrente') {
+            // ✅ MODO RECURRENTE: Verificar fechas excluidas primero
             if (!empty($service->fechas_excluidas)) {
                 $fechas_excluidas = json_decode($service->fechas_excluidas, true);
 
@@ -423,50 +452,75 @@ class ReservasAgencyServicesAdmin
                 }
             }
 
-            // Verificar horarios
-            $horarios = json_decode($service->horarios_disponibles, true);
+            // ✅ MODO RECURRENTE: Array de horas
+            if (is_array($horarios[$dia_nombre])) {
+                foreach ($horarios[$dia_nombre] as $horario_disponible) {
+                    $hora_reserva = substr($hora, 0, 5);
+                    $hora_servicio = substr($horario_disponible, 0, 5);
 
-            if (!isset($horarios[$dia_nombre])) {
-                continue;
-            }
-
-            // Verificar si la hora coincide
-            $hora_coincide = false;
-            foreach ($horarios[$dia_nombre] as $horario_disponible) {
-                $hora_reserva = substr($hora, 0, 5);
-                $hora_servicio = substr($horario_disponible, 0, 5);
-
-                if ($hora_reserva === $hora_servicio) {
-                    $hora_coincide = true;
-                    break;
+                    if ($hora_reserva === $hora_servicio) {
+                        $hora_coincide = true;
+                        error_log("✅ Hora coincide (recurrente): $hora_reserva");
+                        break;
+                    }
                 }
             }
+        } else if ($modo === 'especifico') {
+            // ✅ MODO ESPECÍFICO: Objeto { fecha: [horas] }
+            error_log("🔍 Buscando fecha específica: $fecha");
+            
+            if (is_array($horarios[$dia_nombre]) && isset($horarios[$dia_nombre][$fecha])) {
+                error_log("✅ Fecha específica encontrada: $fecha");
+                
+                $horas_fecha = $horarios[$dia_nombre][$fecha];
+                
+                if (is_array($horas_fecha)) {
+                    foreach ($horas_fecha as $horario_disponible) {
+                        $hora_reserva = substr($hora, 0, 5);
+                        $hora_servicio = substr($horario_disponible, 0, 5);
 
-
-            $table_disabled = $wpdb->prefix . 'reservas_agency_horarios_disabled';
-            $is_disabled = $wpdb->get_var($wpdb->prepare(
-                "SELECT COUNT(*) FROM $table_disabled 
-             WHERE agency_id = %d AND dia = %s AND hora = %s",
-                $service->agency_id,
-                $dia_nombre,
-                $hora
-            ));
-
-            if ($is_disabled > 0) {
-                error_log('❌ Horario deshabilitado: ' . $service->agency_name . ' - ' . $dia_nombre . ' ' . $hora);
-                continue; // ✅ SALTAR ESTE SERVICIO
-            }
-
-
-            if ($hora_coincide) {
-                $available_services[] = $service;
+                        if ($hora_reserva === $hora_servicio) {
+                            $hora_coincide = true;
+                            error_log("✅ Hora coincide (específico): $hora_reserva para fecha $fecha");
+                            break;
+                        }
+                    }
+                } else {
+                    error_log('❌ horas_fecha no es un array');
+                }
+            } else {
+                error_log("❌ Fecha específica no encontrada: $fecha");
             }
         }
 
-        error_log('Total servicios disponibles: ' . count($available_services));
+        // ✅ VERIFICAR HORARIOS DESHABILITADOS
+        $table_disabled = $wpdb->prefix . 'reservas_agency_horarios_disabled';
+        $is_disabled = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table_disabled 
+             WHERE agency_id = %d AND dia = %s AND hora = %s",
+            $service->agency_id,
+            $dia_nombre,
+            $hora
+        ));
 
-        return $available_services;
+        if ($is_disabled > 0) {
+            error_log('❌ Horario deshabilitado: ' . $service->agency_name . ' - ' . $dia_nombre . ' ' . $hora);
+            continue;
+        }
+
+        // ✅ SI LA HORA COINCIDE, AÑADIR A SERVICIOS DISPONIBLES
+        if ($hora_coincide) {
+            error_log("✅ Servicio disponible: {$service->agency_name} (modo: $modo)");
+            $available_services[] = $service;
+        } else {
+            error_log("❌ Hora no coincide para servicio: {$service->agency_name}");
+        }
     }
+
+    error_log('Total servicios disponibles: ' . count($available_services));
+
+    return $available_services;
+}
 
     public function get_agency_service()
     {
