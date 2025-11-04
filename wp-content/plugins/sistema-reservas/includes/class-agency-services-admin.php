@@ -158,72 +158,63 @@ class ReservasAgencyServicesAdmin
      * Guardar servicio de agencia
      */
     public function save_agency_service()
-{
-    error_log('=== SAVE AGENCY SERVICE START ===');
+    {
+        error_log('=== SAVE AGENCY SERVICE START ===');
 
-    // ✅ INICIAR SESIÓN
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+        // ✅ INICIAR SESIÓN
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
-    // Verificar nonce
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
-        wp_send_json_error('Error de seguridad');
-        return;
-    }
+        // Verificar nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'reservas_nonce')) {
+            wp_send_json_error('Error de seguridad');
+            return;
+        }
 
-    // ✅ VERIFICAR SESIÓN DE RESERVAS (NO DE WORDPRESS)
-    if (!isset($_SESSION['reservas_user'])) {
-        wp_send_json_error('Sesión expirada');
-        return;
-    }
+        // ✅ VERIFICAR SESIÓN DE RESERVAS (NO DE WORDPRESS)
+        if (!isset($_SESSION['reservas_user'])) {
+            wp_send_json_error('Sesión expirada');
+            return;
+        }
 
-    // ✅ VERIFICAR PERMISOS DEL SISTEMA DE RESERVAS
-    if ($_SESSION['reservas_user']['role'] !== 'super_admin') {
-        wp_send_json_error('Sin permisos para gestionar servicios de agencias');
-        return;
-    }
+        // ✅ VERIFICAR PERMISOS DEL SISTEMA DE RESERVAS
+        if ($_SESSION['reservas_user']['role'] !== 'super_admin') {
+            wp_send_json_error('Sin permisos para gestionar servicios de agencias');
+            return;
+        }
 
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'reservas_agency_services';
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'reservas_agency_services';
 
-    $agency_id = intval($_POST['agency_id']);
-    $servicio_activo = isset($_POST['servicio_activo']) && $_POST['servicio_activo'] == '1' ? 1 : 0;
+        $agency_id = intval($_POST['agency_id']);
+        $servicio_activo = isset($_POST['servicio_activo']) ? 1 : 0;
 
+        // Validar que la agencia existe
+        $table_agencies = $wpdb->prefix . 'reservas_agencies';
+        $agency_exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table_agencies WHERE id = %d",
+            $agency_id
+        ));
 
-    // Validar que la agencia existe
-    $table_agencies = $wpdb->prefix . 'reservas_agencies';
-    $agency_exists = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_agencies WHERE id = %d",
-        $agency_id
-    ));
+        if (!$agency_exists) {
+            wp_send_json_error('Agencia no encontrada');
+            return;
+        }
 
-    if (!$agency_exists) {
-        wp_send_json_error('Agencia no encontrada');
-        return;
-    }
+        $data = array(
+            'agency_id' => $agency_id,
+            'servicio_activo' => $servicio_activo
+        );
 
-    $data = array(
-        'agency_id' => $agency_id,
-        'servicio_activo' => $servicio_activo
-    );
-
-    // ✅ SOLO PROCESAR LOS DEMÁS CAMPOS SI EL SERVICIO ESTÁ ACTIVO
-    if ($servicio_activo) {
-        // ✅ VALIDAR Y PROCESAR HORARIOS
-        $horarios_json_str = $_POST['horarios_disponibles'] ?? null;
-        
-        if ($horarios_json_str) {
-            // Modo edición: ya viene como JSON
-            $data['horarios_disponibles'] = $horarios_json_str;
-            
-            // Extraer días para guardar en dias_disponibles
-            $horarios_decoded = json_decode($horarios_json_str, true);
-            if ($horarios_decoded && is_array($horarios_decoded)) {
-                $data['dias_disponibles'] = implode(',', array_keys($horarios_decoded));
+        // Solo procesar los demás campos si el servicio está activo
+        if ($servicio_activo) {
+            // ✅ VALIDAR Y PROCESAR HORARIOS (SIN CAMBIOS)
+            if (!isset($_POST['horarios']) || empty($_POST['horarios'])) {
+                wp_send_json_error('Debes seleccionar al menos un día con horarios');
+                return;
             }
-        } elseif (isset($_POST['horarios']) && !empty($_POST['horarios'])) {
-            // Modo creación: viene como array PHP
+
             $horarios_data = $_POST['horarios'];
             $horarios_json = array();
             $dias_disponibles = array();
@@ -248,150 +239,125 @@ class ReservasAgencyServicesAdmin
 
             $data['dias_disponibles'] = implode(',', $dias_disponibles);
             $data['horarios_disponibles'] = json_encode($horarios_json);
-        } else {
-            // No hay horarios en absoluto
-            wp_send_json_error('Debes seleccionar al menos un día con horarios');
-            return;
-        }
 
-        // ✅ PROCESAR MODO DE DISPONIBILIDAD
-        if (isset($_POST['modo_disponibilidad'])) {
-            $modos_data = $_POST['modo_disponibilidad'];
-            if (is_array($modos_data)) {
-                $data['modo_disponibilidad'] = json_encode($modos_data);
-            } else {
-                $data['modo_disponibilidad'] = $modos_data;
-            }
-        } else {
-            $data['modo_disponibilidad'] = null;
-        }
+            // ✅ PROCESAR IDIOMAS (CON NORMALIZACIÓN)
+            $idiomas_data = array();
+            if (isset($_POST['idiomas']) && is_array($_POST['idiomas'])) {
+                error_log('📝 Procesando idiomas recibidos: ' . print_r($_POST['idiomas'], true));
 
-        // ✅ PROCESAR IDIOMAS (CON NORMALIZACIÓN)
-        $idiomas_data = array();
-        if (isset($_POST['idiomas']) && is_array($_POST['idiomas'])) {
-            error_log('📝 Procesando idiomas recibidos: ' . print_r($_POST['idiomas'], true));
-
-            foreach ($_POST['idiomas'] as $dia => $idiomas) {
-                if (!empty($idiomas) && is_array($idiomas)) {
-                    $idiomas_validos = array_filter($idiomas, function ($idioma) {
-                        return in_array($idioma, array('espanol', 'español', 'ingles', 'frances'));
-                    });
-
-                    if (!empty($idiomas_validos)) {
-                        $idiomas_normalizados = array_map(function ($idioma) {
-                            return $idioma === 'español' ? 'espanol' : $idioma;
-                        }, $idiomas_validos);
-
-                        $idiomas_data[$dia] = array_values($idiomas_normalizados);
-                        error_log("✅ Idiomas válidos y normalizados para $dia: " . implode(', ', $idiomas_normalizados));
-                    }
-                }
-            }
-
-            error_log('📋 Idiomas finales procesados: ' . print_r($idiomas_data, true));
-        }
-
-        // ✅ SIEMPRE GUARDAR, INCLUSO SI ESTÁ VACÍO (NULL)
-        $data['idiomas_disponibles'] = !empty($idiomas_data) ? json_encode($idiomas_data, JSON_UNESCAPED_UNICODE) : null;
-
-        // ✅ PROCESAR FECHAS EXCLUIDAS
-        $fechas_excluidas = array();
-        if (isset($_POST['fechas_excluidas']) && !empty($_POST['fechas_excluidas'])) {
-            $fechas_raw = $_POST['fechas_excluidas'];
-
-            if (is_string($fechas_raw)) {
-                // Si viene como JSON string (desde edición)
-                $fechas_decoded = json_decode($fechas_raw, true);
-                if ($fechas_decoded && is_array($fechas_decoded)) {
-                    $fechas_excluidas = $fechas_decoded;
-                }
-            } elseif (is_array($fechas_raw)) {
-                // Si viene como array PHP (desde creación)
-                foreach ($fechas_raw as $dia => $fechas) {
-                    if (!empty($fechas) && is_array($fechas)) {
-                        $fechas_validas = array_filter($fechas, function ($fecha) {
-                            return !empty($fecha) && strtotime($fecha) !== false;
+                foreach ($_POST['idiomas'] as $dia => $idiomas) {
+                    if (!empty($idiomas) && is_array($idiomas)) {
+                        $idiomas_validos = array_filter($idiomas, function ($idioma) {
+                            // ✅ ACEPTAR TANTO español COMO espanol
+                            return in_array($idioma, array('espanol', 'español', 'ingles', 'frances'));
                         });
 
-                        if (!empty($fechas_validas)) {
-                            $fechas_excluidas[$dia] = array_values($fechas_validas);
+                        if (!empty($idiomas_validos)) {
+                            // ✅ NORMALIZAR: Convertir español a espanol
+                            $idiomas_normalizados = array_map(function ($idioma) {
+                                return $idioma === 'español' ? 'espanol' : $idioma;
+                            }, $idiomas_validos);
+
+                            $idiomas_data[$dia] = array_values($idiomas_normalizados);
+                            error_log("✅ Idiomas válidos y normalizados para $dia: " . implode(', ', $idiomas_normalizados));
+                        }
+                    }
+                }
+
+                error_log('📋 Idiomas finales procesados: ' . print_r($idiomas_data, true));
+            }
+
+            // ✅ SIEMPRE GUARDAR, INCLUSO SI ESTÁ VACÍO (NULL)
+            $data['idiomas_disponibles'] = !empty($idiomas_data) ? json_encode($idiomas_data, JSON_UNESCAPED_UNICODE) : null;
+
+            $fechas_excluidas = array();
+            if (isset($_POST['fechas_excluidas']) && !empty($_POST['fechas_excluidas'])) {
+                $fechas_raw = $_POST['fechas_excluidas'];
+
+                if (is_array($fechas_raw)) {
+                    foreach ($fechas_raw as $dia => $fechas) {
+                        if (!empty($fechas) && is_array($fechas)) {
+                            $fechas_validas = array_filter($fechas, function ($fecha) {
+                                return !empty($fecha) && strtotime($fecha) !== false;
+                            });
+
+                            if (!empty($fechas_validas)) {
+                                $fechas_excluidas[$dia] = array_values($fechas_validas);
+                            }
                         }
                     }
                 }
             }
-        }
 
-        $data['fechas_excluidas'] = !empty($fechas_excluidas) ? json_encode($fechas_excluidas) : null;
+            $data['fechas_excluidas'] = !empty($fechas_excluidas) ? json_encode($fechas_excluidas) : null;
 
-        // ✅ VALIDAR PRECIOS (AHORA CON PRECIO NIÑOS MENORES)
-        $precio_adulto = floatval($_POST['precio_adulto'] ?? 0);
-        $precio_nino = floatval($_POST['precio_nino'] ?? 0);
-        $precio_nino_menor = floatval($_POST['precio_nino_menor'] ?? 0);
+            // ✅ VALIDAR PRECIOS (AHORA CON PRECIO NIÑOS MENORES)
+            $precio_adulto = floatval($_POST['precio_adulto'] ?? 0);
+            $precio_nino = floatval($_POST['precio_nino'] ?? 0);
+            $precio_nino_menor = floatval($_POST['precio_nino_menor'] ?? 0); // ✅ NUEVO
 
-        if ($precio_adulto <= 0) {
-            wp_send_json_error('El precio de adulto debe ser mayor a 0');
-            return;
-        }
-
-        if ($precio_nino < 0) {
-            wp_send_json_error('El precio de niño no puede ser negativo');
-            return;
-        }
-
-        if ($precio_nino_menor < 0) {
-            wp_send_json_error('El precio de niño menor no puede ser negativo');
-            return;
-        }
-
-        $data['precio_adulto'] = $precio_adulto;
-        $data['precio_nino'] = $precio_nino;
-        $data['precio_nino_menor'] = $precio_nino_menor;
-        $data['descripcion'] = sanitize_textarea_field($_POST['descripcion'] ?? '');
-        $data['titulo'] = sanitize_text_field($_POST['titulo'] ?? '');
-        $data['orden_prioridad'] = intval($_POST['orden_prioridad'] ?? 999);
-
-        // ✅ PROCESAR IMÁGENES SI SE SUBIERON
-        if (!empty($_FILES['logo_image']['name'])) {
-            $logo_upload = $this->handle_image_upload($_FILES['logo_image'], 'logo', $agency_id);
-            if (is_wp_error($logo_upload)) {
-                wp_send_json_error('Error subiendo logo: ' . $logo_upload->get_error_message());
+            if ($precio_adulto <= 0) {
+                wp_send_json_error('El precio de adulto debe ser mayor a 0');
                 return;
             }
-            $data['logo_url'] = $logo_upload;
-        }
 
-        if (!empty($_FILES['portada_image']['name'])) {
-            $portada_upload = $this->handle_image_upload($_FILES['portada_image'], 'portada', $agency_id);
-            if (is_wp_error($portada_upload)) {
-                wp_send_json_error('Error subiendo portada: ' . $portada_upload->get_error_message());
+            if ($precio_nino < 0) {
+                wp_send_json_error('El precio de niño no puede ser negativo');
                 return;
             }
-            $data['portada_url'] = $portada_upload;
+
+            if ($precio_nino_menor < 0) { // ✅ NUEVO
+                wp_send_json_error('El precio de niño menor no puede ser negativo');
+                return;
+            }
+
+            $data['precio_adulto'] = $precio_adulto;
+            $data['precio_nino'] = $precio_nino;
+            $data['precio_nino_menor'] = $precio_nino_menor; // ✅ NUEVO
+            $data['descripcion'] = sanitize_textarea_field($_POST['descripcion'] ?? '');
+            $data['titulo'] = sanitize_text_field($_POST['titulo'] ?? '');
+            $data['orden_prioridad'] = intval($_POST['orden_prioridad'] ?? 999);
+
+            // Procesar imágenes si se subieron (SIN CAMBIOS)
+            if (!empty($_FILES['logo_image']['name'])) {
+                $logo_upload = $this->handle_image_upload($_FILES['logo_image'], 'logo', $agency_id);
+                if (is_wp_error($logo_upload)) {
+                    wp_send_json_error('Error subiendo logo: ' . $logo_upload->get_error_message());
+                    return;
+                }
+                $data['logo_url'] = $logo_upload;
+            }
+
+            if (!empty($_FILES['portada_image']['name'])) {
+                $portada_upload = $this->handle_image_upload($_FILES['portada_image'], 'portada', $agency_id);
+                if (is_wp_error($portada_upload)) {
+                    wp_send_json_error('Error subiendo portada: ' . $portada_upload->get_error_message());
+                    return;
+                }
+                $data['portada_url'] = $portada_upload;
+            }
+        }
+
+        // Verificar si ya existe un servicio para esta agencia
+        $existing = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM $table_name WHERE agency_id = %d",
+            $agency_id
+        ));
+
+        if ($existing) {
+            $result = $wpdb->update($table_name, $data, array('agency_id' => $agency_id));
+        } else {
+            $result = $wpdb->insert($table_name, $data);
+        }
+
+        if ($result !== false) {
+            error_log('✅ Servicio de agencia guardado correctamente');
+            wp_send_json_success('Servicio guardado correctamente');
+        } else {
+            error_log('❌ Error guardando servicio: ' . $wpdb->last_error);
+            wp_send_json_error('Error al guardar el servicio: ' . $wpdb->last_error);
         }
     }
-
-    // ✅ VERIFICAR SI YA EXISTE UN SERVICIO PARA ESTA AGENCIA
-    $existing = $wpdb->get_var($wpdb->prepare(
-        "SELECT id FROM $table_name WHERE agency_id = %d",
-        $agency_id
-    ));
-
-    if ($existing) {
-        // Actualizar
-        $result = $wpdb->update($table_name, $data, array('agency_id' => $agency_id));
-    } else {
-        // Insertar
-        $result = $wpdb->insert($table_name, $data);
-    }
-
-    if ($result !== false) {
-        error_log('✅ Servicio de agencia guardado correctamente');
-        wp_send_json_success('Servicio guardado correctamente');
-    } else {
-        error_log('❌ Error guardando servicio: ' . $wpdb->last_error);
-        wp_send_json_error('Error al guardar el servicio: ' . $wpdb->last_error);
-    }
-}
 
     public static function get_available_services($fecha, $hora)
     {
@@ -442,81 +408,41 @@ class ReservasAgencyServicesAdmin
             $dias_disponibles = explode(',', $service->dias_disponibles);
 
             if (!in_array($dia_nombre, $dias_disponibles)) {
-                error_log('❌ Servicio no disponible para ' . $dia_nombre);
                 continue;
             }
 
-            // ✅ OBTENER HORARIOS Y MODOS
+            // Verificar fechas excluidas
+            if (!empty($service->fechas_excluidas)) {
+                $fechas_excluidas = json_decode($service->fechas_excluidas, true);
+
+                if (isset($fechas_excluidas[$dia_nombre]) && is_array($fechas_excluidas[$dia_nombre])) {
+                    if (in_array($fecha, $fechas_excluidas[$dia_nombre])) {
+                        error_log('❌ Servicio excluido para esta fecha: ' . $service->agency_name . ' - ' . $fecha);
+                        continue;
+                    }
+                }
+            }
+
+            // Verificar horarios
             $horarios = json_decode($service->horarios_disponibles, true);
-            $modos = json_decode($service->modo_disponibilidad, true);
 
             if (!isset($horarios[$dia_nombre])) {
-                error_log('❌ No hay horarios para ' . $dia_nombre);
                 continue;
             }
 
-            // ✅ DETERMINAR MODO (recurrente por defecto si no existe)
-            $modo = isset($modos[$dia_nombre]) ? $modos[$dia_nombre] : 'recurrente';
-
-            error_log("🔍 Servicio ID {$service->id} - Modo: $modo para $dia_nombre");
-
+            // Verificar si la hora coincide
             $hora_coincide = false;
+            foreach ($horarios[$dia_nombre] as $horario_disponible) {
+                $hora_reserva = substr($hora, 0, 5);
+                $hora_servicio = substr($horario_disponible, 0, 5);
 
-            if ($modo === 'recurrente') {
-                // ✅ MODO RECURRENTE: Verificar fechas excluidas primero
-                if (!empty($service->fechas_excluidas)) {
-                    $fechas_excluidas = json_decode($service->fechas_excluidas, true);
-
-                    if (isset($fechas_excluidas[$dia_nombre]) && is_array($fechas_excluidas[$dia_nombre])) {
-                        if (in_array($fecha, $fechas_excluidas[$dia_nombre])) {
-                            error_log('❌ Servicio excluido para esta fecha: ' . $service->agency_name . ' - ' . $fecha);
-                            continue;
-                        }
-                    }
-                }
-
-                // ✅ MODO RECURRENTE: Array de horas
-                if (is_array($horarios[$dia_nombre])) {
-                    foreach ($horarios[$dia_nombre] as $horario_disponible) {
-                        $hora_reserva = substr($hora, 0, 5);
-                        $hora_servicio = substr($horario_disponible, 0, 5);
-
-                        if ($hora_reserva === $hora_servicio) {
-                            $hora_coincide = true;
-                            error_log("✅ Hora coincide (recurrente): $hora_reserva");
-                            break;
-                        }
-                    }
-                }
-            } else if ($modo === 'especifico') {
-                // ✅ MODO ESPECÍFICO: Objeto { fecha: [horas] }
-                error_log("🔍 Buscando fecha específica: $fecha");
-
-                if (is_array($horarios[$dia_nombre]) && isset($horarios[$dia_nombre][$fecha])) {
-                    error_log("✅ Fecha específica encontrada: $fecha");
-
-                    $horas_fecha = $horarios[$dia_nombre][$fecha];
-
-                    if (is_array($horas_fecha)) {
-                        foreach ($horas_fecha as $horario_disponible) {
-                            $hora_reserva = substr($hora, 0, 5);
-                            $hora_servicio = substr($horario_disponible, 0, 5);
-
-                            if ($hora_reserva === $hora_servicio) {
-                                $hora_coincide = true;
-                                error_log("✅ Hora coincide (específico): $hora_reserva para fecha $fecha");
-                                break;
-                            }
-                        }
-                    } else {
-                        error_log('❌ horas_fecha no es un array');
-                    }
-                } else {
-                    error_log("❌ Fecha específica no encontrada: $fecha");
+                if ($hora_reserva === $hora_servicio) {
+                    $hora_coincide = true;
+                    break;
                 }
             }
 
-            // ✅ VERIFICAR HORARIOS DESHABILITADOS
+
             $table_disabled = $wpdb->prefix . 'reservas_agency_horarios_disabled';
             $is_disabled = $wpdb->get_var($wpdb->prepare(
                 "SELECT COUNT(*) FROM $table_disabled 
@@ -528,15 +454,12 @@ class ReservasAgencyServicesAdmin
 
             if ($is_disabled > 0) {
                 error_log('❌ Horario deshabilitado: ' . $service->agency_name . ' - ' . $dia_nombre . ' ' . $hora);
-                continue;
+                continue; // ✅ SALTAR ESTE SERVICIO
             }
 
-            // ✅ SI LA HORA COINCIDE, AÑADIR A SERVICIOS DISPONIBLES
+
             if ($hora_coincide) {
-                error_log("✅ Servicio disponible: {$service->agency_name} (modo: $modo)");
                 $available_services[] = $service;
-            } else {
-                error_log("❌ Hora no coincide para servicio: {$service->agency_name}");
             }
         }
 
