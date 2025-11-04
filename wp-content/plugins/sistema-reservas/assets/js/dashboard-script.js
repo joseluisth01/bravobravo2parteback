@@ -7467,164 +7467,189 @@ function saveAgencyServiceOnEdit(agencyId) {
     serviceFormData.append('action', 'save_agency_service');
     serviceFormData.append('agency_id', agencyId);
     serviceFormData.append('nonce', reservasAjax.nonce);
-    serviceFormData.append('servicio_activo', servicioActivo ? '1' : '0');
-
     if (servicioActivo) {
-        // ✅ RECOPILAR HORARIOS Y MODOS (ACTUALIZADO)
-        const horarios_data = {};
-        const modos_data = {};
+    serviceFormData.append('servicio_activo', '1');
+} else {
+    serviceFormData.append('servicio_activo', '0');
+}
 
-        jQuery('.edit-day-checkbox:checked').each(function () {
-            const dia = jQuery(this).val();
-            const modo = jQuery(`input[name="modo_${dia}"]:checked`).val() || 'recurrente';
+    // ✅ SI EL SERVICIO NO ESTÁ ACTIVO, ENVIAR SOLO ESO
+    if (!servicioActivo) {
+        console.log('ℹ️ Servicio desactivado, guardando sin validar horarios');
+        
+        jQuery.ajax({
+            url: reservasAjax.ajax_url,
+            type: 'POST',
+            data: serviceFormData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log('✅ Respuesta del servidor:', response);
+                
+                if (response.success) {
+                    alert('✅ Agencia actualizada correctamente (servicio desactivado)');
+                } else {
+                    alert('❌ Error: ' + response.data);
+                }
+                closeEditAgencyModal();
+                loadAgenciesSection();
+            },
+            error: function (xhr, status, error) {
+                console.error('❌ Error guardando:', error);
+                alert('❌ Error de conexión');
+                closeEditAgencyModal();
+                loadAgenciesSection();
+            }
+        });
+        
+        return; // ✅ SALIR AQUÍ SI NO ESTÁ ACTIVO
+    }
 
-            modos_data[dia] = modo;
+    // ✅ SOLO SI ESTÁ ACTIVO, RECOPILAR Y VALIDAR HORARIOS
+    const horarios_data = {};
+    const modos_data = {};
 
-            if (modo === 'recurrente') {
-                // ✅ Modo recurrente: array de horas
+    jQuery('.edit-day-checkbox:checked').each(function () {
+        const dia = jQuery(this).val();
+        const modo = jQuery(`input[name="modo_${dia}"]:checked`).val() || 'recurrente';
+
+        modos_data[dia] = modo;
+
+        if (modo === 'recurrente') {
+            const horas = [];
+            jQuery(`#edit-hours-${dia} .hours-list input[type="time"]`).each(function () {
+                if (jQuery(this).val()) {
+                    horas.push(jQuery(this).val());
+                }
+            });
+
+            if (horas.length > 0) {
+                horarios_data[dia] = horas;
+            }
+        } else if (modo === 'especifico') {
+            const fechasEspecificas = {};
+
+            jQuery(`#edit-hours-${dia} .specific-date-slot`).each(function () {
+                const fecha = jQuery(this).find('input[type="date"]').val();
                 const horas = [];
-                jQuery(`#edit-hours-${dia} .hours-list input[type="time"]`).each(function () {
+
+                jQuery(this).find('input[type="time"]').each(function () {
                     if (jQuery(this).val()) {
                         horas.push(jQuery(this).val());
                     }
                 });
 
-                if (horas.length > 0) {
-                    horarios_data[dia] = horas;
+                if (fecha && horas.length > 0) {
+                    fechasEspecificas[fecha] = horas;
                 }
-            } else if (modo === 'especifico') {
-                // ✅ Modo específico: objeto { fecha: [horas] }
-                const fechasEspecificas = {};
+            });
 
-                jQuery(`#edit-hours-${dia} .specific-date-slot`).each(function () {
-                    const fecha = jQuery(this).find('input[type="date"]').val();
-                    const horas = [];
+            if (Object.keys(fechasEspecificas).length > 0) {
+                horarios_data[dia] = fechasEspecificas;
+            }
+        }
+    });
 
-                    jQuery(this).find('input[type="time"]').each(function () {
-                        if (jQuery(this).val()) {
-                            horas.push(jQuery(this).val());
-                        }
-                    });
+    // ✅ VALIDACIÓN
+    const diasMarcados = jQuery('.edit-day-checkbox:checked').length;
 
-                    if (fecha && horas.length > 0) {
-                        fechasEspecificas[fecha] = horas;
+    if (diasMarcados > 0 && Object.keys(horarios_data).length === 0) {
+        alert('Error: Debes configurar horarios para los días seleccionados');
+        return;
+    }
+
+    // ✅ SOLO AÑADIR SI HAY HORARIOS CONFIGURADOS
+    if (Object.keys(horarios_data).length > 0) {
+        console.log('📋 Horarios recopilados:', horarios_data);
+        console.log('📋 Modos recopilados:', modos_data);
+
+        serviceFormData.append('horarios_disponibles', JSON.stringify(horarios_data));
+        serviceFormData.append('modo_disponibilidad', JSON.stringify(modos_data));
+
+        // ✅ RECOPILAR FECHAS EXCLUIDAS (solo para modo recurrente)
+        const fechasExcluidas = {};
+
+        jQuery('.edit-day-checkbox:checked').each(function () {
+            const dia = jQuery(this).val();
+            const modo = modos_data[dia];
+
+            if (modo === 'recurrente') {
+                const fechas = [];
+                jQuery(`#edit-hours-${dia} .excluded-dates-list input[type="date"]`).each(function () {
+                    if (jQuery(this).val()) {
+                        fechas.push(jQuery(this).val());
                     }
                 });
 
-                if (Object.keys(fechasEspecificas).length > 0) {
-                    horarios_data[dia] = fechasEspecificas;
+                if (fechas.length > 0) {
+                    fechasExcluidas[dia] = fechas;
                 }
             }
         });
 
-        // ✅ VALIDACIÓN MEJORADA
-        const diasMarcados = jQuery('.edit-day-checkbox:checked').length;
+        if (Object.keys(fechasExcluidas).length > 0) {
+            serviceFormData.append('fechas_excluidas', JSON.stringify(fechasExcluidas));
+        }
 
-        if (diasMarcados > 0 && Object.keys(horarios_data).length === 0) {
-            alert('Error: Debes configurar horarios para los días seleccionados');
+        // ✅ RECOPILAR IDIOMAS
+        const idiomas_data = {};
+
+        jQuery('.edit-day-checkbox:checked').each(function () {
+            const dia = jQuery(this).val();
+            const idiomas = [];
+
+            jQuery(`#edit-hours-${dia} .idiomas-checkboxes input[type="checkbox"]:checked`).each(function () {
+                let idioma = jQuery(this).val();
+                if (idioma === 'español') {
+                    idioma = 'espanol';
+                }
+                idiomas.push(idioma);
+            });
+
+            if (idiomas.length > 0) {
+                idiomas_data[dia] = idiomas;
+            }
+        });
+
+        if (Object.keys(idiomas_data).length === 0) {
+            alert('Error: Debes seleccionar al menos un idioma para cada día activo');
             return;
         }
 
-        // ✅ SOLO AÑADIR SI HAY HORARIOS CONFIGURADOS
-        if (Object.keys(horarios_data).length > 0) {
-            console.log('📋 Horarios recopilados:', horarios_data);
-            console.log('📋 Modos recopilados:', modos_data);
+        serviceFormData.append('idiomas_disponibles', JSON.stringify(idiomas_data));
 
-            serviceFormData.append('horarios_disponibles', JSON.stringify(horarios_data));
-            serviceFormData.append('modo_disponibilidad', JSON.stringify(modos_data));
+        // ✅ VALIDAR Y AÑADIR PRECIOS
+        const precioAdulto = parseFloat(jQuery('#edit_precio_adulto_servicio').val());
+        if (!precioAdulto || precioAdulto <= 0) {
+            alert('Error: El precio de adulto debe ser mayor a 0');
+            return;
+        }
 
-            // ✅ RECOPILAR FECHAS EXCLUIDAS (solo para modo recurrente)
-            const fechasExcluidas = {};
+        serviceFormData.append('precio_adulto', precioAdulto);
+        serviceFormData.append('precio_nino', jQuery('#edit_precio_nino_servicio').val());
+        serviceFormData.append('precio_nino_menor', jQuery('#edit_precio_nino_menor_servicio').val());
+        serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val());
+        serviceFormData.append('titulo', jQuery('#edit_titulo_servicio').val());
+        serviceFormData.append('orden_prioridad', jQuery('#edit_orden_prioridad').val());
 
-            jQuery('.edit-day-checkbox:checked').each(function () {
-                const dia = jQuery(this).val();
-                const modo = modos_data[dia];
+        // ✅ AÑADIR ARCHIVOS
+        const logoInput = document.getElementById('edit_logo_image');
+        const portadaInput = document.getElementById('edit_portada_image');
 
-                if (modo === 'recurrente') {
-                    // Solo recopilar fechas excluidas en modo recurrente
-                    const fechas = [];
-                    jQuery(`#edit-hours-${dia} .excluded-dates-list input[type="date"]`).each(function () {
-                        if (jQuery(this).val()) {
-                            fechas.push(jQuery(this).val());
-                        }
-                    });
+        if (logoInput && logoInput.files && logoInput.files.length > 0) {
+            const logoFile = logoInput.files[0];
+            console.log('✅ Logo nuevo detectado:', logoFile.name, logoFile.size, 'bytes');
+            serviceFormData.append('logo_image', logoFile);
+        }
 
-                    if (fechas.length > 0) {
-                        fechasExcluidas[dia] = fechas;
-                    }
-                }
-            });
-
-            if (Object.keys(fechasExcluidas).length > 0) {
-                serviceFormData.append('fechas_excluidas', JSON.stringify(fechasExcluidas));
-            }
-
-            // ✅ RECOPILAR IDIOMAS
-            const idiomas_data = {};
-
-            jQuery('.edit-day-checkbox:checked').each(function () {
-                const dia = jQuery(this).val();
-                const idiomas = [];
-
-                jQuery(`#edit-hours-${dia} .idiomas-checkboxes input[type="checkbox"]:checked`).each(function () {
-                    let idioma = jQuery(this).val();
-                    if (idioma === 'español') {
-                        idioma = 'espanol';
-                    }
-                    idiomas.push(idioma);
-                });
-
-                if (idiomas.length > 0) {
-                    idiomas_data[dia] = idiomas;
-                }
-            });
-
-            if (Object.keys(idiomas_data).length === 0) {
-                alert('Error: Debes seleccionar al menos un idioma para cada día activo');
-                return;
-            }
-
-            serviceFormData.append('idiomas_disponibles', JSON.stringify(idiomas_data));
-
-            // ✅ VALIDAR Y AÑADIR PRECIOS
-            const precioAdulto = parseFloat(jQuery('#edit_precio_adulto_servicio').val());
-            if (!precioAdulto || precioAdulto <= 0) {
-                alert('Error: El precio de adulto debe ser mayor a 0');
-                return;
-            }
-
-            serviceFormData.append('precio_adulto', precioAdulto);
-            serviceFormData.append('precio_nino', jQuery('#edit_precio_nino_servicio').val());
-            serviceFormData.append('precio_nino_menor', jQuery('#edit_precio_nino_menor_servicio').val());
-            serviceFormData.append('descripcion', jQuery('#edit_descripcion_servicio').val());
-            serviceFormData.append('titulo', jQuery('#edit_titulo_servicio').val());
-            serviceFormData.append('orden_prioridad', jQuery('#edit_orden_prioridad').val());
-
-            // ✅ CRÍTICO: Verificar y añadir archivos CORRECTAMENTE
-            const logoInput = document.getElementById('edit_logo_image');
-            const portadaInput = document.getElementById('edit_portada_image');
-
-            if (logoInput && logoInput.files && logoInput.files.length > 0) {
-                const logoFile = logoInput.files[0];
-                console.log('✅ Logo nuevo detectado:', logoFile.name, logoFile.size, 'bytes');
-                serviceFormData.append('logo_image', logoFile);
-            } else {
-                console.log('ℹ️ No hay logo nuevo');
-            }
-
-            if (portadaInput && portadaInput.files && portadaInput.files.length > 0) {
-                const portadaFile = portadaInput.files[0];
-                console.log('✅ Portada nueva detectada:', portadaFile.name, portadaFile.size, 'bytes');
-                serviceFormData.append('portada_image', portadaFile);
-            } else {
-                console.log('ℹ️ No hay portada nueva');
-            }
-        } else {
-            console.log('ℹ️ Servicio activo pero sin días configurados - guardando como desactivado');
+        if (portadaInput && portadaInput.files && portadaInput.files.length > 0) {
+            const portadaFile = portadaInput.files[0];
+            console.log('✅ Portada nueva detectada:', portadaFile.name, portadaFile.size, 'bytes');
+            serviceFormData.append('portada_image', portadaFile);
         }
     }
 
-    // Debug: Ver qué se va a enviar
+    // Debug
     console.log('📋 Datos del servicio a enviar:');
     for (let pair of serviceFormData.entries()) {
         if (pair[1] instanceof File) {
@@ -7634,13 +7659,13 @@ function saveAgencyServiceOnEdit(agencyId) {
         }
     }
 
-    // ✅ ENVIAR CON AJAX CONFIGURADO PARA ARCHIVOS
+    // ✅ ENVIAR
     jQuery.ajax({
         url: reservasAjax.ajax_url,
         type: 'POST',
         data: serviceFormData,
-        processData: false,  // ✅ CRÍTICO
-        contentType: false,  // ✅ CRÍTICO
+        processData: false,
+        contentType: false,
         success: function (response) {
             console.log('✅ Respuesta del servidor:', response);
 
@@ -7654,8 +7679,6 @@ function saveAgencyServiceOnEdit(agencyId) {
         },
         error: function (xhr, status, error) {
             console.error('❌ Error guardando servicio:', error);
-            console.error('Status:', status);
-            console.error('Response:', xhr.responseText);
             alert('❌ Error de conexión al guardar servicio');
             closeEditAgencyModal();
             loadAgenciesSection();
