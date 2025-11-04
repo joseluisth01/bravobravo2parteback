@@ -458,6 +458,9 @@ jQuery(document).ready(function ($) {
     function updatePricingDisplay(result) {
         console.log('Datos recibidos del servidor:', result);
 
+        // ✅ GUARDAR CÁLCULO COMPLETO GLOBALMENTE
+        window.lastPriceCalculation = result;
+
         // Calcular descuento total para mostrar
         const descuentoTotal = (result.descuento_grupo || 0) + (result.descuento_servicio || 0);
 
@@ -518,7 +521,7 @@ jQuery(document).ready(function ($) {
         window.lastDiscountRule = result.regla_descuento_aplicada;
 
         // Actualizar precio total
-        const totalPrice = parseFloat(result.total) || 0;
+        const totalPrice = parseFloat(result.precio_final) || 0;
         $('#total-price').text(totalPrice.toFixed(2) + '€');
 
         console.log('Precios actualizados:', {
@@ -654,7 +657,7 @@ jQuery(document).ready(function ($) {
     };
 
     window.proceedToDetails = function () {
-        console.log('=== INICIANDO proceedToDetails SIN REDSYS (MODO DESARROLLO) ===');
+        console.log('=== INICIANDO proceedToDetails CON REDSYS ===');
 
         if (!selectedDate || !selectedServiceId) {
             alert('Error: No hay fecha o servicio seleccionado');
@@ -672,17 +675,11 @@ jQuery(document).ready(function ($) {
         const ninos_5_12 = parseInt($('#ninos-5-12').val()) || 0;
         const ninos_menores = parseInt($('#ninos-menores').val()) || 0;
 
-        // ❌ ELIMINAR ESTA LÍNEA - NO CONFIAR EN EL PRECIO DEL FRONTEND
-        // let totalPrice = '0';
-        // try {
-        //     const totalPriceElement = $('#total-price');
-        //     if (totalPriceElement.length > 0) {
-        //         const totalPriceText = totalPriceElement.text();
-        //         totalPrice = totalPriceText.replace('€', '').trim();
-        //     }
-        // } catch (error) {
-        //     console.error('Error obteniendo precio total:', error);
-        // }
+        // ✅ OBTENER DATOS DEL CÁLCULO SEGURO
+        if (!window.lastPriceCalculation || !window.lastPriceCalculation.firma) {
+            alert('Error: Precio no validado. Por favor, recarga la página.');
+            return;
+        }
 
         const reservationData = {
             fecha: selectedDate,
@@ -696,10 +693,8 @@ jQuery(document).ready(function ($) {
             precio_adulto: service.precio_adulto,
             precio_nino: service.precio_nino,
             precio_residente: service.precio_residente,
-            // ❌ ELIMINAR: total_price: totalPrice,
-            // ❌ ELIMINAR: descuento_grupo: $('#total-discount').text().includes('€') ?
-            //     parseFloat($('#total-discount').text().replace('€', '').replace('-', '')) : 0,
-            // ✅ SOLO ENVIAR INFORMACIÓN PARA RECALCULAR
+            // ✅ INCLUIR CÁLCULO COMPLETO CON FIRMA
+            calculo_completo: window.lastPriceCalculation,
             regla_descuento_aplicada: window.lastDiscountRule || null
         };
 
@@ -742,7 +737,7 @@ jQuery(document).ready(function ($) {
 });
 
 function processReservation() {
-    console.log("=== PROCESANDO RESERVA SIN TPV (MODO DESARROLLO) ===");
+    console.log("=== PROCESANDO RESERVA CON REDSYS ===");
 
     // Verificar checkbox de privacidad
     const checkbox = document.getElementById("privacy-policy");
@@ -796,20 +791,26 @@ function processReservation() {
         return;
     }
 
+    // ✅ VERIFICAR FIRMA DIGITAL
+    if (!reservationData.calculo_completo || !reservationData.calculo_completo.firma) {
+        alert("Error: Precio no validado. Por favor, vuelve al paso anterior.");
+        return;
+    }
+
     // ✅ AÑADIR DATOS PERSONALES A LA RESERVA
     reservationData.nombre = nombre;
     reservationData.apellidos = apellidos;
     reservationData.email = email;
     reservationData.telefono = telefono;
 
-    console.log("Datos completos para procesamiento directo:", reservationData);
+    console.log("Datos completos para Redsys:", reservationData);
 
     // Deshabilitar botón y mostrar estado de carga
     const processBtn = document.querySelector(".process-btn");
     if (processBtn) {
         const originalText = processBtn.textContent;
         processBtn.disabled = true;
-        processBtn.textContent = "Procesando reserva...";
+        processBtn.textContent = "Procesando...";
 
         // Función para rehabilitar botón
         window.enableProcessButton = function () {
@@ -818,20 +819,16 @@ function processReservation() {
         };
     }
 
-    // ✅ PROCESAR DIRECTAMENTE SIN REDSYS
+    // ✅ GENERAR FORMULARIO DE REDSYS
     const requestData = {
-        action: "process_reservation",
+        action: "generar_formulario_pago_redsys",
         nonce: reservasAjax.nonce,
-        nombre: nombre,
-        apellidos: apellidos,
-        email: email,
-        telefono: telefono,
         reservation_data: JSON.stringify(reservationData)
     };
 
-    console.log("Enviando datos para procesamiento directo:", requestData);
+    console.log("Enviando datos a Redsys:", requestData);
 
-    // Enviar solicitud AJAX para procesar reserva
+    // Enviar solicitud AJAX para generar formulario Redsys
     fetch(reservasAjax.ajax_url, {
         method: "POST",
         headers: {
@@ -855,19 +852,14 @@ function processReservation() {
             if (window.enableProcessButton) window.enableProcessButton();
 
             if (data && data.success) {
-                console.log("✅ Reserva procesada correctamente");
-
-                // ✅ REDIRIGIR A PÁGINA DE CONFIRMACIÓN
-                if (data.data.redirect_url) {
-                    console.log("Redirigiendo a:", data.data.redirect_url);
-                    window.location.href = data.data.redirect_url;
-                } else {
-                    console.log("Redirigiendo con localizador:", data.data.localizador);
-                    window.location.href = '/confirmacion-reserva/?localizador=' + data.data.localizador;
-                }
+                console.log("✅ Formulario Redsys generado correctamente");
+                
+                // ✅ INSERTAR Y EJECUTAR FORMULARIO REDSYS
+                document.body.insertAdjacentHTML('beforeend', data.data);
+                console.log("✅ Formulario insertado en el DOM");
             } else {
-                console.error("❌ Error procesando reserva:", data);
-                const errorMsg = data && data.data ? data.data : "Error procesando la reserva";
+                console.error("❌ Error generando formulario Redsys:", data);
+                const errorMsg = data && data.data ? data.data : "Error generando el formulario de pago";
                 alert("Error: " + errorMsg);
             }
         })

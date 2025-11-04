@@ -226,18 +226,26 @@ class ReservasFrontend
 
         $firma = hash_hmac('sha256', json_encode($firma_data), wp_salt('nonce'));
 
-        // ✅ PREPARAR RESPUESTA CON FIRMA
         $response_data = array(
-            'precio_base' => round($precio_base, 2),
-            'descuento_residentes' => round($descuento_residentes, 2),
-            'descuento_ninos' => round($descuento_ninos, 2),
-            'descuento_grupo' => round($descuento_final_grupo, 2),
-            'descuento_servicio' => round($descuento_final_servicio, 2),
-            'precio_final' => round($precio_final, 2),
-            'regla_descuento_aplicada' => $regla_final_aplicada,
-            'firma' => $firma,
-            'firma_data' => $firma_data
-        );
+    'precio_base' => round($precio_base, 2),
+    'descuento_residentes' => round($descuento_residentes, 2),
+    'descuento_ninos' => round($descuento_ninos, 2),
+    'descuento_grupo' => round($descuento_final_grupo, 2),
+    'descuento_servicio' => round($descuento_final_servicio, 2),
+    'precio_final' => round($precio_final, 2),
+    'regla_descuento_aplicada' => $regla_final_aplicada,
+    'servicio_con_descuento' => array(
+        'tiene_descuento' => $servicio->tiene_descuento,
+        'porcentaje_descuento' => $servicio->porcentaje_descuento,
+        'descuento_tipo' => $servicio->descuento_tipo ?? 'fijo',
+        'descuento_minimo_personas' => $servicio->descuento_minimo_personas ?? 1,
+        'descuento_acumulable' => $servicio->descuento_acumulable ?? 0,
+        'descuento_prioridad' => $servicio->descuento_prioridad ?? 'servicio',
+        'descuento_aplicado' => $aplicar_descuento_servicio
+    ),
+    'firma' => $firma,
+    'firma_data' => $firma_data
+);
 
         wp_send_json_success($response_data);
     }
