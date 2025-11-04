@@ -1519,8 +1519,7 @@ body {
     display: flex;
     gap: 20px;
     align-items: end;
-    margin-bottom: 30px;
-    padding: 20px;
+    padding: 10px 12PX;
     background: #f8f9fa;
     border-radius: 6px;
     border: 1px solid #dee2e6;

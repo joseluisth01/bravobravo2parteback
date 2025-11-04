@@ -2107,6 +2107,19 @@ function loadReportsSection() {
                                     <option value="fecha_servicio">Fecha de Servicio</option>
                                 </select>
                                 <input type="text" id="search-value" placeholder="Introduce el valor a buscar...">
+                                
+                                <!-- ✅ NUEVO FILTRO DE FECHAS OPCIONAL -->
+                                <div class="date-filters">
+                                    <label>
+                                        <input type="checkbox" id="enable-date-filter">
+                                        Filtrar también por rango de fechas
+                                    </label>
+                                    <div id="search-date-inputs" style="display: none;">
+                                        <input type="date" id="search-fecha-inicio" placeholder="Desde">
+                                        <input type="date" id="search-fecha-fin" placeholder="Hasta">
+                                    </div>
+                                </div>
+                                
                                 <button class="btn-primary" onclick="searchReservations()">🔍 Buscar</button>
                             </div>
                         </div>
@@ -3185,6 +3198,18 @@ function initReportsEvents() {
         }
     });
 
+    document.getElementById('enable-date-filter').addEventListener('change', function() {
+    const dateInputs = document.getElementById('search-date-inputs');
+    if (this.checked) {
+        dateInputs.style.display = 'flex';
+    } else {
+        dateInputs.style.display = 'none';
+        // Limpiar campos al desactivar
+        document.getElementById('search-fecha-inicio').value = '';
+        document.getElementById('search-fecha-fin').value = '';
+    }
+});
+
     const pdfButton = document.getElementById('download-pdf-report');
     if (pdfButton) {
         pdfButton.addEventListener('click', function () {
@@ -3528,6 +3553,17 @@ function searchReservations() {
         return;
     }
 
+    // ✅ OBTENER DATOS DEL FILTRO DE FECHAS
+    const enableDateFilter = document.getElementById('enable-date-filter').checked;
+    const fechaInicio = document.getElementById('search-fecha-inicio').value;
+    const fechaFin = document.getElementById('search-fecha-fin').value;
+
+    // ✅ VALIDAR SI SE ACTIVÓ EL FILTRO DE FECHAS
+    if (enableDateFilter && (!fechaInicio || !fechaFin)) {
+        alert('Si activas el filtro de fechas, debes seleccionar ambas fechas');
+        return;
+    }
+
     document.getElementById('search-results').innerHTML = '<div class="loading">Buscando reservas...</div>';
 
     const formData = new FormData();
@@ -3535,6 +3571,15 @@ function searchReservations() {
     formData.append('search_type', searchType);
     formData.append('search_value', searchValue);
     formData.append('nonce', reservasAjax.nonce);
+
+    // ✅ AÑADIR PARÁMETROS DE FECHA SI ESTÁ ACTIVADO
+    if (enableDateFilter) {
+        formData.append('enable_date_filter', '1');
+        formData.append('fecha_inicio', fechaInicio);
+        formData.append('fecha_fin', fechaFin);
+    } else {
+        formData.append('enable_date_filter', '0');
+    }
 
     fetch(reservasAjax.ajax_url, {
         method: 'POST',
@@ -3558,10 +3603,18 @@ function searchReservations() {
 
 
 function renderSearchResults(data) {
+        let filtrosTexto = `Búsqueda por <strong>${data.search_type}</strong>: "${data.search_value}"`;
+    
+    if (data.enable_date_filter && data.fecha_inicio && data.fecha_fin) {
+        const fechaInicioFormat = new Date(data.fecha_inicio).toLocaleDateString('es-ES');
+        const fechaFinFormat = new Date(data.fecha_fin).toLocaleDateString('es-ES');
+        filtrosTexto += ` | <strong>Rango de fechas:</strong> ${fechaInicioFormat} - ${fechaFinFormat}`;
+    }
+
     let resultsHtml = `
         <div class="search-header">
             <h4>Resultados de búsqueda: ${data.total_found} reservas encontradas</h4>
-            <p>Búsqueda por <strong>${data.search_type}</strong>: "${data.search_value}"</p>
+            <p>${filtrosTexto}</p>
         </div>
     `;
 

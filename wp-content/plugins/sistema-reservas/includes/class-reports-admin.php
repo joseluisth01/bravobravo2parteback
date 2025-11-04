@@ -1188,7 +1188,6 @@ public function search_reservations()
     $search_type = sanitize_text_field($_POST['search_type']);
     $search_value = sanitize_text_field($_POST['search_value']);
     
-    // ✅ PARÁMETROS DE FECHA OPCIONALES
     $enable_date_filter = isset($_POST['enable_date_filter']) && $_POST['enable_date_filter'] === '1';
     $fecha_inicio = sanitize_text_field($_POST['fecha_inicio'] ?? '');
     $fecha_fin = sanitize_text_field($_POST['fecha_fin'] ?? '');
@@ -1229,12 +1228,16 @@ public function search_reservations()
             $search_params[] = '%' . $search_value . '%';
             break;
 
+        case 'localizador':
+            $where_conditions[] = "r.localizador LIKE %s";
+            $search_params[] = '%' . $search_value . '%';
+            break;
+
         default:
             wp_send_json_error('Tipo de búsqueda no válido');
             return;
     }
 
-    // ✅ AÑADIR FILTRO DE FECHAS ADICIONAL SI ESTÁ ACTIVADO
     if ($enable_date_filter && !empty($fecha_inicio) && !empty($fecha_fin)) {
         $where_conditions[] = "r.fecha BETWEEN %s AND %s";
         $search_params[] = $fecha_inicio;
